@@ -29,8 +29,6 @@
         private void InitializeComponent()
         {
             this.btnOpenFile = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.openLogFile = new System.Windows.Forms.OpenFileDialog();
             this.mapPanel = new System.Windows.Forms.Panel();
             this.tractionCirclePanel = new System.Windows.Forms.Panel();
@@ -59,37 +57,21 @@
             this.colSourceFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.txtCursorPos = new System.Windows.Forms.TextBox();
+            this.btnAutoAlign = new System.Windows.Forms.Button();
+            this.txtAutoAlignThreshold = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             this.SuspendLayout();
             // 
             // btnOpenFile
             // 
             this.btnOpenFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenFile.Location = new System.Drawing.Point(1070, 8);
+            this.btnOpenFile.Location = new System.Drawing.Point(904, 198);
             this.btnOpenFile.Name = "btnOpenFile";
-            this.btnOpenFile.Size = new System.Drawing.Size(33, 23);
+            this.btnOpenFile.Size = new System.Drawing.Size(198, 23);
             this.btnOpenFile.TabIndex = 0;
-            this.btnOpenFile.Text = "...";
+            this.btnOpenFile.Text = "Add Runs";
             this.btnOpenFile.UseVisualStyleBackColor = true;
             this.btnOpenFile.Click += new System.EventHandler(this.btnOpenFile_Click);
-            // 
-            // textBox1
-            // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(63, 10);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(1001, 20);
-            this.textBox1.TabIndex = 1;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 13);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(44, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Log File";
             // 
             // mapPanel
             // 
@@ -97,9 +79,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.mapPanel.BackColor = System.Drawing.Color.White;
             this.mapPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.mapPanel.Location = new System.Drawing.Point(795, 439);
+            this.mapPanel.Location = new System.Drawing.Point(795, 415);
             this.mapPanel.Name = "mapPanel";
-            this.mapPanel.Size = new System.Drawing.Size(314, 456);
+            this.mapPanel.Size = new System.Drawing.Size(314, 480);
             this.mapPanel.TabIndex = 4;
             this.mapPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.trackMap_Paint);
             this.mapPanel.Layout += new System.Windows.Forms.LayoutEventHandler(this.trackMap_Layout);
@@ -109,10 +91,11 @@
             // 
             // tractionCirclePanel
             // 
-            this.tractionCirclePanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.tractionCirclePanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tractionCirclePanel.BackColor = System.Drawing.Color.White;
             this.tractionCirclePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tractionCirclePanel.Location = new System.Drawing.Point(16, 222);
+            this.tractionCirclePanel.Location = new System.Drawing.Point(12, 198);
             this.tractionCirclePanel.Name = "tractionCirclePanel";
             this.tractionCirclePanel.Size = new System.Drawing.Size(209, 211);
             this.tractionCirclePanel.TabIndex = 5;
@@ -129,9 +112,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.stripChartPanel.BackColor = System.Drawing.Color.White;
             this.stripChartPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.stripChartPanel.Location = new System.Drawing.Point(12, 439);
+            this.stripChartPanel.Location = new System.Drawing.Point(12, 415);
             this.stripChartPanel.Name = "stripChartPanel";
-            this.stripChartPanel.Size = new System.Drawing.Size(777, 456);
+            this.stripChartPanel.Size = new System.Drawing.Size(777, 480);
             this.stripChartPanel.TabIndex = 6;
             this.stripChartPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.stripChart_Paint);
             this.stripChartPanel.Layout += new System.Windows.Forms.LayoutEventHandler(this.stripChartPanel_Layout);
@@ -143,7 +126,7 @@
             // txtRunInfo
             // 
             this.txtRunInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtRunInfo.Location = new System.Drawing.Point(240, 222);
+            this.txtRunInfo.Location = new System.Drawing.Point(227, 198);
             this.txtRunInfo.Multiline = true;
             this.txtRunInfo.Name = "txtRunInfo";
             this.txtRunInfo.ScrollBars = System.Windows.Forms.ScrollBars.Both;
@@ -156,7 +139,7 @@
             this.chkSpeed.AutoSize = true;
             this.chkSpeed.Checked = true;
             this.chkSpeed.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSpeed.Location = new System.Drawing.Point(1007, 344);
+            this.chkSpeed.Location = new System.Drawing.Point(998, 278);
             this.chkSpeed.Name = "chkSpeed";
             this.chkSpeed.Size = new System.Drawing.Size(57, 17);
             this.chkSpeed.TabIndex = 8;
@@ -168,7 +151,7 @@
             // 
             this.chkXAccel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkXAccel.AutoSize = true;
-            this.chkXAccel.Location = new System.Drawing.Point(1007, 367);
+            this.chkXAccel.Location = new System.Drawing.Point(998, 301);
             this.chkXAccel.Name = "chkXAccel";
             this.chkXAccel.Size = new System.Drawing.Size(95, 17);
             this.chkXAccel.TabIndex = 9;
@@ -180,7 +163,7 @@
             // 
             this.chkYAccel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkYAccel.AutoSize = true;
-            this.chkYAccel.Location = new System.Drawing.Point(1007, 390);
+            this.chkYAccel.Location = new System.Drawing.Point(998, 324);
             this.chkYAccel.Name = "chkYAccel";
             this.chkYAccel.Size = new System.Drawing.Size(95, 17);
             this.chkYAccel.TabIndex = 10;
@@ -192,7 +175,7 @@
             // 
             this.chkZAccel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkZAccel.AutoSize = true;
-            this.chkZAccel.Location = new System.Drawing.Point(1007, 413);
+            this.chkZAccel.Location = new System.Drawing.Point(998, 347);
             this.chkZAccel.Name = "chkZAccel";
             this.chkZAccel.Size = new System.Drawing.Size(95, 17);
             this.chkZAccel.TabIndex = 11;
@@ -204,7 +187,7 @@
             // 
             this.chkDist.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkDist.AutoSize = true;
-            this.chkDist.Location = new System.Drawing.Point(917, 367);
+            this.chkDist.Location = new System.Drawing.Point(908, 301);
             this.chkDist.Name = "chkDist";
             this.chkDist.Size = new System.Drawing.Size(68, 17);
             this.chkDist.TabIndex = 13;
@@ -218,7 +201,7 @@
             this.chkTime.AutoSize = true;
             this.chkTime.Checked = true;
             this.chkTime.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkTime.Location = new System.Drawing.Point(917, 344);
+            this.chkTime.Location = new System.Drawing.Point(908, 278);
             this.chkTime.Name = "chkTime";
             this.chkTime.Size = new System.Drawing.Size(49, 17);
             this.chkTime.TabIndex = 12;
@@ -230,7 +213,7 @@
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(918, 328);
+            this.label2.Location = new System.Drawing.Point(909, 262);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(63, 13);
             this.label2.TabIndex = 14;
@@ -240,7 +223,7 @@
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(1004, 328);
+            this.label3.Location = new System.Drawing.Point(995, 262);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(62, 13);
             this.label3.TabIndex = 15;
@@ -266,7 +249,7 @@
             this.colAccelZ,
             this.colSpeed,
             this.colSourceFile});
-            this.runDataGrid.Location = new System.Drawing.Point(12, 36);
+            this.runDataGrid.Location = new System.Drawing.Point(11, 12);
             this.runDataGrid.Name = "runDataGrid";
             this.runDataGrid.RowHeadersVisible = false;
             this.runDataGrid.Size = new System.Drawing.Size(1091, 180);
@@ -348,17 +331,40 @@
             // 
             // txtCursorPos
             // 
-            this.txtCursorPos.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.txtCursorPos.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtCursorPos.Location = new System.Drawing.Point(12, 901);
             this.txtCursorPos.Name = "txtCursorPos";
             this.txtCursorPos.Size = new System.Drawing.Size(1097, 20);
             this.txtCursorPos.TabIndex = 19;
+            // 
+            // btnAutoAlign
+            // 
+            this.btnAutoAlign.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAutoAlign.Location = new System.Drawing.Point(906, 227);
+            this.btnAutoAlign.Name = "btnAutoAlign";
+            this.btnAutoAlign.Size = new System.Drawing.Size(75, 23);
+            this.btnAutoAlign.TabIndex = 20;
+            this.btnAutoAlign.Text = "AutoAlign";
+            this.btnAutoAlign.UseVisualStyleBackColor = true;
+            this.btnAutoAlign.Click += new System.EventHandler(this.btnAutoAlign_Click);
+            // 
+            // txtAutoAlignThreshold
+            // 
+            this.txtAutoAlignThreshold.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtAutoAlignThreshold.Location = new System.Drawing.Point(987, 229);
+            this.txtAutoAlignThreshold.Name = "txtAutoAlignThreshold";
+            this.txtAutoAlignThreshold.Size = new System.Drawing.Size(100, 20);
+            this.txtAutoAlignThreshold.TabIndex = 21;
+            this.txtAutoAlignThreshold.Text = "0.10";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1115, 925);
+            this.Controls.Add(this.txtAutoAlignThreshold);
+            this.Controls.Add(this.btnAutoAlign);
             this.Controls.Add(this.txtCursorPos);
             this.Controls.Add(this.runDataGrid);
             this.Controls.Add(this.label3);
@@ -373,8 +379,6 @@
             this.Controls.Add(this.stripChartPanel);
             this.Controls.Add(this.tractionCirclePanel);
             this.Controls.Add(this.mapPanel);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.btnOpenFile);
             this.Name = "Form1";
             this.Text = "Team Yamura data logger viewer";
@@ -387,8 +391,6 @@
         #endregion
 
         private System.Windows.Forms.Button btnOpenFile;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.OpenFileDialog openLogFile;
         private System.Windows.Forms.Panel mapPanel;
         private System.Windows.Forms.Panel tractionCirclePanel;
@@ -417,6 +419,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colAccelZ;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSpeed;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSourceFile;
+        private System.Windows.Forms.Button btnAutoAlign;
+        private System.Windows.Forms.TextBox txtAutoAlignThreshold;
     }
 }
 

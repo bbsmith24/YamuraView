@@ -153,20 +153,28 @@ namespace YamuraLog
         }
         private void btnOpenFile_Click(object sender, EventArgs e)
         {
-            if(openLogFile.ShowDialog() != DialogResult.OK)
+            if (openLogFile.ShowDialog() != DialogResult.OK)
             {
                 return;
             }
-            textBox1.Text = openLogFile.FileName;
-            String tempLogFile = openLogFile.FileName.Replace(".txt", ".tmp");
+            ReadLogFile(openLogFile.FileName);
+
+            DrawMap();
+            DrawTraction();
+            DrawSpeed();
+        }
+
+        private void ReadLogFile(String fileName)
+        {
+            String tempLogFile = fileName.Replace(".txt", ".tmp");
             tempLogFile = tempLogFile.Replace(".TXT", ".TMP");
-            StreamReader readLog = new StreamReader(openLogFile.FileName, true);
+            StreamReader readLog = new StreamReader(fileName, true);
             StreamWriter writeLog = new StreamWriter(tempLogFile, false);
             String tmp_text = readLog.ReadToEnd();// readFile.ReadToEnd();
             StringBuilder gpx_text = new StringBuilder();
             foreach (char c in tmp_text)
             {
-                if((c != 0x01) && (c != 0x11) && (c != 0x0C))
+                if ((c != 0x01) && (c != 0x11) && (c != 0x0C))
                 {
                     writeLog.Write(c);
                     gpx_text.Append(c);
@@ -194,7 +202,7 @@ namespace YamuraLog
             while (!readTemp.EndOfStream)
             {
                 inputStr = readTemp.ReadLine();
-                if(inputStr.Length == 0)
+                if (inputStr.Length == 0)
                 {
                     continue;
                 }
@@ -208,7 +216,7 @@ namespace YamuraLog
                     runDisplay.Add(new RunDisplay_Data());
                     logRunsIdx = logEvents.Count - 1;
                     // set run file name in run data
-                    runData[logRunsIdx].fileName = textBox1.Text;
+                    runData[logRunsIdx].fileName = System.IO.Path.GetFileName(fileName);
                     // initialize run display color and offset
                     runDisplay[logRunsIdx].runColor = penColors[logRunsIdx % penColors.Count()];
                     runDisplay[logRunsIdx].stipchart_Offset[0] = 0.0F;
@@ -234,7 +242,7 @@ namespace YamuraLog
                 //36050376 0.41   0.00    0.94
                 // timestamp is always first
                 timestamp = (ulong)BitConverter.ToUInt32(BitConverter.GetBytes(Convert.ToInt32(splitStr[0])), 0);
-                if(logEvents[logRunsIdx].Count == 0)
+                if (logEvents[logRunsIdx].Count == 0)
                 {
                     timestampOffset = timestamp;
                 }
@@ -242,7 +250,7 @@ namespace YamuraLog
                 timestampSeconds = Convert.ToSingle(timestamp) / 1000000.0F;
                 logEvents[logRunsIdx].Add(timestampSeconds, new DataBlock());
                 logRunDataIdx = logEvents[logRunsIdx].Count() - 1;
-                
+
                 // block timestamp converted from unsigned long microseconds to float seconds
                 logEvents[logRunsIdx][timestampSeconds].micros = timestampSeconds;
                 // gps only, gps+accelerometer - get gps portion
@@ -259,8 +267,8 @@ namespace YamuraLog
                     logEvents[logRunsIdx][timestampSeconds].gps.heading = Convert.ToSingle(splitStr[6]);
                     logEvents[logRunsIdx][timestampSeconds].gps.satellites = Convert.ToInt32(splitStr[7]);
                     logEvents[logRunsIdx][timestampSeconds].gps.isValid = true;
-                    
-                    if(runData[logRunsIdx].dateStr.Length == 0)
+
+                    if (runData[logRunsIdx].dateStr.Length == 0)
                     {
                         runData[logRunsIdx].dateStr = splitStr[1];
                         runData[logRunsIdx].timeStr = splitStr[2];
@@ -283,7 +291,7 @@ namespace YamuraLog
                     logEvents[logRunsIdx][timestampSeconds].accel.zAccel = gZ;
                     logEvents[logRunsIdx][timestampSeconds].accel.isValid = true;
                 }
-                if((!logEvents[logRunsIdx][timestampSeconds].accel.isValid) && (!logEvents[logRunsIdx][timestamp].gps.isValid))
+                if ((!logEvents[logRunsIdx][timestampSeconds].accel.isValid) && (!logEvents[logRunsIdx][timestampSeconds].gps.isValid))
                 {
                     logEvents[logRunsIdx].Remove(timestampSeconds);// .RemoveAt(logRunDataIdx);
                     continue;
@@ -292,6 +300,11 @@ namespace YamuraLog
                 runDisplay[logRunsIdx].UpdateDataRanges(timestampSeconds, logEvents[logRunsIdx][timestampSeconds].gps, logEvents[logRunsIdx][timestampSeconds].accel);
                 globalDisplay.UpdateDataRanges(timestampSeconds, logEvents[logRunsIdx][timestampSeconds].gps, logEvents[logRunsIdx][timestampSeconds].accel);
             }
+            // close and delete temp file
+            readTemp.Close();
+            System.IO.File.Delete(tempLogFile);
+
+
             for (int runIdx = 0; runIdx < runData.Count(); runIdx++)
             {
                 trackMapLastCursorPos.Add(new Point(0, 0));
@@ -299,7 +312,8 @@ namespace YamuraLog
                 tractionCircleLastCursorPos.Add(new Point(0, 0));
                 tractionCircleLastCursorPosValid.Add(false);
             }
-
+            // auto align launches
+            AutoAlign(0.10F);
 
             StringBuilder rangesStr = new StringBuilder();
             rangesStr.AppendFormat("Ranges{0}", System.Environment.NewLine);
@@ -326,11 +340,11 @@ namespace YamuraLog
             {
                 runDataGrid.Rows.Add();
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runIdx + 1).ToString();
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = true;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = runDisplay[runIdx].showRun;
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = runData[runIdx].dateStr + " " + runData[runIdx].timeStr;
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = runData[runIdx].minMaxTimestamp[0];
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = runData[runIdx].minMaxTimestamp[1];
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = 0;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = runDisplay[runIdx].stipchart_Offset[0];
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colAccelX"].Value = String.Format("{0} to {1}", runData[runIdx].minMaxAccel[0][0], runData[runIdx].minMaxAccel[0][1]);
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colAccelY"].Value = String.Format("{0} to {1}", runData[runIdx].minMaxAccel[1][0], runData[runIdx].minMaxAccel[1][1]);
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colAccelZ"].Value = String.Format("{0} to {1}", runData[runIdx].minMaxAccel[2][0], runData[runIdx].minMaxAccel[2][1]);
@@ -341,10 +355,59 @@ namespace YamuraLog
 
 
             txtRunInfo.Text = rangesStr.ToString();
-
-            DrawMap();
-            DrawTraction();
-            DrawSpeed();
+        }
+        /// <summary>
+        /// estimate launch point offset from speed data
+        /// find first speed > 30, walk back to first speed = 0
+        /// </summary>
+        private void AutoAlign(float launchThreshold)
+        {
+            int runCount = 0;
+            float baseLaunch = 0.0F;
+            int launchIdx = 0;
+            foreach (SortedList<float, DataBlock> curPath in logEvents)
+            {
+                if(runData[runCount].minMaxSpeed[1] < 20.0F)
+                {
+                    runDisplay[runCount].showRun = false;
+                    runCount++;
+                    continue;
+                }
+                foreach (KeyValuePair<float, DataBlock> curBlock in curPath)
+                {
+                    if (!curBlock.Value.gps.isValid)
+                    {
+                        continue;
+                    }
+                    if(curBlock.Value.gps.mph < 30.0F)
+                    {
+                        continue;
+                    }
+                    // found point after launch, walk back to speed 0
+                    launchIdx = curPath.IndexOfKey(curBlock.Value.micros);
+                    while(launchIdx >= 0)
+                    {
+                        // not valid gps, no speed - continue
+                        if(!curPath.ElementAt(launchIdx).Value.gps.isValid)
+                        {
+                            launchIdx--;
+                            continue;
+                        }
+                        // speed - 0 = this is last point prior to launch
+                        if(curPath.ElementAt(launchIdx).Value.gps.mph <= launchThreshold)
+                        {
+                            if(runCount == 0)
+                            {
+                                baseLaunch = curPath.ElementAt(launchIdx).Value.micros;
+                            }
+                            runDisplay[runCount].stipchart_Offset[0] = baseLaunch - curPath.ElementAt(launchIdx).Value.micros;
+                            break;
+                        }
+                        launchIdx--;
+                    }
+                }
+                runCount++;
+            }
         }
         public void DrawMap()
         {
@@ -1356,6 +1419,21 @@ namespace YamuraLog
             return rgb;
         }
         #endregion
+
+        private void btnAutoAlign_Click(object sender, EventArgs e)
+        {
+            float autoThreshold = 0.0F;
+            try
+            {
+                autoThreshold = Convert.ToSingle(txtAutoAlignThreshold.Text);
+            }
+            catch
+            {
+                MessageBox.Show("Can't convert auto align value " + txtAutoAlignThreshold.Text + " to a number");
+                return;
+            }
+            AutoAlign(autoThreshold);
+        }
     }
 
     public partial class GlobalDisplay_Data
@@ -1465,6 +1543,7 @@ namespace YamuraLog
                                        new float[] {float.MaxValue, float.MinValue}};
         public float[] minMaxTimestamp = new float[] { float.MaxValue, float.MinValue };
         public float[] minMaxSpeed = new float[] { float.MaxValue, float.MinValue };
+        public bool showRun = true;
         public void UpdateDataRanges(float timeStamp, GPS_Data gps, Accel_Data accel)
         {
             if (timeStamp < minMaxTimestamp[0])
