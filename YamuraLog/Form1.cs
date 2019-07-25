@@ -108,7 +108,7 @@ namespace YamuraLog
         #endregion
         #region scaling
         float stripChartScaleX = 0.0F;
-        List<float> stripChartScaleY = new List<float>();
+        Dictionary<String, float> stripChartScaleY = new Dictionary<String, float>();
         float stripChartScaleFactorX = 1.0F;
         float stripChartScaleFactorY = 1.0F;
         #endregion
@@ -226,7 +226,7 @@ namespace YamuraLog
                     // set run file name in run data
                     dataLogger.runData[logRunsIdx].fileName = System.IO.Path.GetFileName(fileName);
                     // add timestamp here, since it is always present
-                    dataLogger.runData[logRunsIdx].AddChannel("Timestamp", "Timestamp", "Internal", 1.0F);
+                    dataLogger.runData[logRunsIdx].AddChannel("Time", "Timestamp", "Internal", 1.0F);
                     // initialize run display color and offset
                     runDisplay[logRunsIdx].runColor = penColors[logRunsIdx % penColors.Count()];
                     runDisplay[logRunsIdx].stipchart_Offset[0] = 0.0F;
@@ -255,7 +255,7 @@ namespace YamuraLog
                 }
                 timestamp -= timestampOffset;
                 timestampSeconds = Convert.ToSingle(timestamp) / 1000000.0F;
-                dataLogger.runData[logRunsIdx].channels["Timestamp"].AddPoint(timestampSeconds, timestampSeconds);
+                dataLogger.runData[logRunsIdx].channels["Time"].AddPoint(timestampSeconds, timestampSeconds);
                 #endregion
                 #region GPS data
                 // gps+accel form - 11 fields
@@ -333,6 +333,11 @@ namespace YamuraLog
                     globalDisplay.channelRanges[curChannel.Key][1] = curChannel.Value.ChannelMax > globalDisplay.channelRanges[curChannel.Key][1] ? curChannel.Value.ChannelMax : globalDisplay.channelRanges[curChannel.Key][1];
                 }
             }
+            foreach(KeyValuePair<String, float[]> kvp in globalDisplay.channelRanges)
+            {
+                cmbXAxis.Items.Add(kvp.Key);
+            }
+            cmbXAxis.SelectedText = "Time";
             #endregion
 
             for (int runIdx = 0; runIdx < dataLogger.runData.Count(); runIdx++)
@@ -382,8 +387,8 @@ namespace YamuraLog
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runIdx + 1).ToString();
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = runDisplay[runIdx].showRun;
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = dataLogger.runData[runIdx].dateStr + " " + dataLogger.runData[runIdx].timeStr;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runIdx].channels["Timestamp"].ChannelMin;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runIdx].channels["Timestamp"].ChannelMax;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMin;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMax;
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = runDisplay[runIdx].stipchart_Offset[0];
                 //runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colAccelX"].Value = String.Format("{0} to {1}", dataLogger[runIdx].minMaxAccel[0][0], dataLogger[runIdx].minMaxAccel[0][1]);
                 //runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colAccelY"].Value = String.Format("{0} to {1}", dataLogger[runIdx].minMaxAccel[1][0], dataLogger[runIdx].minMaxAccel[1][1]);
@@ -1059,32 +1064,13 @@ namespace YamuraLog
             stripChartStartPosValid = false;
             stripChartLastCursorPosValid = false;
 
-            //if ((globalDisplay.minMaxSpeed[0] == float.MaxValue) &&
-            //    (globalDisplay.minMaxTimestamp[0] == ulong.MaxValue))
-            //{
-            //    return;
-            //}
-            //bool initialGPS = false;
-            //if ((stripChartScaleX == 0.0F) && (runDisplay.Count() > 0))
-            //{
-            //    stripChartScaleX = (float)stripChartPanelBounds.Width / (globalDisplay.minMaxTimestamp[1] - globalDisplay.minMaxTimestamp[0]) * stripChartScaleFactorX;
-            //}
-
-            //// scale for each possible trace (speed; X, Y, Z accel)
-            //stripChartScaleY.Clear();
-            //stripChartScaleY.Add((float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.minMaxSpeed[1] - globalDisplay.minMaxSpeed[0]));
-            //stripChartScaleY.Add((float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.minMaxAccel[0][1] - globalDisplay.minMaxAccel[0][0]));
-            //stripChartScaleY.Add((float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.minMaxAccel[1][1] - globalDisplay.minMaxAccel[1][0]));
-            //stripChartScaleY.Add((float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.minMaxAccel[2][1] - globalDisplay.minMaxAccel[2][0]));
-            //float[] minRangeY = new float[4] {  0.0F, 0.0F ,  0.0F, 0.0F};
-            //minRangeY[0] = globalDisplay.minMaxSpeed[0];
-            //minRangeY[1] = globalDisplay.minMaxAccel[0][0];
-            //minRangeY[2] = globalDisplay.minMaxAccel[1][0];
-            //minRangeY[3] = globalDisplay.minMaxAccel[2][0];
+            //// scale for each active trace
+            stripChartScaleY.Clear();
 
             //stripChartExtents[0] = -1.0F * stripChartOffset[0];
             //stripChartExtents[1] = ((float)stripChartPanel.Width / (stripChartScaleX * stripChartScaleFactorX)) - stripChartOffset[0];
-            if(globalDisplay.channelRanges.Count == 0)
+
+            if (globalDisplay.channelRanges.Count == 0)
             {
                 return;
             }
@@ -1100,7 +1086,7 @@ namespace YamuraLog
                 bool initialValue = false;
                 string channelName = "none";
                 int channelCount = 0;
-                float stripChartScaleX = ((float)(stripChartPanel.Width - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.channelRanges["Timestamp"][1] - globalDisplay.channelRanges["Timestamp"][0]));
+                float stripChartScaleX = ((float)(stripChartPanel.Width - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.channelRanges["Time"][1] - globalDisplay.channelRanges["Time"][0]));
 
                 for (int rowIdx = 0; rowIdx < channelDataGrid.Rows.Count; rowIdx++)
                 {
@@ -1108,6 +1094,8 @@ namespace YamuraLog
                     {
                         continue;
                     }
+                    channelName = channelDataGrid.Rows[rowIdx].Cells["channelName"].Value.ToString();
+                    stripChartScaleY.Add(channelName, (float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.channelRanges[channelName][1] - globalDisplay.channelRanges[channelName][0]));
                     channelCount++;
                 }
                 for (int rowIdx = 0; rowIdx < channelDataGrid.Rows.Count; rowIdx++)
@@ -1128,21 +1116,20 @@ namespace YamuraLog
                             continue;
                         }
                         drawPen = new Pen(runDisplay[runCount].runColor);
-                        float scaleY = ((float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(curRun.channels[channelName].ChannelMax - curRun.channels[channelName].ChannelMin));
-                        float minY = curRun.channels[channelName].ChannelMin;
+                        float minY = globalDisplay.channelRanges[channelName][0];// curRun.channels[channelName].ChannelMin;
                         initialValue = false;
                         foreach (KeyValuePair<float, DataPoint> curData in curRun.channels[channelName].DataPoints)
                         {
                             valueX = curData.Key;
                             valueY = curData.Value.PointValue;
-                            endPt.X = valueX - (float)globalDisplay.channelRanges["Timestamp"][0];
+                            endPt.X = valueX - (float)globalDisplay.channelRanges["Time"][0];
                             endPt.Y = valueY - minY/*minRangeY[0]*/;
 
                             endPt = globalDisplay.ScaleDataToDisplay(endPt,
                                                                        stripChartScaleX * stripChartScaleFactorX,
-                                                                       scaleY/*stripChartScaleY[0]*/ * stripChartScaleFactorY,
-                                                                       stripChartOffset[0] + runDisplay[runCount].stipchart_Offset[0],
-                                                                       stripChartOffset[1] + runDisplay[runCount].stipchart_Offset[1],
+                                                                       stripChartScaleY[channelName] * stripChartScaleFactorY,
+                                                                       stripChartOffset[0] + globalDisplay.channelRanges[channelName][0],
+                                                                       0.0F,//stripChartOffset[1] + globalDisplay.channelRanges[channelName][1],
                                                                        stripChartPanelBounds);
                             if (initialValue)
                             {
