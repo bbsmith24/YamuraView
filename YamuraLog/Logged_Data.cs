@@ -9,10 +9,9 @@ namespace YamuraLog
     /// <summary>
     /// run header - one per run, contains global data for run
     /// </summary>
-    class RunHeader_Data
+    class DataLogger
     {
         public float[] minMaxTimestamp = new float[] { float.MaxValue, float.MinValue };
-
         public float[]   minMaxLong = new float[] { float.MaxValue, float.MinValue };
         public float[]   minMaxLat = new float[] { float.MaxValue, float.MinValue };
         public float[] minMaxSpeed = new float[] { float.MaxValue, float.MinValue };
@@ -21,167 +20,192 @@ namespace YamuraLog
                                                       new float[] {float.MaxValue, float.MinValue},
                                                       new float[] {float.MaxValue, float.MinValue}};
 
+        public List<RunData> runData = new List<RunData>();
+        public Dictionary<String, float[]> channelRanges = new Dictionary<string, float[]>();
+        public void UpdateChannelRange(String channelName, float curVal)
+        {
+            channelRanges[channelName][0] = curVal < channelRanges[channelName][0] ? curVal : channelRanges[channelName][0];
+            channelRanges[channelName][1] = curVal > channelRanges[channelName][1] ? curVal : channelRanges[channelName][1];
+        }
+        //public void UpdateDataRanges(float timeStamp, GPS_Data gps, Accel_Data accel)
+        //{
+        //    if (timeStamp < minMaxTimestamp[0])
+        //    {
+        //        minMaxTimestamp[0] = timeStamp;
+        //    }
+        //    if (timeStamp > minMaxTimestamp[1])
+        //    {
+        //        minMaxTimestamp[1] = timeStamp;
+        //    }
+        //    if (gps.isValid)
+        //    {
+        //        if (gps.latVal < minMaxLat[0])
+        //        {
+        //            minMaxLat[0] = gps.latVal;
+        //        }
+        //        if (gps.latVal > minMaxLat[1])
+        //        {
+        //            minMaxLat[1] = gps.latVal;
+        //        }
+        //        //
+        //        if (gps.longVal < minMaxLong[0])
+        //        {
+        //            minMaxLong[0] = gps.longVal;
+        //        }
+        //        if (gps.longVal > minMaxLong[1])
+        //        {
+        //            minMaxLong[1] = gps.longVal;
+        //        }
+        //        //
+        //        if (gps.mph < minMaxSpeed[0])
+        //        {
+        //            minMaxSpeed[0] = gps.mph;
+        //        }
+        //        if (gps.mph > minMaxSpeed[1])
+        //        {
+        //            minMaxSpeed[1] = gps.mph;
+        //        }
+        //    }
+        //    if(accel.isValid)
+        //    {
+        //        if (accel.xAccel > minMaxAccel[0][1])
+        //        {
+        //            minMaxAccel[0][1] = accel.xAccel;
+        //        }
+        //        if (accel.xAccel < minMaxAccel[0][0])
+        //        {
+        //            minMaxAccel[0][0] = accel.xAccel;
+        //        }
+        //        //
+        //        if (accel.yAccel < minMaxAccel[1][0])
+        //        {
+        //            minMaxAccel[1][0] = accel.yAccel;
+        //        }
+        //        if (accel.yAccel > minMaxAccel[1][1])
+        //        {
+        //            minMaxAccel[1][1] = accel.yAccel;
+        //        }
+        //        //
+        //        if (accel.zAccel > minMaxAccel[2][1])
+        //        {
+        //            minMaxAccel[2][1] = accel.zAccel;
+        //        }
+        //        if (accel.zAccel < minMaxAccel[2][0])
+        //        {
+        //            minMaxAccel[2][0] = accel.zAccel;
+        //        }
+        //    }
+        //}
+    }
+    class RunData
+    {
+        public Dictionary<String, float[]> channelRanges = new Dictionary<string, float[]>();
+        public Dictionary<String, DataChannel> channels = new Dictionary<string, DataChannel>();
         public String dateStr = "";
         public String timeStr = "";
         public String fileName = "";
-        public DataEvents channels;
-        public void UpdateDataRanges(float timeStamp, GPS_Data gps, Accel_Data accel)
+        public float[] minMaxTimestamp = new float[] { float.MaxValue, float.MinValue };
+        public void AddChannel(String name, String desc, String src, float scl)
         {
-            if (timeStamp < minMaxTimestamp[0])
+            if(channels.ContainsKey(name))
             {
-                minMaxTimestamp[0] = timeStamp;
+                return;
             }
-            if (timeStamp > minMaxTimestamp[1])
-            {
-                minMaxTimestamp[1] = timeStamp;
-            }
-            if (gps.isValid)
-            {
-                if (gps.latVal < minMaxLat[0])
-                {
-                    minMaxLat[0] = gps.latVal;
-                }
-                if (gps.latVal > minMaxLat[1])
-                {
-                    minMaxLat[1] = gps.latVal;
-                }
-                //
-                if (gps.longVal < minMaxLong[0])
-                {
-                    minMaxLong[0] = gps.longVal;
-                }
-                if (gps.longVal > minMaxLong[1])
-                {
-                    minMaxLong[1] = gps.longVal;
-                }
-                //
-                if (gps.mph < minMaxSpeed[0])
-                {
-                    minMaxSpeed[0] = gps.mph;
-                }
-                if (gps.mph > minMaxSpeed[1])
-                {
-                    minMaxSpeed[1] = gps.mph;
-                }
-            }
-            if(accel.isValid)
-            {
-                if (accel.xAccel > minMaxAccel[0][1])
-                {
-                    minMaxAccel[0][1] = accel.xAccel;
-                }
-                if (accel.xAccel < minMaxAccel[0][0])
-                {
-                    minMaxAccel[0][0] = accel.xAccel;
-                }
-                //
-                if (accel.yAccel < minMaxAccel[1][0])
-                {
-                    minMaxAccel[1][0] = accel.yAccel;
-                }
-                if (accel.yAccel > minMaxAccel[1][1])
-                {
-                    minMaxAccel[1][1] = accel.yAccel;
-                }
-                //
-                if (accel.zAccel > minMaxAccel[2][1])
-                {
-                    minMaxAccel[2][1] = accel.zAccel;
-                }
-                if (accel.zAccel < minMaxAccel[2][0])
-                {
-                    minMaxAccel[2][0] = accel.zAccel;
-                }
-            }
+            channelRanges.Add(name, new float[2] { float.MaxValue, float.MinValue });
+            channels.Add(name, new DataChannel(name, desc, src, scl));
+        }
+        public void UpdateChannelRange(String channelName, float time,  float curVal)
+        {
+            channelRanges[channelName][0] = curVal < channelRanges[channelName][0] ? curVal : channelRanges[channelName][0];
+            channelRanges[channelName][1] = curVal > channelRanges[channelName][1] ? curVal : channelRanges[channelName][1];
+            channelRanges[channelName][0] = curVal < channelRanges[channelName][0] ? curVal : channelRanges[channelName][0];
+            channelRanges[channelName][1] = curVal > channelRanges[channelName][1] ? curVal : channelRanges[channelName][1];
+        }
+        public void AddChannelData(String channelName, float time, float value)
+        {
+            UpdateChannelRange(channelName, time, value);
+            channels[channelName].DataPoints.Add(time, new DataPoint(value));
         }
     }
-    /// <summary>
-    /// data block - contains sample data objects and microsecond timestamp
-    /// </summary>
-    class DataBlock
-    {
-        public float micros;
-        public GPS_Data gps = new GPS_Data();
-        public Accel_Data accel = new Accel_Data();
-    }
-    public class GPS_Data
-    {
-        public String dateStr;
-        public String timeStr;
-        public float latVal;
-        public float longVal;
-        public float mph;
-        public float heading;
-        public int satellites;
-        public bool isValid = false;
-        public GPS_Data()
-        {
-            dateStr = "";
-            timeStr = "";
-            latVal = 0.0F;
-            longVal = 0.0F;
-            mph = 0.0F;
-            heading = 0.0F;
-            satellites = 0;
-            isValid = false;
-        }
-        public GPS_Data(String date, String time, float lat, float longitude, float spd, float head, int sats, float x, float y, float z)
-        {
-            dateStr = date;
-            timeStr = time;
-            latVal = lat;
-            longVal = longitude;
-            mph = spd;
-            heading = head;
-            satellites = sats;
-            if ((latVal == 0.0) && (longVal == 0.0))
-            {
-                isValid = false;
-            }
-            else
-            {
-                isValid = true;
-            }
-        }
-    }
-    public class Accel_Data
-    {
-        public float xAccel;
-        public float yAccel;
-        public float zAccel;
-        public bool isValid = false;
-        public Accel_Data()
-        {
-            xAccel = 0.0F;
-            yAccel = 0.0F;
-            zAccel = 0.0F;
-            isValid = false;
-        }
-        public Accel_Data(float x, float y, float z)
-        {
-            xAccel = x;
-            yAccel = y;
-            zAccel = z;
-            if ((xAccel == 0.0) && (yAccel == 0.0) && (zAccel == 0.0))
-            {
-                isValid = false;
-            }
-            else
-            {
-                isValid = true;
-            }
+    ///// <summary>
+    ///// data block - contains sample data objects and microsecond timestamp
+    ///// </summary>
+    //class DataBlock
+    //{
+    //    public float micros;
+    //    public GPS_Data gps = new GPS_Data();
+    //    public Accel_Data accel = new Accel_Data();
+    //}
+    //public class GPS_Data
+    //{
+    //    public String dateStr;
+    //    public String timeStr;
+    //    public float latVal;
+    //    public float longVal;
+    //    public float mph;
+    //    public float heading;
+    //    public int satellites;
+    //    public bool isValid = false;
+    //    public GPS_Data()
+    //    {
+    //        dateStr = "";
+    //        timeStr = "";
+    //        latVal = 0.0F;
+    //        longVal = 0.0F;
+    //        mph = 0.0F;
+    //        heading = 0.0F;
+    //        satellites = 0;
+    //        isValid = false;
+    //    }
+    //    public GPS_Data(String date, String time, float lat, float longitude, float spd, float head, int sats, float x, float y, float z)
+    //    {
+    //        dateStr = date;
+    //        timeStr = time;
+    //        latVal = lat;
+    //        longVal = longitude;
+    //        mph = spd;
+    //        heading = head;
+    //        satellites = sats;
+    //        if ((latVal == 0.0) && (longVal == 0.0))
+    //        {
+    //            isValid = false;
+    //        }
+    //        else
+    //        {
+    //            isValid = true;
+    //        }
+    //    }
+    //}
+    //public class Accel_Data
+    //{
+    //    public float xAccel;
+    //    public float yAccel;
+    //    public float zAccel;
+    //    public bool isValid = false;
+    //    public Accel_Data()
+    //    {
+    //        xAccel = 0.0F;
+    //        yAccel = 0.0F;
+    //        zAccel = 0.0F;
+    //        isValid = false;
+    //    }
+    //    public Accel_Data(float x, float y, float z)
+    //    {
+    //        xAccel = x;
+    //        yAccel = y;
+    //        zAccel = z;
+    //        if ((xAccel == 0.0) && (yAccel == 0.0) && (zAccel == 0.0))
+    //        {
+    //            isValid = false;
+    //        }
+    //        else
+    //        {
+    //            isValid = true;
+    //        }
 
-        }
-    }
+    //    }
+    //}
     // single channel classes
-    public class DataEvents
-    {
-        public Dictionary<String, DataChannel> channelData = new Dictionary<String, DataChannel>();
-        public void AddChannel(String name, String desc, String src, float scale)
-        {
-            channelData.Add(name, new DataChannel(name, desc, src, scale));
-        }
-    }
     public class DataChannel
     {
         String channelName;

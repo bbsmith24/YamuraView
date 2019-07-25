@@ -28,18 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btnOpenFile = new System.Windows.Forms.Button();
             this.openLogFile = new System.Windows.Forms.OpenFileDialog();
             this.mapPanel = new System.Windows.Forms.Panel();
             this.tractionCirclePanel = new System.Windows.Forms.Panel();
             this.stripChartPanel = new System.Windows.Forms.Panel();
             this.txtRunInfo = new System.Windows.Forms.TextBox();
-            this.chkSpeed = new System.Windows.Forms.CheckBox();
-            this.chkXAccel = new System.Windows.Forms.CheckBox();
-            this.chkYAccel = new System.Windows.Forms.CheckBox();
-            this.chkZAccel = new System.Windows.Forms.CheckBox();
-            this.chkDist = new System.Windows.Forms.CheckBox();
-            this.chkTime = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.runDataGrid = new System.Windows.Forms.DataGridView();
@@ -59,15 +54,20 @@
             this.txtCursorPos = new System.Windows.Forms.TextBox();
             this.btnAutoAlign = new System.Windows.Forms.Button();
             this.txtAutoAlignThreshold = new System.Windows.Forms.TextBox();
+            this.channelDataGrid = new System.Windows.Forms.DataGridView();
+            this.displayChannel = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.channelName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cmbXAxis = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.channelDataGrid)).BeginInit();
             this.SuspendLayout();
             // 
             // btnOpenFile
             // 
             this.btnOpenFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenFile.Location = new System.Drawing.Point(904, 198);
+            this.btnOpenFile.Location = new System.Drawing.Point(866, 196);
             this.btnOpenFile.Name = "btnOpenFile";
-            this.btnOpenFile.Size = new System.Drawing.Size(198, 23);
+            this.btnOpenFile.Size = new System.Drawing.Size(91, 23);
             this.btnOpenFile.TabIndex = 0;
             this.btnOpenFile.Text = "Add Runs";
             this.btnOpenFile.UseVisualStyleBackColor = true;
@@ -130,104 +130,28 @@
             this.txtRunInfo.Multiline = true;
             this.txtRunInfo.Name = "txtRunInfo";
             this.txtRunInfo.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtRunInfo.Size = new System.Drawing.Size(671, 211);
+            this.txtRunInfo.Size = new System.Drawing.Size(336, 211);
             this.txtRunInfo.TabIndex = 7;
-            // 
-            // chkSpeed
-            // 
-            this.chkSpeed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkSpeed.AutoSize = true;
-            this.chkSpeed.Checked = true;
-            this.chkSpeed.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSpeed.Location = new System.Drawing.Point(998, 278);
-            this.chkSpeed.Name = "chkSpeed";
-            this.chkSpeed.Size = new System.Drawing.Size(57, 17);
-            this.chkSpeed.TabIndex = 8;
-            this.chkSpeed.Text = "Speed";
-            this.chkSpeed.UseVisualStyleBackColor = true;
-            this.chkSpeed.CheckedChanged += new System.EventHandler(this.chkSpeed_CheckedChanged);
-            // 
-            // chkXAccel
-            // 
-            this.chkXAccel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkXAccel.AutoSize = true;
-            this.chkXAccel.Location = new System.Drawing.Point(998, 301);
-            this.chkXAccel.Name = "chkXAccel";
-            this.chkXAccel.Size = new System.Drawing.Size(95, 17);
-            this.chkXAccel.TabIndex = 9;
-            this.chkXAccel.Text = "X Acceleration";
-            this.chkXAccel.UseVisualStyleBackColor = true;
-            this.chkXAccel.CheckedChanged += new System.EventHandler(this.chkXAccel_CheckedChanged);
-            // 
-            // chkYAccel
-            // 
-            this.chkYAccel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkYAccel.AutoSize = true;
-            this.chkYAccel.Location = new System.Drawing.Point(998, 324);
-            this.chkYAccel.Name = "chkYAccel";
-            this.chkYAccel.Size = new System.Drawing.Size(95, 17);
-            this.chkYAccel.TabIndex = 10;
-            this.chkYAccel.Text = "Y Acceleration";
-            this.chkYAccel.UseVisualStyleBackColor = true;
-            this.chkYAccel.CheckedChanged += new System.EventHandler(this.chkYAccel_CheckedChanged);
-            // 
-            // chkZAccel
-            // 
-            this.chkZAccel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkZAccel.AutoSize = true;
-            this.chkZAccel.Location = new System.Drawing.Point(998, 347);
-            this.chkZAccel.Name = "chkZAccel";
-            this.chkZAccel.Size = new System.Drawing.Size(95, 17);
-            this.chkZAccel.TabIndex = 11;
-            this.chkZAccel.Text = "Z Acceleration";
-            this.chkZAccel.UseVisualStyleBackColor = true;
-            this.chkZAccel.CheckedChanged += new System.EventHandler(this.chkZAccel_CheckedChanged);
-            // 
-            // chkDist
-            // 
-            this.chkDist.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkDist.AutoSize = true;
-            this.chkDist.Location = new System.Drawing.Point(908, 301);
-            this.chkDist.Name = "chkDist";
-            this.chkDist.Size = new System.Drawing.Size(68, 17);
-            this.chkDist.TabIndex = 13;
-            this.chkDist.Text = "Distance";
-            this.chkDist.UseVisualStyleBackColor = true;
-            this.chkDist.CheckedChanged += new System.EventHandler(this.chkDist_CheckedChanged);
-            // 
-            // chkTime
-            // 
-            this.chkTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkTime.AutoSize = true;
-            this.chkTime.Checked = true;
-            this.chkTime.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkTime.Location = new System.Drawing.Point(908, 278);
-            this.chkTime.Name = "chkTime";
-            this.chkTime.Size = new System.Drawing.Size(49, 17);
-            this.chkTime.TabIndex = 12;
-            this.chkTime.Text = "Time";
-            this.chkTime.UseVisualStyleBackColor = true;
-            this.chkTime.CheckedChanged += new System.EventHandler(this.chkTime_CheckedChanged);
             // 
             // label2
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(909, 262);
+            this.label2.Location = new System.Drawing.Point(569, 225);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(63, 13);
+            this.label2.Size = new System.Drawing.Size(111, 13);
             this.label2.TabIndex = 14;
-            this.label2.Text = "X Axis (one)";
+            this.label2.Text = "Stripchart X Axis (one)";
             // 
             // label3
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(995, 262);
+            this.label3.Location = new System.Drawing.Point(792, 225);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(62, 13);
+            this.label3.Size = new System.Drawing.Size(110, 13);
             this.label3.TabIndex = 15;
-            this.label3.Text = "Y Axis (any)";
+            this.label3.Text = "Stripchart Y Axis (any)";
             // 
             // runDataGrid
             // 
@@ -341,7 +265,7 @@
             // btnAutoAlign
             // 
             this.btnAutoAlign.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAutoAlign.Location = new System.Drawing.Point(906, 227);
+            this.btnAutoAlign.Location = new System.Drawing.Point(963, 197);
             this.btnAutoAlign.Name = "btnAutoAlign";
             this.btnAutoAlign.Size = new System.Drawing.Size(75, 23);
             this.btnAutoAlign.TabIndex = 20;
@@ -352,29 +276,60 @@
             // txtAutoAlignThreshold
             // 
             this.txtAutoAlignThreshold.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtAutoAlignThreshold.Location = new System.Drawing.Point(987, 229);
+            this.txtAutoAlignThreshold.Location = new System.Drawing.Point(1044, 199);
             this.txtAutoAlignThreshold.Name = "txtAutoAlignThreshold";
-            this.txtAutoAlignThreshold.Size = new System.Drawing.Size(100, 20);
+            this.txtAutoAlignThreshold.Size = new System.Drawing.Size(58, 20);
             this.txtAutoAlignThreshold.TabIndex = 21;
             this.txtAutoAlignThreshold.Text = "0.10";
+            // 
+            // channelDataGrid
+            // 
+            this.channelDataGrid.AllowUserToAddRows = false;
+            this.channelDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.channelDataGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.displayChannel,
+            this.channelName});
+            this.channelDataGrid.Location = new System.Drawing.Point(795, 241);
+            this.channelDataGrid.Name = "channelDataGrid";
+            this.channelDataGrid.RowHeadersVisible = false;
+            this.channelDataGrid.Size = new System.Drawing.Size(314, 168);
+            this.channelDataGrid.TabIndex = 22;
+            // 
+            // displayChannel
+            // 
+            this.displayChannel.HeaderText = "Show";
+            this.displayChannel.Name = "displayChannel";
+            this.displayChannel.Width = 50;
+            // 
+            // channelName
+            // 
+            this.channelName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
+            this.channelName.DefaultCellStyle = dataGridViewCellStyle1;
+            this.channelName.HeaderText = "Channel";
+            this.channelName.Name = "channelName";
+            // 
+            // cmbXAxis
+            // 
+            this.cmbXAxis.FormattingEnabled = true;
+            this.cmbXAxis.Location = new System.Drawing.Point(569, 241);
+            this.cmbXAxis.Name = "cmbXAxis";
+            this.cmbXAxis.Size = new System.Drawing.Size(220, 21);
+            this.cmbXAxis.TabIndex = 23;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1115, 925);
+            this.Controls.Add(this.cmbXAxis);
+            this.Controls.Add(this.channelDataGrid);
             this.Controls.Add(this.txtAutoAlignThreshold);
             this.Controls.Add(this.btnAutoAlign);
             this.Controls.Add(this.txtCursorPos);
             this.Controls.Add(this.runDataGrid);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.chkDist);
-            this.Controls.Add(this.chkTime);
-            this.Controls.Add(this.chkZAccel);
-            this.Controls.Add(this.chkYAccel);
-            this.Controls.Add(this.chkXAccel);
-            this.Controls.Add(this.chkSpeed);
             this.Controls.Add(this.txtRunInfo);
             this.Controls.Add(this.stripChartPanel);
             this.Controls.Add(this.tractionCirclePanel);
@@ -383,6 +338,7 @@
             this.Name = "Form1";
             this.Text = "Team Yamura data logger viewer";
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.channelDataGrid)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -396,12 +352,6 @@
         private System.Windows.Forms.Panel tractionCirclePanel;
         private System.Windows.Forms.Panel stripChartPanel;
         private System.Windows.Forms.TextBox txtRunInfo;
-        private System.Windows.Forms.CheckBox chkSpeed;
-        private System.Windows.Forms.CheckBox chkXAccel;
-        private System.Windows.Forms.CheckBox chkYAccel;
-        private System.Windows.Forms.CheckBox chkZAccel;
-        private System.Windows.Forms.CheckBox chkDist;
-        private System.Windows.Forms.CheckBox chkTime;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.DataGridView runDataGrid;
@@ -421,6 +371,10 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colSourceFile;
         private System.Windows.Forms.Button btnAutoAlign;
         private System.Windows.Forms.TextBox txtAutoAlignThreshold;
+        private System.Windows.Forms.DataGridView channelDataGrid;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn displayChannel;
+        private System.Windows.Forms.DataGridViewTextBoxColumn channelName;
+        private System.Windows.Forms.ComboBox cmbXAxis;
     }
 }
 
