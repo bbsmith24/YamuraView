@@ -47,6 +47,8 @@ namespace YamuraLog
         List<RunDisplay_Data> runDisplay = new List<RunDisplay_Data>();
         GlobalDisplay_Data globalDisplay = new GlobalDisplay_Data();
 
+        DataEvents channelData = new DataEvents();
+
         #region track map
         #region mouse move points
         Point trackMapStartPos = new Point(0, 0);
@@ -198,6 +200,7 @@ namespace YamuraLog
             ulong timestampOffset = 0;
             float timestampSeconds = 0.0F;
             float mph = 0;
+            float heading = 0;
             StringBuilder strRunsList = new StringBuilder();
             while (!readTemp.EndOfStream)
             {
@@ -217,6 +220,15 @@ namespace YamuraLog
                     logRunsIdx = logEvents.Count - 1;
                     // set run file name in run data
                     runData[logRunsIdx].fileName = System.IO.Path.GetFileName(fileName);
+                    runData[logRunsIdx].channels = new DataEvents();
+                    runData[logRunsIdx].channels.AddChannel("Latitude", "GPS Latitude", "GPS", 1.0F);
+                    runData[logRunsIdx].channels.AddChannel("Longitude", "GPS Longitude", "GPS", 1.0F);
+                    runData[logRunsIdx].channels.AddChannel("Speed-GPS", "GPS Speed", "GPS", 1.0F);
+                    runData[logRunsIdx].channels.AddChannel("Heading-GPS", "GPS Heading", "GPS", 1.0F);
+                    runData[logRunsIdx].channels.AddChannel("gX", "X Axis Acceleration", "Accelerometer", 1.0F);
+                    runData[logRunsIdx].channels.AddChannel("gY", "Y Axis Acceleration", "Accelerometer", 1.0F);
+                    runData[logRunsIdx].channels.AddChannel("gZ", "Z Axis Acceleration", "Accelerometer", 1.0F);
+
                     // initialize run display color and offset
                     runDisplay[logRunsIdx].runColor = penColors[logRunsIdx % penColors.Count()];
                     runDisplay[logRunsIdx].stipchart_Offset[0] = 0.0F;
@@ -259,12 +271,13 @@ namespace YamuraLog
                     latVal = Convert.ToSingle(splitStr[3]);
                     longVal = Convert.ToSingle(splitStr[4]);
                     mph = Convert.ToSingle(splitStr[5]);
+                    heading = Convert.ToSingle(splitStr[6]);
                     logEvents[logRunsIdx][timestampSeconds].gps.dateStr = splitStr[1];
                     logEvents[logRunsIdx][timestampSeconds].gps.timeStr = splitStr[2];
                     logEvents[logRunsIdx][timestampSeconds].gps.latVal = latVal;
                     logEvents[logRunsIdx][timestampSeconds].gps.longVal = longVal;
                     logEvents[logRunsIdx][timestampSeconds].gps.mph = mph;
-                    logEvents[logRunsIdx][timestampSeconds].gps.heading = Convert.ToSingle(splitStr[6]);
+                    logEvents[logRunsIdx][timestampSeconds].gps.heading = heading;
                     logEvents[logRunsIdx][timestampSeconds].gps.satellites = Convert.ToInt32(splitStr[7]);
                     logEvents[logRunsIdx][timestampSeconds].gps.isValid = true;
 
@@ -273,6 +286,10 @@ namespace YamuraLog
                         runData[logRunsIdx].dateStr = splitStr[1];
                         runData[logRunsIdx].timeStr = splitStr[2];
                     }
+                    runData[logRunsIdx].channels.channelData["Latitude"].AddPoint(timestampSeconds, latVal);
+                    runData[logRunsIdx].channels.channelData["Longitude"].AddPoint(timestampSeconds, latVal);
+                    runData[logRunsIdx].channels.channelData["Speed-GPS"].AddPoint(timestampSeconds, mph);
+                    runData[logRunsIdx].channels.channelData["Heading-GPS"].AddPoint(timestampSeconds, heading);
                 }
                 // accelerometer only, or gps+accelerometer - get accelerometer portion
                 if ((splitStr.Count() == 4) || (splitStr.Count() == 11))
@@ -290,6 +307,9 @@ namespace YamuraLog
                     logEvents[logRunsIdx][timestampSeconds].accel.yAccel = gY;
                     logEvents[logRunsIdx][timestampSeconds].accel.zAccel = gZ;
                     logEvents[logRunsIdx][timestampSeconds].accel.isValid = true;
+                    runData[logRunsIdx].channels.channelData["gX"].AddPoint(timestampSeconds, gX);
+                    runData[logRunsIdx].channels.channelData["gY"].AddPoint(timestampSeconds, gY);
+                    runData[logRunsIdx].channels.channelData["gZ"].AddPoint(timestampSeconds, gZ);
                 }
                 if ((!logEvents[logRunsIdx][timestampSeconds].accel.isValid) && (!logEvents[logRunsIdx][timestampSeconds].gps.isValid))
                 {

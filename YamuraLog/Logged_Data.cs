@@ -24,6 +24,7 @@ namespace YamuraLog
         public String dateStr = "";
         public String timeStr = "";
         public String fileName = "";
+        public DataEvents channels;
         public void UpdateDataRanges(float timeStamp, GPS_Data gps, Accel_Data accel)
         {
             if (timeStamp < minMaxTimestamp[0])
@@ -170,6 +171,193 @@ namespace YamuraLog
                 isValid = true;
             }
 
+        }
+    }
+    // single channel classes
+    public class DataEvents
+    {
+        public Dictionary<String, DataChannel> channelData = new Dictionary<String, DataChannel>();
+        public void AddChannel(String name, String desc, String src, float scale)
+        {
+            channelData.Add(name, new DataChannel(name, desc, src, scale));
+        }
+    }
+    public class DataChannel
+    {
+        String channelName;
+        String channelDescription;
+        String channelSource;
+        float channelScale;
+        float timeMin = float.MaxValue;
+        float timeMax = float.MinValue;
+        float channelMin = float.MaxValue;
+        float channelMax = float.MinValue;
+        public SortedList<float, DataPoint> dataPoints = new SortedList<float, DataPoint>();
+        public string ChannelName
+        {
+            get
+            {
+                return channelName;
+            }
+
+            set
+            {
+                channelName = value;
+            }
+        }
+        public string ChannelDescription
+        {
+            get
+            {
+                return channelDescription;
+            }
+
+            set
+            {
+                channelDescription = value;
+            }
+        }
+        public string ChannelSource
+        {
+            get
+            {
+                return channelSource;
+            }
+
+            set
+            {
+                channelSource = value;
+            }
+        }
+        public float ChannelScale
+        {
+            get
+            {
+                return channelScale;
+            }
+
+            set
+            {
+                channelScale = value;
+            }
+        }
+        public float TimeMin
+        {
+            get
+            {
+                return timeMin;
+            }
+
+            set
+            {
+                timeMin = value;
+            }
+        }
+        public float TimeMax
+        {
+            get
+            {
+                return timeMax;
+            }
+
+            set
+            {
+                timeMax = value;
+            }
+        }
+        public float ChannelMin
+        {
+            get
+            {
+                return channelMin;
+            }
+
+            set
+            {
+                channelMin = value;
+            }
+        }
+        public float ChannelMax
+        {
+            get
+            {
+                return channelMax;
+            }
+
+            set
+            {
+                channelMax = value;
+            }
+        }
+        public DataChannel(String name, String desc, String src, float scale)
+        {
+            channelName = name;
+            channelDescription = desc;
+            channelSource = src;
+            channelScale = scale;
+            dataPoints = new SortedList<float, DataPoint>();
+        }
+        public SortedList<float, DataPoint> DataPoints
+        {
+            get
+            {
+                return dataPoints;
+            }
+
+            set
+            {
+                dataPoints = value;
+            }
+        }
+        public void AddPoint(float timeStamp, float value)
+        {
+            DataPoints.Add(timeStamp, new DataPoint(value));
+            TimeMin = value < TimeMin ? value : TimeMin;
+            TimeMax = value > TimeMax ? value : TimeMax;
+            ChannelMin = value < ChannelMin ? value : ChannelMin;
+            ChannelMax = value > ChannelMax ? value : ChannelMax;
+        }
+        public bool FindPointAtTime(float timeStamp, ref DataPoint foundPoint)
+        {
+            float priorTime = dataPoints.LastOrDefault(i => i.Key <= timeStamp).Key;
+            float nextTime = dataPoints.FirstOrDefault(i => i.Key >= timeStamp).Key;
+            // exact match
+            if (priorTime == timeStamp)
+            {
+                foundPoint = dataPoints[priorTime];
+            }
+            // check for window size?
+            // prior time is nearest
+            else if ((timeStamp - priorTime) < (nextTime - timeStamp))
+            {
+                foundPoint = dataPoints[priorTime];
+            }
+            // next time is nearest
+            else
+            {
+                foundPoint = dataPoints[nextTime];
+            }
+            return true;
+        }
+    }
+    public class DataPoint
+    {
+        float pointValue = 0.0F;
+        public float PointValue
+        {
+            get
+            {
+                return pointValue;
+            }
+
+            set
+            {
+                pointValue = value;
+            }
+        }
+        public DataPoint(float dataValue)
+        {
+            PointValue = dataValue;
         }
     }
 }
