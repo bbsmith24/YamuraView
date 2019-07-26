@@ -285,6 +285,7 @@
             // channelDataGrid
             // 
             this.channelDataGrid.AllowUserToAddRows = false;
+            this.channelDataGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.channelDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.channelDataGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.displayChannel,
@@ -311,6 +312,7 @@
             // 
             // cmbXAxis
             // 
+            this.cmbXAxis.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbXAxis.FormattingEnabled = true;
             this.cmbXAxis.Location = new System.Drawing.Point(569, 241);
             this.cmbXAxis.Name = "cmbXAxis";

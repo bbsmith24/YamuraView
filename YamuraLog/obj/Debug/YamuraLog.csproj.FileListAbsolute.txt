@@ -8,7 +8,6 @@ C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\bin\Debug\Win32Int
 C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\bin\Debug\Win32Interop.Gdi32.pdb
 C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\bin\Debug\Win32Interop.Gdi32.xml
 C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\bin\Debug\Win32Interop.User32.pdb
-C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.csprojResolveAssemblyReference.cache
 C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.Form1.resources
 C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.Properties.Resources.resources
 C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.csproj.GenerateResource.Cache
