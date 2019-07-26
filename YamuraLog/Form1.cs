@@ -104,6 +104,7 @@ namespace YamuraLog
         #region cursor
         PointF stripChartStartCursorPos = new Point(0, 0);
         PointF stripChartLastCursorPos = new Point(0, 0);
+        Point stripChartStartCursorPosInt = new Point(0, 0);
         Point stripChartLastCursorPosInt = new Point(0, 0);
         bool stripChartLastCursorPosValid = false;
         #endregion
@@ -1108,8 +1109,8 @@ namespace YamuraLog
                             endPt = globalDisplay.ScaleDataToDisplay(endPt,
                                                                        stripChartScaleX * stripChartScaleFactorX,
                                                                        stripChartScaleY[channelName] * stripChartScaleFactorY,
-                                                                       runDisplay[runCount].stipchart_Offset[0] + globalDisplay.channelRanges[channelName][0],
-                                                                       runDisplay[runCount].stipchart_Offset[1],//stripChartOffset[1] + globalDisplay.channelRanges[channelName][1],
+                                                                       stripChartOffset[0] + globalDisplay.channelRanges[channelName][0],
+                                                                       stripChartOffset[1] + runDisplay[runCount].stipchart_Offset[1],//stripChartOffset[1] + globalDisplay.channelRanges[channelName][1],
                                                                        stripChartPanelBounds);
                             if (initialValue)
                             {
@@ -1126,27 +1127,99 @@ namespace YamuraLog
         }
         private void stripChart_MouseMove(object sender, MouseEventArgs e)
         {
+            stripChartPanel.Focus();
             PointF floatPosition = new PointF(e.X, e.Y);
-            #region left mouse button down - dragging view 
+            floatPosition = globalDisplay.ScaleDisplayToData(floatPosition,
+                                             stripChartScaleX * stripChartScaleFactorX,
+                                             1,
+                                             stripChartOffset[0],
+                                             stripChartOffset[1],
+                                             stripChartPanelBounds);
+
+            #region left mouse button down - dragging zoom region 
+            IntPtr lpPoint = new IntPtr();
             if (e.Button == MouseButtons.Left)
             {
-                floatPosition = globalDisplay.ScaleDisplayToData(floatPosition,
-                                 stripChartScaleX * stripChartScaleFactorX,
-                                 1,
-                                 stripChartOffset[0],
-                                 stripChartOffset[1],
-                                 stripChartPanelBounds);
                 if (!stripChartStartPosValid)
                 {
+                    #region erase existing cursor lines
+                    using (Graphics drawGraphics = stripChartPanel.CreateGraphics())
+                    {
+                        IntPtr hDC = drawGraphics.GetHdc();
+                        IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
+                                                        dragZoomPenWidth,
+                                                        NotRGB(Color.Gray));
+                        IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
+                        IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
+                        IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
+                        Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
+
+                        Gdi32.MoveToEx(hDC, stripChartLastCursorPosInt.X, 0, lpPoint);
+                        Gdi32.LineTo(hDC, stripChartLastCursorPosInt.X, stripChartPanel.Height);
+
+                        Gdi32.MoveToEx(hDC, 0, stripChartLastCursorPosInt.Y, lpPoint);
+                        Gdi32.LineTo(hDC, stripChartPanel.Width, stripChartLastCursorPosInt.Y);
+
+                        Gdi32.SelectObject(hDC, oldPen);
+                        Gdi32.SelectObject(hDC, oldBrush);
+                        Gdi32.DeleteObject(newPen);
+                        Gdi32.DeleteObject(newBrush);
+                        drawGraphics.ReleaseHdc();
+                    }
+                    #endregion
                     stripChartStartPosValid = true;
                     stripChartStartPos = e.Location;
                     stripChartStartCursorPos = floatPosition;
+                    stripChartStartCursorPosInt = e.Location;
                 }
-                stripChartLastCursorPos = floatPosition;
-                stripChartLastCursorPosInt.X = e.Location.X;
+                #region zoom box - light gray filled
+                using (Graphics drawGraphics = stripChartPanel.CreateGraphics())
+                {
+                    IntPtr hDC = drawGraphics.GetHdc();
 
+                    IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
+                                                    dragZoomPenWidth,
+                                                    NotRGB(Color.Gray));
+                    IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.LTGRAY_BRUSH);
+                    IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
+                    IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
+                    Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
+
+                    lpPoint = IntPtr.Zero;
+                    // only erase if something was drawn and cursor was moved
+                    if ((stripChartLastCursorPosValid) &&
+                        ((e.Location.X != stripChartLastCursorPosInt.X) || (e.Location.Y != stripChartLastCursorPosInt.Y)))
+                    {
+                        //Gdi32.MoveToEx(hDC, stripChartLastCursorPosInt.X, 0, lpPoint);
+                        //Gdi32.LineTo(hDC, stripChartLastCursorPosInt.X, stripChartPanel.Height);
+
+                        //Gdi32.MoveToEx(hDC, 0, stripChartLastCursorPosInt.Y, lpPoint);
+                        Gdi32.Rectangle(hDC, stripChartStartCursorPosInt.X, 0, stripChartLastCursorPosInt.X, stripChartPanel.Height);
+                        //Gdi32.LineTo(hDC, stripChartPanel.Width, stripChartLastCursorPosInt.Y);
+                    }
+                    // only draw if nothing has been drawn or cursor was moved
+                    if ((!stripChartLastCursorPosValid) ||
+                        ((e.Location.X != stripChartLastCursorPosInt.X) || (e.Location.Y != stripChartLastCursorPosInt.Y)))
+                    {
+                        //Gdi32.MoveToEx(hDC, e.Location.X, 0, lpPoint);
+                        //Gdi32.LineTo(hDC, e.Location.X, stripChartPanel.Height);
+
+                        //Gdi32.MoveToEx(hDC, 0, e.Location.Y, lpPoint);
+                        //Gdi32.LineTo(hDC, stripChartPanel.Width, e.Location.Y);
+                        Gdi32.Rectangle(hDC, stripChartStartCursorPosInt.X, 0, e.X, stripChartPanel.Height);
+
+                    }
+
+                    Gdi32.SelectObject(hDC, oldPen);
+                    Gdi32.SelectObject(hDC, oldBrush);
+                    Gdi32.DeleteObject(newPen);
+                    Gdi32.DeleteObject(newBrush);
+                    drawGraphics.ReleaseHdc();
+                }
+                #endregion
             }
             #endregion
+            #region just moving the mouse
             else
             {
                 #region vertical cursor
@@ -1162,7 +1235,6 @@ namespace YamuraLog
                     IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
                     Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
 
-                    IntPtr lpPoint = new IntPtr();
                     lpPoint = IntPtr.Zero;
                     // only erase if something was drawn and cursor was moved
                     if ((stripChartLastCursorPosValid) && 
@@ -1192,36 +1264,33 @@ namespace YamuraLog
                     drawGraphics.ReleaseHdc();
                 }
                 #endregion
+            }
+            #endregion
+            #region update position info text
+            StringBuilder positionStr = new StringBuilder();
+            positionStr.AppendFormat("X={0}", floatPosition.X.ToString());
+            foreach (KeyValuePair<String, bool> kvp in globalDisplay.yAxisChannel)
+            {
+                if (!kvp.Value)
+                {
+                    continue;
+                }
+                floatPosition = new PointF(e.X, e.Y);
                 floatPosition = globalDisplay.ScaleDisplayToData(floatPosition,
                                                  stripChartScaleX * stripChartScaleFactorX,
-                                                 1,
+                                                 stripChartScaleY[kvp.Key] * stripChartScaleFactorY,
                                                  stripChartOffset[0],
                                                  stripChartOffset[1],
                                                  stripChartPanelBounds);
-
-                stripChartLastCursorPos = floatPosition;
-                StringBuilder positionStr = new StringBuilder();
-                positionStr.AppendFormat("X={0}", floatPosition.X.ToString());
-                foreach (KeyValuePair<String, bool> kvp in globalDisplay.yAxisChannel)
-                {
-                    if(!kvp.Value)
-                    {
-                        continue;
-                    }
-                    floatPosition = new PointF(e.X, e.Y);
-                    floatPosition = globalDisplay.ScaleDisplayToData(floatPosition,
-                                                     stripChartScaleX * stripChartScaleFactorX,
-                                                     stripChartScaleY[kvp.Key] * stripChartScaleFactorY,
-                                                     stripChartOffset[0],
-                                                     stripChartOffset[1],
-                                                     stripChartPanelBounds);
-                    positionStr.AppendFormat(" {0}={1}", kvp.Key, floatPosition.X.ToString());
-                }
-
-                txtCursorPos.Text = positionStr.ToString();
-                TrackMapUpdateCursor(floatPosition.X);
-                TractionCircleUpdateCursor(floatPosition.X);
+                positionStr.AppendFormat(" {0}={1}", kvp.Key, floatPosition.Y.ToString());
             }
+            txtCursorPos.Text = positionStr.ToString();
+            #endregion
+
+            stripChartLastCursorPos = floatPosition;
+            TrackMapUpdateCursor(floatPosition.X);
+            TractionCircleUpdateCursor(floatPosition.X);
+
             stripChartLastCursorPosInt = e.Location;
             stripChartLastCursorPosValid = true;
         }
@@ -1229,10 +1298,7 @@ namespace YamuraLog
         {
             if(stripChartStartPosValid)
             {
-                // strip chart offset in X axis units (scaled)
-                // drag position
-                //stripChartOffset[0] += ((float)(e.Location.X - stripChartStartPos.X) / stripChartScaleX);
-                // drag zoom
+                // dragged zoom rectangle
                 PointF scaledStart = new PointF(stripChartStartCursorPos.X, stripChartStartCursorPos.Y);
                 PointF scaledEnd = new PointF(stripChartLastCursorPos.X, stripChartLastCursorPos.Y);
 
@@ -1240,15 +1306,11 @@ namespace YamuraLog
                 stripChartExtentsX[0] = scaledStart.X < scaledEnd.X ? scaledStart.X : scaledEnd.X;
                 stripChartExtentsX[1] = scaledStart.X < scaledEnd.X ? scaledEnd.X : scaledStart.X;
 
-                System.Diagnostics.Debug.Write("Zoom from " + scaledStart.ToString() + "  to " + scaledEnd.ToString() + " original scale " + stripChartScaleX.ToString());
-
                 stripChartScaleX = (float)stripChartPanelBounds.Width / Math.Abs(scaledEnd.X - scaledStart.X);
-
-                System.Diagnostics.Debug.Write("new scale " + stripChartScaleX.ToString());
-                System.Diagnostics.Debug.WriteLine("");
 
                 stripChartScaleFactorX = 1.0F;
 
+                // update associated views to show only current zoomed area
                 stripChartStartPosValid = false;
                 stripChartLastPosValid = false;
                 stripChartPanel.Invalidate();
@@ -1310,19 +1372,20 @@ namespace YamuraLog
             //    tractionCirclePanel.Invalidate();
             //    mapPanel.Invalidate();
             //}
-            //else if ((e.KeyChar == '1') || (e.KeyChar == 'R') || (e.KeyChar == 'r'))
-            //{
-            //    stripChartScaleFactorX = 1.0F;
-            //    stripChartScaleX = (float)stripChartPanelBounds.Width / (globalDisplay.minMaxTimestamp[1] - globalDisplay.minMaxTimestamp[0]);
-            //    stripChartOffset[0] = 0;
-            //    stripChartOffset[1] = 0;
-            //    stripChartExtents[0] = 0.0F;
-            //    stripChartExtents[1] = globalDisplay.minMaxTimestamp[1] - globalDisplay.minMaxTimestamp[0];
+            if ((e.KeyChar == '1') || (e.KeyChar == 'R') || (e.KeyChar == 'r'))
+            {
+                stripChartScaleFactorX = 1.0F;
+                stripChartScaleX = (float)stripChartPanelBounds.Width / (globalDisplay.channelRanges["Time"][1] - globalDisplay.channelRanges["Time"][0]);
+                stripChartOffset[0] = 0;
+                stripChartOffset[1] = 0;
+                stripChartExtentsX[0] = 0.0F;
+                stripChartExtentsX[0] = globalDisplay.channelRanges["Time"][1] - globalDisplay.channelRanges["Time"][0]; 
+                //stripChartExtents[1] = globalDisplay.minMaxTimestamp[1] - globalDisplay.minMaxTimestamp[0];
 
-            //    stripChartPanel.Invalidate();
-            //    tractionCirclePanel.Invalidate();
-            //    mapPanel.Invalidate();
-            //}
+                stripChartPanel.Invalidate();
+                tractionCirclePanel.Invalidate();
+                mapPanel.Invalidate();
+            }
         }
         private void stripChart_Resize(object sender, EventArgs e)
         {
@@ -1437,7 +1500,6 @@ namespace YamuraLog
             AutoAlign(autoThreshold);
         }
     }
-
     public partial class GlobalDisplay_Data
     {
         public Dictionary<String, float[]> channelRanges = new Dictionary<string, float[]>();
@@ -1459,7 +1521,6 @@ namespace YamuraLog
             channelRanges[channelName][0] = value < channelRanges[channelName][0] ? value : channelRanges[channelName][0];
             channelRanges[channelName][1] = value > channelRanges[channelName][1] ? value : channelRanges[channelName][1];
         }
-
         public PointF ScaleDataToDisplay(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
         {
             PointF rPt = new PointF(sourcePt.X, sourcePt.Y);
@@ -1471,11 +1532,10 @@ namespace YamuraLog
         {
             PointF rPt = new PointF(sourcePt.X, sourcePt.Y);
             rPt.X = (rPt.X / scaleX) - offsetX;
-            rPt.Y = /* */(((float)bounds.Height - rPt.Y) / scaleY) - offsetY;
+            rPt.Y = -1.0F * ((rPt.Y - (float)bounds.Height ) / scaleY) - offsetY;
             return rPt;
         }
     }
-
     public partial class RunDisplay_Data
     {
         public Color runColor = Color.Black;
