@@ -48,6 +48,7 @@ namespace YamuraLog
         // run for display data
         List<RunDisplay_Data> runDisplay = new List<RunDisplay_Data>();
 
+        float gpsDist = 0.0F;
         //DataEvents channelData = new DataEvents();
 
         #region track map
@@ -122,6 +123,8 @@ namespace YamuraLog
         float[] stripChartOffset = new float[] { 0.0F, 0.0F };
         float[] stripChartExtentsX = new float[] { 0.0F, 0.0F };
         #endregion
+        string xChannelName = "none";
+        string yChannelName = "none";
         #endregion
 
         int dragZoomPenWidth = 1;
@@ -167,7 +170,32 @@ namespace YamuraLog
             DrawTraction();
             DrawSpeed();
         }
+        private void btnAutoAlign_Click(object sender, EventArgs e)
+        {
+            float autoThreshold = 0.0F;
+            try
+            {
+                autoThreshold = Convert.ToSingle(txtAutoAlignThreshold.Text);
+            }
+            catch
+            {
+                MessageBox.Show("Can't convert auto align value " + txtAutoAlignThreshold.Text + " to a number");
+                return;
+            }
+            AutoAlign(autoThreshold);
+        }
+        private void cmbXAxis_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            xChannelName = cmbXAxis.Text;
+            stripChartOffset[0] = -1.0F * globalDisplay.channelRanges[xChannelName][0];
+            stripChartExtentsX[0] = globalDisplay.channelRanges[xChannelName][0];
+            stripChartExtentsX[1] = globalDisplay.channelRanges[xChannelName][1];
 
+
+            stripChartScaleX = 0.0F;
+            stripChartPanel.Invalidate();
+        }
+        #region read log file
         private void ReadLogFile(String fileName)
         {
             #region create a temp file to write cleaned up data stream
@@ -193,6 +221,8 @@ namespace YamuraLog
             String inputStr;
             String[] splitStr;
             int logRunsIdx = 0;
+            float priorLatVal = 0.0F;
+            float priorLongVal = 0.0F;
             float latVal = 0.0F;
             float longVal = 0.0F;
             float gX = 0.0F;
@@ -204,6 +234,7 @@ namespace YamuraLog
             float mph = 0;
             float heading = 0;
             bool timestampOffsetValid = false;
+            bool gpsDistanceValid = false;
             StringBuilder strRunsList = new StringBuilder();
             while (!readTemp.EndOfStream)
             {
@@ -220,6 +251,8 @@ namespace YamuraLog
                 //                  new display header
                 if (String.Compare(inputStr, "Start", true) == 0)
                 {
+                    gpsDistanceValid = false;
+                    gpsDist = 0.0F;
                     timestampOffsetValid = false;
                     timestampOffset = 0;
                     dataLogger.runData.Add(new RunData());
@@ -287,11 +320,24 @@ namespace YamuraLog
                     dataLogger.runData[logRunsIdx].AddChannel("Longitude", "GPS Longitude", "GPS", 1.0F);
                     dataLogger.runData[logRunsIdx].AddChannel("Speed-GPS", "GPS Speed", "GPS", 1.0F);
                     dataLogger.runData[logRunsIdx].AddChannel("Heading-GPS", "GPS Heading", "GPS", 1.0F);
+                    dataLogger.runData[logRunsIdx].AddChannel("Distance-GPS", "GPS Distance", "GPS", 1.0F);
                     // add data to channel
                     dataLogger.runData[logRunsIdx].channels["Latitude"].AddPoint(timestampSeconds, latVal);
-                    dataLogger.runData[logRunsIdx].channels["Longitude"].AddPoint(timestampSeconds, latVal);
+                    dataLogger.runData[logRunsIdx].channels["Longitude"].AddPoint(timestampSeconds, longVal);
                     dataLogger.runData[logRunsIdx].channels["Speed-GPS"].AddPoint(timestampSeconds, mph);
                     dataLogger.runData[logRunsIdx].channels["Heading-GPS"].AddPoint(timestampSeconds, heading);
+                    if (!gpsDistanceValid)
+                    {
+                        dataLogger.runData[logRunsIdx].channels["Distance-GPS"].AddPoint(timestampSeconds, 0.0F);
+                        priorLatVal = latVal;
+                        priorLongVal = longVal;
+                        gpsDistanceValid = true;
+                    }
+                    else
+                    {
+                        gpsDist += GPSDistance(priorLatVal, priorLongVal, latVal, longVal);
+                        dataLogger.runData[logRunsIdx].channels["Distance-GPS"].AddPoint(timestampSeconds, gpsDist);
+                    }
                 }
                 #endregion
                 #region accelerometer data
@@ -376,17 +422,17 @@ namespace YamuraLog
 
 
         }
+        #endregion
         /// <summary>
         /// estimate launch point offset from speed data
         /// find first speed > 30, walk back to first speed = 0
         /// </summary>
         private void AutoAlign(float launchThreshold)
         {
-            return;
             //int runCount = 0;
             //float baseLaunch = 0.0F;
             //int launchIdx = 0;
-            //foreach (SortedList<float, DataBlock> curPath in logEvents)
+            //foreach (RunData curRun in dataLogger.runData)
             //{
             //    if(dataLogger[runCount].minMaxSpeed[1] < 20.0F)
             //    {
@@ -445,100 +491,81 @@ namespace YamuraLog
         #region track map events
         private void trackMap_Paint(object sender, PaintEventArgs e)
         {
-            return;
-            //for (int validIdx = 0; validIdx < trackMapLastCursorPosValid.Count(); validIdx++)
-            //{
-            //    trackMapLastCursorPosValid[validIdx] = false;
-            //}
+            for (int validIdx = 0; validIdx < trackMapLastCursorPosValid.Count(); validIdx++)
+            {
+                trackMapLastCursorPosValid[validIdx] = false;
+            }
 
-            //if ((globalDisplay.minMaxLat[0] == float.MaxValue) &&
-            //   (globalDisplay.minMaxLong[0] == float.MaxValue))
-            //{
-            //    return;
-            //}
-            //Pen drawPen = new Pen(Color.Black, 1);
-            //PointF startPt = new PointF();
-            //PointF endPt = new PointF();
-            //bool initialGPS = false;
-            //float scaleX = (float)trackMapBounds.Width / (float)Math.Abs(globalDisplay.minMaxLong[1] - globalDisplay.minMaxLong[0]);
-            //float scaleY = (float)trackMapBounds.Height / (float)Math.Abs(globalDisplay.minMaxLat[1] - globalDisplay.minMaxLat[0]);
-            //trackMapScale = scaleX < scaleY ? scaleX : scaleY;
+            // nothing to display yet, or not acceleration data
+            if ((globalDisplay.channelRanges.Count == 0) ||
+                (!globalDisplay.channelRanges.ContainsKey("Latitude")) ||
+                (!globalDisplay.channelRanges.ContainsKey("Longitude")))
+            {
+                return;
+            }
+            Pen drawPen = new Pen(Color.Black, 1);
+            PointF startPt = new PointF(0.0F, 0.0F);
+            PointF endPt = new PointF(0.0F, 0.0F);
+            bool initialValue = false;
+            float scaleX = (float)trackMapBounds.Width / (float)Math.Abs(globalDisplay.channelRanges["Longitude"][1] - globalDisplay.channelRanges["Longitude"][0]);
+            float scaleY = (float)trackMapBounds.Height / (float)Math.Abs(globalDisplay.channelRanges["Latitude"][1] - globalDisplay.channelRanges["Latitude"][0]);
+            trackMapScale = scaleX < scaleY ? scaleX : scaleY;
+            float longVal = 0.0F;
+            float startTime = 0.0F;
+            float endTime = 0.0F;
+            int runCount = 0;
 
-            //float startTime = 0.0F;
-            //float endTime = 0.0F;
+            using (Graphics mapGraphics = mapPanel.CreateGraphics())
+            {
 
-            //using (Graphics mapGraphics = mapPanel.CreateGraphics())
-            //{
-            //    int runCount = 0;
-            //    foreach (SortedList<float, DataBlock> curPath in logEvents)
-            //    {
-            //        if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
-            //        {
-            //            runCount++;
-            //            continue;
-            //        }
-            //        drawPen = new Pen(runDisplay[runCount].runColor);
-            //        initialGPS = false;
-            //        startPt.X = 0;
-            //        startPt.Y = 0;
-            //        foreach (KeyValuePair<float, DataBlock> curData in curPath)
-            //        {
-            //            if (!curData.Value.gps.isValid)
-            //            {
-            //                continue;
-            //            }
-            //            if (!initialGPS)
-            //            {
-            //                startPt.X = curData.Value.gps.longVal - globalDisplay.minMaxLong[0];
-            //                startPt.Y = curData.Value.gps.latVal - globalDisplay.minMaxLat[0];
+                foreach (RunData curRun in dataLogger.runData)
+                {
+                    if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
+                    {
+                        runCount++;
+                        continue;
+                    }
+                    drawPen = new Pen(runDisplay[runCount].runColor);
+                    initialValue = false;
+                    foreach (KeyValuePair<float, DataPoint> curData in curRun.channels["Longitude"].DataPoints)
+                    {
+                        endPt.X = curData.Value.PointValue - globalDisplay.channelRanges["Longitude"][0];
+                        longVal = curRun.channels["Latitude"].dataPoints[curData.Key].PointValue;
+                        endPt.Y = longVal - globalDisplay.channelRanges["Latitude"][0];
 
-            //                startPt = globalDisplay.ScaleDataToDisplay(startPt, 
-            //                                                           trackMapScale * trackMapScaleFactor, 
-            //                                                           trackMapScale * trackMapScaleFactor,
-            //                                                           trackMapOffset[0],
-            //                                                           trackMapOffset[1], 
-            //                                                           trackMapBounds);
-
-            //                startTime = curData.Key - runDisplay[runCount].stipchart_Offset[0];
-            //                initialGPS = true;
-            //                continue;
-            //            }
-            //            else
-            //            {
-            //                endPt.X = curData.Value.gps.longVal - globalDisplay.minMaxLong[0];
-            //                endPt.Y = curData.Value.gps.latVal - globalDisplay.minMaxLat[0];
-
-            //                endPt = globalDisplay.ScaleDataToDisplay(endPt,
-            //                                                         trackMapScale * trackMapScaleFactor,
-            //                                                         trackMapScale * trackMapScaleFactor,
-            //                                                         trackMapOffset[0],
-            //                                                         trackMapOffset[1],
-            //                                                         trackMapBounds);
+                        endPt = globalDisplay.ScaleDataToDisplay(endPt,
+                                                                 trackMapScale * trackMapScaleFactor,
+                                                                 trackMapScale * trackMapScaleFactor,
+                                                                 trackMapOffset[0],
+                                                                 trackMapOffset[1],
+                                                                 trackMapBounds);
 
 
-            //                endTime = curData.Key;// - runDisplay[runCount].stipchart_Offset[0];
+                        endTime = curData.Key;
 
-            //                if (endTime < stripChartExtents[0])
-            //                {
-            //                    startPt.X = endPt.X;
-            //                    startPt.Y = endPt.Y;
-            //                    startTime = endTime;
-            //                    continue;
-            //                }
-            //                if (startTime > stripChartExtents[1])
-            //                {
-            //                    break;
-            //                }
-
-            //                mapGraphics.DrawLine(drawPen, startPt, endPt);
-            //                startPt.X = endPt.X;
-            //                startPt.Y = endPt.Y;
-            //                startTime = endTime;
-            //            }
-            //        }
-            //        runCount++;
-            //    }
-            //}
+                        if (endTime < stripChartExtentsX[0])
+                        {
+                            startPt.X = endPt.X;
+                            startPt.Y = endPt.Y;
+                            startTime = endTime;
+                            continue;
+                        }
+                        if (startTime > stripChartExtentsX[1])
+                        {
+                            break;
+                        }
+                        if (initialValue)
+                        {
+                            mapGraphics.DrawLine(drawPen, startPt, endPt);
+                        }
+                        startPt.X = endPt.X;
+                        startPt.Y = endPt.Y;
+                        startTime = endTime;
+                        initialValue = true;
+                    }
+                    runCount++;
+                }
+            }
         }
         private void trackMap_MouseMove(object sender, MouseEventArgs e)
         {
@@ -602,237 +629,191 @@ namespace YamuraLog
         }
         private void TrackMapUpdateCursor(float xAxisValue)
         {
-            return;
-            //Pen drawPen = new Pen(Color.Black, 1);
-            //PointF locationPt = new PointF();
-            //Rectangle locationBox = new Rectangle();
+            Pen drawPen = new Pen(Color.Black, 1);
+            PointF locationPt = new PointF();
+            Rectangle locationBox = new Rectangle();
+            int runCount = 0;
+            float runTimeStamp = 0.0F;
+            using (Graphics mapGraphics = mapPanel.CreateGraphics())
+            {
+                foreach (RunData curRun in dataLogger.runData)
+                {
+                    if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
+                    {
+                        runCount++;
+                        continue;
+                    }
+                    drawPen = new Pen(runDisplay[runCount].runColor);
+                    runTimeStamp = xAxisValue - runDisplay[runCount].stipchart_Offset[0];
 
-            //float runTimeStamp = 0.0F;
-            //using (Graphics mapGraphics = mapPanel.CreateGraphics())
-            //{
-            //    int runCount = 0;
-            //    foreach (SortedList<float, DataBlock> curPath in logEvents)
-            //    {
-            //        if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
-            //        {
-            //            runCount++;
-            //            continue;
-            //        }
-            //        drawPen = new Pen(runDisplay[runCount].runColor);
+                    KeyValuePair<float, DataPoint> kvp = curRun.channels["Longitude"].DataPoints.FirstOrDefault(i => i.Key > runTimeStamp);
+                    DataPoint curPoint = kvp.Value;
+                    runTimeStamp = kvp.Key;
+                    if (curPoint == null)
+                    {
+                        continue;
+                    }
+                    locationPt.X = curPoint.PointValue - globalDisplay.channelRanges["Longitude"][0];
+                    locationPt.Y = curRun.channels["Latitude"].DataPoints[runTimeStamp].PointValue - globalDisplay.channelRanges["Latitude"][0];
 
-            //        runTimeStamp = xAxisValue - runDisplay[runCount].stipchart_Offset[0];
-            //        DataBlock curBlock = curPath.FirstOrDefault(i => i.Key > runTimeStamp).Value;
-            //        if (curBlock == null)
-            //        {
-            //            continue;
-            //        }
-            //        if (!curBlock.gps.isValid)
-            //        {
-            //            int idx = curPath.IndexOfKey(curBlock.micros);
-            //            curBlock = null;
-            //            while (idx >= 0)
-            //            {
-            //                if(curPath.ElementAt(idx).Value.gps.isValid)
-            //                {
-            //                    curBlock = curPath.ElementAt(idx).Value;
-            //                    break;
-            //                }
-            //                idx--;
-            //            }
-            //        }
-            //        if (curBlock == null)
-            //        {
-            //            continue;
-            //        }
-            //        locationPt.X = curBlock.gps.longVal - globalDisplay.minMaxLong[0];
-            //        locationPt.Y = curBlock.gps.latVal - globalDisplay.minMaxLat[0];
+                    locationPt = globalDisplay.ScaleDataToDisplay(locationPt,
+                                                                  trackMapScale * trackMapScaleFactor,
+                                                                  trackMapScale * trackMapScaleFactor,
+                                                                  trackMapOffset[0],
+                                                                  trackMapOffset[1],
+                                                                  trackMapBounds);
 
-            //        locationPt = globalDisplay.ScaleDataToDisplay(locationPt,
-            //                                                      trackMapScale * trackMapScaleFactor,
-            //                                                      trackMapScale * trackMapScaleFactor,
-            //                                                      trackMapOffset[0],
-            //                                                      trackMapOffset[1],
-            //                                                      trackMapBounds);
+                    #region position cursor
+                    IntPtr hDC = mapGraphics.GetHdc();
 
-            //        #region position cursor
-            //        IntPtr hDC = mapGraphics.GetHdc();
+                    IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
+                                                    dragZoomPenWidth,
+                                                    NotRGB(runDataGrid.Rows[runCount].Cells["colTraceColor"].Style.BackColor));
+                    IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
+                    IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
+                    IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
+                    Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
 
-            //        IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-            //                                        dragZoomPenWidth,
-            //                                        NotRGB(runDataGrid.Rows[runCount].Cells["colTraceColor"].Style.BackColor));
-            //        IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
-            //        IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-            //        IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-            //        Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
+                    IntPtr lpPoint = new IntPtr();
+                    lpPoint = IntPtr.Zero;
 
-            //        IntPtr lpPoint = new IntPtr();
-            //        lpPoint = IntPtr.Zero;
+                    if (trackMapLastCursorPosValid[runCount])
+                    {
+                        locationBox = new Rectangle(trackMapLastCursorPos[runCount].X, trackMapLastCursorPos[runCount].Y, (int)trackMapCursorSize, (int)trackMapCursorSize);
+                        Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)trackMapCursorSize, locationBox.Top + (int)trackMapCursorSize);
+                    }
 
-            //        if (trackMapLastCursorPosValid[runCount])
-            //        {
-            //            locationBox = new Rectangle(trackMapLastCursorPos[runCount].X, trackMapLastCursorPos[runCount].Y, (int)trackMapCursorSize, (int)trackMapCursorSize);
-            //            Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)trackMapCursorSize, locationBox.Top + (int)trackMapCursorSize);
-            //        }
-
-            //        locationBox = new Rectangle((int)(locationPt.X),
-            //                                    (int)(locationPt.Y),
-            //                                    (int)(trackMapCursorSize),
-            //                                    (int)(trackMapCursorSize));
+                    locationBox = new Rectangle((int)(locationPt.X),
+                                                (int)(locationPt.Y),
+                                                (int)(trackMapCursorSize),
+                                                (int)(trackMapCursorSize));
 
 
-            //        Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left+(int)trackMapCursorSize, locationBox.Top+(int)trackMapCursorSize);
-            //        trackMapLastCursorPos[runCount] = new Point(locationBox.Left, locationBox.Top);
-            //        trackMapLastCursorPosValid[runCount] = true;
+                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)trackMapCursorSize, locationBox.Top + (int)trackMapCursorSize);
+                    trackMapLastCursorPos[runCount] = new Point(locationBox.Left, locationBox.Top);
+                    trackMapLastCursorPosValid[runCount] = true;
 
-            //        Gdi32.SelectObject(hDC, oldPen);
-            //        Gdi32.SelectObject(hDC, oldBrush);
-            //        Gdi32.DeleteObject(newPen);
-            //        Gdi32.DeleteObject(newBrush);
-            //        mapGraphics.ReleaseHdc();
-            //        #endregion
-
-            //        runCount++;
-            //    }
-            //}
+                    Gdi32.SelectObject(hDC, oldPen);
+                    Gdi32.SelectObject(hDC, oldBrush);
+                    Gdi32.DeleteObject(newPen);
+                    Gdi32.DeleteObject(newBrush);
+                    mapGraphics.ReleaseHdc();
+                    #endregion
+                    runCount++;
+                }
+            }
         }
         private void TrackMapClearCursor()
         {
-            return;
-            //using (Graphics mapGraphics = mapPanel.CreateGraphics())
-            //{
-            //    int runCount = 0;
-            //    Rectangle locationBox = new Rectangle(0, 0, 0, 0);
-            //    foreach (SortedList<float, DataBlock> curPath in logEvents)
-            //    {
-            //        if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
-            //        {
-            //            runCount++;
-            //            continue;
-            //        }
-            //        #region position cursor
-            //        IntPtr hDC = mapGraphics.GetHdc();
+            using (Graphics mapGraphics = mapPanel.CreateGraphics())
+            {
+                int runCount = 0;
+                Rectangle locationBox = new Rectangle(0, 0, 0, 0);
+                foreach (RunData curRun in dataLogger.runData)
+                {
+                    if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
+                    {
+                        runCount++;
+                        continue;
+                    }
+                    #region position cursor
+                    IntPtr hDC = mapGraphics.GetHdc();
 
-            //        IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-            //                                        dragZoomPenWidth,
-            //                                        NotRGB(runDataGrid.Rows[runCount].Cells["colTraceColor"].Style.BackColor));
-            //        IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
-            //        IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-            //        IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-            //        Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
+                    IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
+                                                    dragZoomPenWidth,
+                                                    NotRGB(runDataGrid.Rows[runCount].Cells["colTraceColor"].Style.BackColor));
+                    IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
+                    IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
+                    IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
+                    Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
 
-            //        IntPtr lpPoint = new IntPtr();
-            //        lpPoint = IntPtr.Zero;
+                    IntPtr lpPoint = new IntPtr();
+                    lpPoint = IntPtr.Zero;
 
-            //        locationBox = new Rectangle(trackMapLastCursorPos[runCount].X, trackMapLastCursorPos[runCount].Y, (int)trackMapCursorSize, (int)trackMapCursorSize);
-            //        Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)trackMapCursorSize, locationBox.Top + (int)trackMapCursorSize);
+                    locationBox = new Rectangle(trackMapLastCursorPos[runCount].X, trackMapLastCursorPos[runCount].Y, (int)trackMapCursorSize, (int)trackMapCursorSize);
+                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)trackMapCursorSize, locationBox.Top + (int)trackMapCursorSize);
 
-            //        trackMapLastCursorPosValid[runCount] = false;
-            //        Gdi32.SelectObject(hDC, oldPen);
-            //        Gdi32.SelectObject(hDC, oldBrush);
-            //        Gdi32.DeleteObject(newPen);
-            //        Gdi32.DeleteObject(newBrush);
-            //        mapGraphics.ReleaseHdc();
-            //        #endregion
+                    trackMapLastCursorPosValid[runCount] = false;
+                    Gdi32.SelectObject(hDC, oldPen);
+                    Gdi32.SelectObject(hDC, oldBrush);
+                    Gdi32.DeleteObject(newPen);
+                    Gdi32.DeleteObject(newBrush);
+                    mapGraphics.ReleaseHdc();
+                    #endregion
 
-            //        runCount++;
-            //    }
-            //}
+                    runCount++;
+                }
+            }
         }
         #endregion
         #region traction circle events
         private void tractionCircle_Paint(object sender, PaintEventArgs e)
         {
-            return;
-            //tractionCircleStartPosValid = false;
-            //tractionCircleLastPosValid = false;
-            //for (int validIdx = 0; validIdx < trackMapLastCursorPosValid.Count(); validIdx++)
-            //{
-            //    trackMapLastCursorPosValid[validIdx] = false;
-            //}
+            tractionCircleStartPosValid = false;
+            tractionCircleLastPosValid = false;
+            for (int validIdx = 0; validIdx < trackMapLastCursorPosValid.Count(); validIdx++)
+            {
+                trackMapLastCursorPosValid[validIdx] = false;
+            }
+            // nothing to display yet, or not acceleration data
+            if ((globalDisplay.channelRanges.Count == 0) ||
+                (!globalDisplay.channelRanges.ContainsKey("gX")) ||
+                (!globalDisplay.channelRanges.ContainsKey("gY")))
+            {
+                return;
+            }
+            Pen drawPen = new Pen(Color.Black, 1);
+            PointF startPt = new PointF();
+            PointF endPt = new PointF();
+            bool initialValue = false;
+            float scaleX = (float)tractionCircleBounds.Width / (float)Math.Abs(globalDisplay.channelRanges["gX"][1] - globalDisplay.channelRanges["gX"][0]);
+            float scaleY = (float)tractionCircleBounds.Height / (float)Math.Abs(globalDisplay.channelRanges["gY"][1] - globalDisplay.channelRanges["gY"][0]);
+            tractionCircleScale = scaleX < scaleY ? scaleX : scaleY;
+            float startTime = 0.0F;
+            float endTime = 0.0F;
+            int runCount = 0;
 
-            //if ((globalDisplay.minMaxLat[0] == float.MaxValue) &&
-            //   (globalDisplay.minMaxLong[0] == float.MaxValue))
-            //{
-            //    return;
-            //}
-            //Pen drawPen = new Pen(Color.Black, 1);
-            //PointF startPt = new PointF();
-            //PointF endPt = new PointF();
-            //bool initialGPS = false;
-            //float scaleX = (float)tractionCircleBounds.Width / (float)Math.Abs(globalDisplay.minMaxAccel[0][1] - globalDisplay.minMaxAccel[0][0]);
-            //float scaleY = (float)tractionCircleBounds.Height / (float)Math.Abs(globalDisplay.minMaxAccel[1][1] - globalDisplay.minMaxAccel[1][0]);
-            //tractionCircleScale = scaleX < scaleY ? scaleX : scaleY;
-            //float startTime = 0.0F;
-            //float endTime = 0.0F;
-
-            //using (Graphics tractionCircleGraphics = tractionCirclePanel.CreateGraphics())
-            //{
-            //    int runCount = 0;
-            //    foreach (SortedList<float, DataBlock> curPath in logEvents)
-            //    {
-            //        drawPen = new Pen(runDisplay[runCount].runColor);
-            //        if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
-            //        {
-            //            runCount++;
-            //            continue;
-            //        }
-
-            //        initialGPS = false;
-            //        startPt.X = 0;
-            //        startPt.Y = 0;
-            //        foreach (KeyValuePair<float, DataBlock> curData in curPath)
-            //        {
-            //            if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
-            //            {
-            //                runCount++;
-            //                continue;
-            //            }
-            //            if (!(curData.Value.accel.isValid))
-            //            {
-            //                continue;
-            //            }
-            //            if (!initialGPS)
-            //            {
-            //                startPt.X = curData.Value.accel.xAccel - globalDisplay.minMaxAccel[0][0];
-            //                startPt.Y = curData.Value.accel.yAccel - globalDisplay.minMaxAccel[1][0];
-            //                startPt = globalDisplay.ScaleDataToDisplay(startPt,
-            //                                                           tractionCircleScale * tractionCircleScaleFactor,
-            //                                                           tractionCircleScale * tractionCircleScaleFactor,
-            //                                                           tractionCircleOffset[0],
-            //                                                           tractionCircleOffset[1],
-            //                                                           tractionCircleBounds);
-            //                startTime = (float)curData.Key;
-            //                initialGPS = true;
-            //                continue;
-            //            }
-            //            else
-            //            {
-            //                endPt.X = curData.Value.accel.xAccel - globalDisplay.minMaxAccel[0][0];
-            //                endPt.Y = curData.Value.accel.yAccel - globalDisplay.minMaxAccel[1][0];
-            //                endPt = globalDisplay.ScaleDataToDisplay(endPt,
-            //                                                         tractionCircleScale * tractionCircleScaleFactor,
-            //                                                         tractionCircleScale * tractionCircleScaleFactor,
-            //                                                         tractionCircleOffset[0],
-            //                                                         tractionCircleOffset[1],
-            //                                                         tractionCircleBounds);
-            //                endTime = (float)curData.Key;
-            //                if(endTime < stripChartExtents[0])
-            //                {
-            //                    continue;
-            //                }
-            //                if(startTime > stripChartExtents[1])
-            //                {
-            //                    break;
-            //                }
-            //                tractionCircleGraphics.DrawLine(drawPen, startPt, endPt);
-            //                startPt.X = endPt.X;
-            //                startPt.Y = endPt.Y;
-            //                startTime = endTime;
-            //            }
-            //        }
-            //        runCount++;
-            //    }
-            //}
+            using (Graphics tractionCircleGraphics = tractionCirclePanel.CreateGraphics())
+            {
+                foreach (RunData curRun in dataLogger.runData)
+                {
+                    if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
+                    {
+                        runCount++;
+                        continue;
+                    }
+                    drawPen = new Pen(runDisplay[runCount].runColor);
+                    initialValue = false;
+                    foreach (KeyValuePair<float, DataPoint> curData in curRun.channels["gX"].DataPoints)
+                    {
+                        endPt.X = curData.Value.PointValue - globalDisplay.channelRanges["gX"][0];
+                        endPt.Y = curRun.channels["gY"].dataPoints[curData.Key].PointValue - globalDisplay.channelRanges["gY"][0];
+                        endPt = globalDisplay.ScaleDataToDisplay(endPt,
+                                                                 tractionCircleScale * tractionCircleScaleFactor,
+                                                                 tractionCircleScale * tractionCircleScaleFactor,
+                                                                 tractionCircleOffset[0],
+                                                                 tractionCircleOffset[1],
+                                                                 tractionCircleBounds);
+                        endTime = (float)curData.Key;
+                        if (endTime < stripChartExtentsX[0])
+                        {
+                            continue;
+                        }
+                        if (startTime > stripChartExtentsX[1])
+                        {
+                            break;
+                        }
+                        if (initialValue)
+                        {
+                            tractionCircleGraphics.DrawLine(drawPen, startPt, endPt);
+                        }
+                        startPt = endPt;
+                        startTime = endTime;
+                        initialValue = true;
+                    }
+                    runCount++;
+                }
+            }
         }
         private void tractionCircle_MouseMove(object sender, MouseEventArgs e)
         {
@@ -896,141 +877,124 @@ namespace YamuraLog
         }
         private void TractionCircleUpdateCursor(float xAxisValue)
         {
-            return;
-            //Pen drawPen = new Pen(Color.Black, 1);
-            //PointF locationPt = new PointF();
-            //Rectangle locationBox = new Rectangle();
+            Pen drawPen = new Pen(Color.Black, 1);
+            PointF locationPt = new PointF();
+            Rectangle locationBox = new Rectangle();
+            int runCount = 0;
+            float runTimeStamp = 0.0F;
+            using (Graphics mapGraphics = tractionCirclePanel.CreateGraphics())
+            {
+                foreach (RunData curRun in dataLogger.runData)
+                {
+                    if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
+                    {
+                        runCount++;
+                        continue;
+                    }
+                    drawPen = new Pen(runDisplay[runCount].runColor);
 
-            //float runTimeStamp = 0.0F;
-            //using (Graphics mapGraphics = tractionCirclePanel.CreateGraphics())
-            //{
-            //    int runCount = 0;
-            //    foreach (SortedList<float, DataBlock> curPath in logEvents)
-            //    {
-            //        if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
-            //        {
-            //            runCount++;
-            //            continue;
-            //        }
-            //        drawPen = new Pen(runDisplay[runCount].runColor);
-
-            //        runTimeStamp = xAxisValue - runDisplay[runCount].stipchart_Offset[0];
-            //        DataBlock curBlock = curPath.FirstOrDefault(i => i.Key > runTimeStamp).Value;
-            //        if (curBlock == null)
-            //        {
-            //            continue;
-            //        }
-            //        if (!curBlock.accel.isValid)
-            //        {
-            //            int idx = curPath.IndexOfKey(curBlock.micros);
-            //            curBlock = null;
-            //            while (idx >= 0)
-            //            {
-            //                if (curPath.ElementAt(idx).Value.accel.isValid)
-            //                {
-            //                    curBlock = curPath.ElementAt(idx).Value;
-            //                    break;
-            //                }
-            //                idx--;
-            //            }
-            //        }
-            //        if (curBlock == null)
-            //        {
-            //            continue;
-            //        }
-            //        locationPt.X = curBlock.accel.xAccel - globalDisplay.minMaxAccel[0][0];
-            //        locationPt.Y = curBlock.accel.yAccel - globalDisplay.minMaxAccel[1][0];
-
-            //        locationPt = globalDisplay.ScaleDataToDisplay(locationPt,
-            //                                                      tractionCircleScale * tractionCircleScaleFactor,
-            //                                                      tractionCircleScale * tractionCircleScaleFactor,
-            //                                                      tractionCircleOffset[0],
-            //                                                      tractionCircleOffset[1],
-            //                                                      tractionCircleBounds);
-
-            //        #region position cursor
-            //        IntPtr hDC = mapGraphics.GetHdc();
-
-            //        IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-            //                                        dragZoomPenWidth,
-            //                                        NotRGB(runDataGrid.Rows[runCount].Cells["colTraceColor"].Style.BackColor));
-            //        IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
-            //        IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-            //        IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-            //        Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
-
-            //        IntPtr lpPoint = new IntPtr();
-            //        lpPoint = IntPtr.Zero;
-
-            //        if (tractionCircleLastCursorPosValid[runCount])
-            //        {
-            //            locationBox = new Rectangle(tractionCircleLastCursorPos[runCount].X, tractionCircleLastCursorPos[runCount].Y, (int)tractionCircleCursorSize, (int)tractionCircleCursorSize);
-            //            Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)tractionCircleCursorSize, locationBox.Top + (int)tractionCircleCursorSize);
-            //        }
-
-            //        locationBox = new Rectangle((int)(locationPt.X),
-            //                                    (int)(locationPt.Y),
-            //                                    (int)(tractionCircleCursorSize),
-            //                                    (int)(tractionCircleCursorSize));
+                    runTimeStamp = xAxisValue - runDisplay[runCount].stipchart_Offset[0];
 
 
-            //        Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)tractionCircleCursorSize, locationBox.Top + (int)tractionCircleCursorSize);
-            //        tractionCircleLastCursorPos[runCount] = new Point(locationBox.Left, locationBox.Top);
-            //        tractionCircleLastCursorPosValid[runCount] = true;
+                    KeyValuePair<float, DataPoint> kvp = curRun.channels["gX"].DataPoints.FirstOrDefault(i => i.Key > runTimeStamp);
+                    DataPoint curPoint = kvp.Value;
+                    runTimeStamp = kvp.Key;
+                    if (curPoint == null)
+                    {
+                        continue;
+                    }
+                    locationPt.X = curPoint.PointValue - globalDisplay.channelRanges["gX"][0];
+                    locationPt.Y = curRun.channels["gY"].DataPoints[runTimeStamp].PointValue - globalDisplay.channelRanges["gY"][0];
 
-            //        Gdi32.SelectObject(hDC, oldPen);
-            //        Gdi32.SelectObject(hDC, oldBrush);
-            //        Gdi32.DeleteObject(newPen);
-            //        Gdi32.DeleteObject(newBrush);
-            //        mapGraphics.ReleaseHdc();
-            //        #endregion
+                    locationPt = globalDisplay.ScaleDataToDisplay(locationPt,
+                                                                  tractionCircleScale * tractionCircleScaleFactor,
+                                                                  tractionCircleScale * tractionCircleScaleFactor,
+                                                                  tractionCircleOffset[0],
+                                                                  tractionCircleOffset[1],
+                                                                  tractionCircleBounds);
 
-            //        runCount++;
-            //    }
-            //}
+                    #region position cursor
+                    IntPtr hDC = mapGraphics.GetHdc();
+
+                    IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
+                                                    dragZoomPenWidth,
+                                                    NotRGB(runDataGrid.Rows[runCount].Cells["colTraceColor"].Style.BackColor));
+                    IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
+                    IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
+                    IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
+                    Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
+
+                    IntPtr lpPoint = new IntPtr();
+                    lpPoint = IntPtr.Zero;
+
+                    if (tractionCircleLastCursorPosValid[runCount])
+                    {
+                        locationBox = new Rectangle(tractionCircleLastCursorPos[runCount].X, tractionCircleLastCursorPos[runCount].Y, (int)tractionCircleCursorSize, (int)tractionCircleCursorSize);
+                        Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)tractionCircleCursorSize, locationBox.Top + (int)tractionCircleCursorSize);
+                    }
+
+                    locationBox = new Rectangle((int)(locationPt.X),
+                                                (int)(locationPt.Y),
+                                                (int)(tractionCircleCursorSize),
+                                                (int)(tractionCircleCursorSize));
+
+
+                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)tractionCircleCursorSize, locationBox.Top + (int)tractionCircleCursorSize);
+                    tractionCircleLastCursorPos[runCount] = new Point(locationBox.Left, locationBox.Top);
+                    tractionCircleLastCursorPosValid[runCount] = true;
+
+                    Gdi32.SelectObject(hDC, oldPen);
+                    Gdi32.SelectObject(hDC, oldBrush);
+                    Gdi32.DeleteObject(newPen);
+                    Gdi32.DeleteObject(newBrush);
+                    mapGraphics.ReleaseHdc();
+                    #endregion
+
+                    runCount++;
+                }
+            }
         }
         private void TractionCircleClearCursor()
         {
-            return;
-            //using (Graphics mapGraphics = tractionCirclePanel.CreateGraphics())
-            //{
-            //    int runCount = 0;
-            //    Rectangle locationBox = new Rectangle(0, 0, 0, 0);
-            //    foreach (SortedList<float, DataBlock> curPath in logEvents)
-            //    {
-            //        if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
-            //        {
-            //            runCount++;
-            //            continue;
-            //        }
-            //        #region position cursor
-            //        IntPtr hDC = mapGraphics.GetHdc();
+            using (Graphics mapGraphics = tractionCirclePanel.CreateGraphics())
+            {
+                int runCount = 0;
+                Rectangle locationBox = new Rectangle(0, 0, 0, 0);
+                foreach (RunData curRun in dataLogger.runData)
+                {
+                    if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
+                    {
+                        runCount++;
+                        continue;
+                    }
+                    #region position cursor
+                    IntPtr hDC = mapGraphics.GetHdc();
 
-            //        IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-            //                                        dragZoomPenWidth,
-            //                                        NotRGB(runDataGrid.Rows[runCount].Cells["colTraceColor"].Style.BackColor));
-            //        IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
-            //        IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-            //        IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-            //        Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
+                    IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
+                                                    dragZoomPenWidth,
+                                                    NotRGB(runDataGrid.Rows[runCount].Cells["colTraceColor"].Style.BackColor));
+                    IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
+                    IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
+                    IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
+                    Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
 
-            //        IntPtr lpPoint = new IntPtr();
-            //        lpPoint = IntPtr.Zero;
+                    IntPtr lpPoint = new IntPtr();
+                    lpPoint = IntPtr.Zero;
 
-            //        locationBox = new Rectangle(tractionCircleLastCursorPos[runCount].X, tractionCircleLastCursorPos[runCount].Y, (int)tractionCircleCursorSize, (int)tractionCircleCursorSize);
-            //        Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)tractionCircleCursorSize, locationBox.Top + (int)tractionCircleCursorSize);
+                    locationBox = new Rectangle(tractionCircleLastCursorPos[runCount].X, tractionCircleLastCursorPos[runCount].Y, (int)tractionCircleCursorSize, (int)tractionCircleCursorSize);
+                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)tractionCircleCursorSize, locationBox.Top + (int)tractionCircleCursorSize);
 
-            //        tractionCircleLastCursorPosValid[runCount] = false;
-            //        Gdi32.SelectObject(hDC, oldPen);
-            //        Gdi32.SelectObject(hDC, oldBrush);
-            //        Gdi32.DeleteObject(newPen);
-            //        Gdi32.DeleteObject(newBrush);
-            //        mapGraphics.ReleaseHdc();
-            //        #endregion
+                    tractionCircleLastCursorPosValid[runCount] = false;
+                    Gdi32.SelectObject(hDC, oldPen);
+                    Gdi32.SelectObject(hDC, oldBrush);
+                    Gdi32.DeleteObject(newPen);
+                    Gdi32.DeleteObject(newBrush);
+                    mapGraphics.ReleaseHdc();
+                    #endregion
 
-            //        runCount++;
-            //    }
-            //}
+                    runCount++;
+                }
+            }
         }
         #endregion
         #region stripchart events
@@ -1054,39 +1018,38 @@ namespace YamuraLog
             Pen drawPen = new Pen(Color.Black, 1);
             bool initialValue = false;
             int runCount = 0;
-            string channelName = "none";
             int channelCount = 0;
 
             #region get count of displayed channels
             //for (int rowIdx = 0; rowIdx < channelDataGrid.Rows.Count; rowIdx++)
             foreach(KeyValuePair<String, bool> kvp in globalDisplay.yAxisChannel)
             {
-                channelName = kvp.Key;
-                if (globalDisplay.yAxisChannel[channelName] == false)
+                yChannelName = kvp.Key;
+                if (globalDisplay.yAxisChannel[yChannelName] == false)
                 {
                     continue;
                 }
                 channelCount++;
             }
             #endregion
-
+            xChannelName = cmbXAxis.Text;
             using (Graphics mapGraphics = stripChartPanel.CreateGraphics())
             {
                 if (stripChartScaleX == 0.0F)
                 {
-                    stripChartScaleX = ((float)(stripChartPanel.Width - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.channelRanges["Time"][1] - globalDisplay.channelRanges["Time"][0]));
+                    stripChartScaleX = ((float)(stripChartPanel.Width - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.channelRanges[xChannelName][1] - globalDisplay.channelRanges[xChannelName][0]));
+                    stripChartExtentsX[0] = globalDisplay.channelRanges[xChannelName][0] - stripChartOffset[0];
+                    stripChartExtentsX[1] = globalDisplay.channelRanges[xChannelName][1] + stripChartOffset[0];
                 }
-                stripChartExtentsX[0] = -1.0F * stripChartOffset[0];
-                stripChartExtentsX[1] = ((float)stripChartPanel.Width / (stripChartScaleX * stripChartScaleFactorX)) - stripChartOffset[0];
 
                 foreach (KeyValuePair<String, bool> kvp in globalDisplay.yAxisChannel)
                 {
-                    channelName = kvp.Key;
-                    if (globalDisplay.yAxisChannel[channelName] == false)
+                    yChannelName = kvp.Key;
+                    if (globalDisplay.yAxisChannel[yChannelName] == false)
                     {
                         continue;
                     }
-                    stripChartScaleY.Add(channelName, (float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.channelRanges[channelName][1] - globalDisplay.channelRanges[channelName][0]));
+                    stripChartScaleY.Add(yChannelName, (float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.channelRanges[yChannelName][1] - globalDisplay.channelRanges[yChannelName][0]));
 
                     runCount = 0;
 
@@ -1101,17 +1064,26 @@ namespace YamuraLog
                         drawPen = new Pen(runDisplay[runCount].runColor);
                         
                         initialValue = false;
-                        foreach (KeyValuePair<float, DataPoint> curData in curRun.channels[channelName].DataPoints)
+                        foreach (KeyValuePair<float, DataPoint> curData in curRun.channels[yChannelName].DataPoints)
                         {
-                            endPt.X = curData.Key - (float)globalDisplay.channelRanges["Time"][0];
-                            endPt.Y = curData.Value.PointValue - globalDisplay.channelRanges[channelName][0];
-
+                            // x axis is time
+                            if (xChannelName == "Time")
+                            {
+                                endPt.X = curData.Key - (float)globalDisplay.channelRanges[xChannelName][0] + runDisplay[runCount].stipchart_Offset[0];
+                                endPt.Y = curData.Value.PointValue - globalDisplay.channelRanges[yChannelName][0];
+                            }
+                            else
+                            {
+                                DataPoint tst = curRun.channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+                                endPt.X = tst.PointValue - globalDisplay.channelRanges[xChannelName][0] + runDisplay[runCount].stipchart_Offset[0];// curRun.channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key > curData.Key).Value.PointValue;// curData.Value.PointValue - (float)globalDisplay.channelRanges[xChannelName][0];
+                                endPt.Y = curData.Value.PointValue - globalDisplay.channelRanges[yChannelName][0];
+                            }
                             endPt = globalDisplay.ScaleDataToDisplay(endPt,
-                                                                       stripChartScaleX * stripChartScaleFactorX,
-                                                                       stripChartScaleY[channelName] * stripChartScaleFactorY,
-                                                                       stripChartOffset[0] + globalDisplay.channelRanges[channelName][0],
-                                                                       stripChartOffset[1] + runDisplay[runCount].stipchart_Offset[1],//stripChartOffset[1] + globalDisplay.channelRanges[channelName][1],
-                                                                       stripChartPanelBounds);
+                                                                     stripChartScaleX * stripChartScaleFactorX,
+                                                                     stripChartScaleY[yChannelName] * stripChartScaleFactorY,
+                                                                     stripChartOffset[0] + globalDisplay.channelRanges[yChannelName][0],
+                                                                     stripChartOffset[1] + runDisplay[runCount].stipchart_Offset[1],//stripChartOffset[1] + globalDisplay.channelRanges[channelName][1],
+                                                                     stripChartPanelBounds);
                             if (initialValue)
                             {
                                 mapGraphics.DrawLine(drawPen, startPt, endPt);
@@ -1358,29 +1330,14 @@ namespace YamuraLog
         }
         private void stripChart_KeyDown(object sender, KeyPressEventArgs e)
         {
-            //if (e.KeyChar == '+')
-            //{
-            //    stripChartScaleFactorX *= 1.05F;
-            //    stripChartPanel.Invalidate();
-            //    tractionCirclePanel.Invalidate();
-            //    mapPanel.Invalidate();
-            //}
-            //else if (e.KeyChar == '-')
-            //{
-            //    stripChartScaleFactorX *= 0.95F;
-            //    stripChartPanel.Invalidate();
-            //    tractionCirclePanel.Invalidate();
-            //    mapPanel.Invalidate();
-            //}
             if ((e.KeyChar == '1') || (e.KeyChar == 'R') || (e.KeyChar == 'r'))
             {
                 stripChartScaleFactorX = 1.0F;
                 stripChartScaleX = (float)stripChartPanelBounds.Width / (globalDisplay.channelRanges["Time"][1] - globalDisplay.channelRanges["Time"][0]);
-                stripChartOffset[0] = 0;
-                stripChartOffset[1] = 0;
-                stripChartExtentsX[0] = 0.0F;
-                stripChartExtentsX[0] = globalDisplay.channelRanges["Time"][1] - globalDisplay.channelRanges["Time"][0]; 
-                //stripChartExtents[1] = globalDisplay.minMaxTimestamp[1] - globalDisplay.minMaxTimestamp[0];
+                stripChartOffset[0] = -1 * globalDisplay.channelRanges[xChannelName][0];
+                stripChartOffset[1] = 0.0F;
+                stripChartExtentsX[0] = globalDisplay.channelRanges[xChannelName][0];
+                stripChartExtentsX[1] = globalDisplay.channelRanges[xChannelName][1]; 
 
                 stripChartPanel.Invalidate();
                 tractionCirclePanel.Invalidate();
@@ -1484,21 +1441,40 @@ namespace YamuraLog
             return rgb;
         }
         #endregion
-
-        private void btnAutoAlign_Click(object sender, EventArgs e)
+        #region GPS to distance
+        private float GPSDistance(float lat1Deg, float long1Deg, float lat2Deg, float long2Deg )
         {
-            float autoThreshold = 0.0F;
-            try
-            {
-                autoThreshold = Convert.ToSingle(txtAutoAlignThreshold.Text);
-            }
-            catch
-            {
-                MessageBox.Show("Can't convert auto align value " + txtAutoAlignThreshold.Text + " to a number");
-                return;
-            }
-            AutoAlign(autoThreshold);
+            // This uses the ‘haversine’ formula to calculate the great - circle distance between two points 
+            // the shortest distance over the earth’s surface – giving an ‘as- the - crow - flies’ distance between the points 
+            // (ignoring any hills they fly over, of course!).
+            // Haversine formula:	a = sin²(deltaLat / 2) + cos lat1 ⋅ cos lat2 ⋅ sin²(deltaLong / 2)
+            // c = 2 ⋅ atan2( √a, √(1−a) )
+            // d = R ⋅ c
+            // where   'lat' is latitude, 'long' is longitude, R is earth’s radius (mean radius = 6371km);
+
+            double R = 6371e3F; // metres
+            R = R * 3.28084; // feet
+            double lat1 = DegreesToRadians(lat1Deg);
+            double lat2 = DegreesToRadians(lat2Deg);
+            double long1 = DegreesToRadians(lat1Deg);
+            double long2 = DegreesToRadians(lat2Deg);
+            double deltaLat = lat2 - lat1;
+            double deltaLong = long2 - long1;
+
+            double a = Math.Sin(deltaLat / 2) * Math.Sin(deltaLat / 2) +
+                    Math.Cos(lat1) * Math.Cos(lat2) *
+                    Math.Sin(deltaLong / 2) * Math.Sin(deltaLong / 2);
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            double d = R * c;
+            return (float)d;
         }
+        private float DegreesToRadians(double deg)
+        {
+            double rad = (deg * Math.PI) / 180.0;
+            return (float)rad;
+        }
+        #endregion
     }
     public partial class GlobalDisplay_Data
     {

@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btnOpenFile = new System.Windows.Forms.Button();
             this.openLogFile = new System.Windows.Forms.OpenFileDialog();
             this.mapPanel = new System.Windows.Forms.Panel();
@@ -58,6 +58,7 @@
             this.displayChannel = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.channelName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cmbXAxis = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.channelDataGrid)).BeginInit();
             this.SuspendLayout();
@@ -65,9 +66,9 @@
             // btnOpenFile
             // 
             this.btnOpenFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenFile.Location = new System.Drawing.Point(866, 196);
+            this.btnOpenFile.Location = new System.Drawing.Point(795, 196);
             this.btnOpenFile.Name = "btnOpenFile";
-            this.btnOpenFile.Size = new System.Drawing.Size(91, 23);
+            this.btnOpenFile.Size = new System.Drawing.Size(162, 23);
             this.btnOpenFile.TabIndex = 0;
             this.btnOpenFile.Text = "Add Runs";
             this.btnOpenFile.UseVisualStyleBackColor = true;
@@ -79,9 +80,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.mapPanel.BackColor = System.Drawing.Color.White;
             this.mapPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.mapPanel.Location = new System.Drawing.Point(795, 415);
+            this.mapPanel.Location = new System.Drawing.Point(795, 409);
             this.mapPanel.Name = "mapPanel";
-            this.mapPanel.Size = new System.Drawing.Size(314, 480);
+            this.mapPanel.Size = new System.Drawing.Size(314, 486);
             this.mapPanel.TabIndex = 4;
             this.mapPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.trackMap_Paint);
             this.mapPanel.Layout += new System.Windows.Forms.LayoutEventHandler(this.trackMap_Layout);
@@ -97,7 +98,7 @@
             this.tractionCirclePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tractionCirclePanel.Location = new System.Drawing.Point(12, 198);
             this.tractionCirclePanel.Name = "tractionCirclePanel";
-            this.tractionCirclePanel.Size = new System.Drawing.Size(209, 211);
+            this.tractionCirclePanel.Size = new System.Drawing.Size(209, 205);
             this.tractionCirclePanel.TabIndex = 5;
             this.tractionCirclePanel.Paint += new System.Windows.Forms.PaintEventHandler(this.tractionCircle_Paint);
             this.tractionCirclePanel.Layout += new System.Windows.Forms.LayoutEventHandler(this.tractionCircle_Layout);
@@ -112,9 +113,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.stripChartPanel.BackColor = System.Drawing.Color.White;
             this.stripChartPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.stripChartPanel.Location = new System.Drawing.Point(12, 415);
+            this.stripChartPanel.Location = new System.Drawing.Point(12, 409);
             this.stripChartPanel.Name = "stripChartPanel";
-            this.stripChartPanel.Size = new System.Drawing.Size(777, 480);
+            this.stripChartPanel.Size = new System.Drawing.Size(777, 486);
             this.stripChartPanel.TabIndex = 6;
             this.stripChartPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.stripChart_Paint);
             this.stripChartPanel.Layout += new System.Windows.Forms.LayoutEventHandler(this.stripChartPanel_Layout);
@@ -130,14 +131,14 @@
             this.txtRunInfo.Multiline = true;
             this.txtRunInfo.Name = "txtRunInfo";
             this.txtRunInfo.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtRunInfo.Size = new System.Drawing.Size(336, 211);
+            this.txtRunInfo.Size = new System.Drawing.Size(562, 205);
             this.txtRunInfo.TabIndex = 7;
             // 
             // label2
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(569, 225);
+            this.label2.Location = new System.Drawing.Point(792, 226);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(111, 13);
             this.label2.TabIndex = 14;
@@ -147,7 +148,7 @@
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(792, 225);
+            this.label3.Location = new System.Drawing.Point(792, 266);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(110, 13);
             this.label3.TabIndex = 15;
@@ -257,14 +258,15 @@
             // 
             this.txtCursorPos.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtCursorPos.Location = new System.Drawing.Point(12, 901);
+            this.txtCursorPos.Location = new System.Drawing.Point(97, 901);
             this.txtCursorPos.Name = "txtCursorPos";
-            this.txtCursorPos.Size = new System.Drawing.Size(1097, 20);
+            this.txtCursorPos.Size = new System.Drawing.Size(1012, 20);
             this.txtCursorPos.TabIndex = 19;
             // 
             // btnAutoAlign
             // 
             this.btnAutoAlign.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAutoAlign.Enabled = false;
             this.btnAutoAlign.Location = new System.Drawing.Point(963, 197);
             this.btnAutoAlign.Name = "btnAutoAlign";
             this.btnAutoAlign.Size = new System.Drawing.Size(75, 23);
@@ -276,6 +278,7 @@
             // txtAutoAlignThreshold
             // 
             this.txtAutoAlignThreshold.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtAutoAlignThreshold.Enabled = false;
             this.txtAutoAlignThreshold.Location = new System.Drawing.Point(1044, 199);
             this.txtAutoAlignThreshold.Name = "txtAutoAlignThreshold";
             this.txtAutoAlignThreshold.Size = new System.Drawing.Size(58, 20);
@@ -290,10 +293,10 @@
             this.channelDataGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.displayChannel,
             this.channelName});
-            this.channelDataGrid.Location = new System.Drawing.Point(795, 241);
+            this.channelDataGrid.Location = new System.Drawing.Point(795, 282);
             this.channelDataGrid.Name = "channelDataGrid";
             this.channelDataGrid.RowHeadersVisible = false;
-            this.channelDataGrid.Size = new System.Drawing.Size(314, 168);
+            this.channelDataGrid.Size = new System.Drawing.Size(314, 121);
             this.channelDataGrid.TabIndex = 22;
             // 
             // displayChannel
@@ -305,8 +308,8 @@
             // channelName
             // 
             this.channelName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
-            this.channelName.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
+            this.channelName.DefaultCellStyle = dataGridViewCellStyle2;
             this.channelName.HeaderText = "Channel";
             this.channelName.Name = "channelName";
             // 
@@ -314,16 +317,27 @@
             // 
             this.cmbXAxis.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbXAxis.FormattingEnabled = true;
-            this.cmbXAxis.Location = new System.Drawing.Point(569, 241);
+            this.cmbXAxis.Location = new System.Drawing.Point(795, 242);
             this.cmbXAxis.Name = "cmbXAxis";
             this.cmbXAxis.Size = new System.Drawing.Size(220, 21);
             this.cmbXAxis.TabIndex = 23;
+            this.cmbXAxis.SelectedIndexChanged += new System.EventHandler(this.cmbXAxis_SelectedIndexChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 904);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(79, 13);
+            this.label1.TabIndex = 24;
+            this.label1.Text = "Cursor position:";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1115, 925);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.cmbXAxis);
             this.Controls.Add(this.channelDataGrid);
             this.Controls.Add(this.txtAutoAlignThreshold);
@@ -377,6 +391,7 @@
         private System.Windows.Forms.DataGridViewCheckBoxColumn displayChannel;
         private System.Windows.Forms.DataGridViewTextBoxColumn channelName;
         private System.Windows.Forms.ComboBox cmbXAxis;
+        private System.Windows.Forms.Label label1;
     }
 }
 

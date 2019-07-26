@@ -18,7 +18,6 @@ C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLo
 C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\bin\Debug\YamuraLog.exe.config
 C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.exe
 C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.pdb
-C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.csprojResolveAssemblyReference.cache
 C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.Form1.resources
 C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.Properties.Resources.resources
 C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.csproj.GenerateResource.Cache
