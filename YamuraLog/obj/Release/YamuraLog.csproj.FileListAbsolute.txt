@@ -15,3 +15,4 @@ C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\obj\Release\Yamura
 C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\obj\Release\YamuraLog.application
 C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\obj\Release\YamuraLog.exe
 C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\obj\Release\YamuraLog.pdb
+C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\obj\Release\YamuraLog.csprojResolveAssemblyReference.cache
