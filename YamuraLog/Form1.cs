@@ -1084,7 +1084,7 @@ namespace YamuraLog
                                                                      stripChartOffset[0] + globalDisplay.channelRanges[yChannelName][0],
                                                                      stripChartOffset[1] + runDisplay[runCount].stipchart_Offset[1],//stripChartOffset[1] + globalDisplay.channelRanges[channelName][1],
                                                                      stripChartPanelBounds);
-                            if (initialValue)
+                            if ((initialValue) && (startPt.X < stripChartPanelBounds.Width) && (endPt.X > 0))
                             {
                                 mapGraphics.DrawLine(drawPen, startPt, endPt);
                             }
@@ -1240,7 +1240,7 @@ namespace YamuraLog
             #endregion
             #region update position info text
             StringBuilder positionStr = new StringBuilder();
-            positionStr.AppendFormat("X={0}", floatPosition.X.ToString());
+            positionStr.AppendFormat("{0}={1}", xChannelName, floatPosition.X.ToString());
             foreach (KeyValuePair<String, bool> kvp in globalDisplay.yAxisChannel)
             {
                 if (!kvp.Value)
@@ -1258,13 +1258,13 @@ namespace YamuraLog
             }
             txtCursorPos.Text = positionStr.ToString();
             #endregion
-
+            #region update cursor positions
             stripChartLastCursorPos = floatPosition;
             TrackMapUpdateCursor(floatPosition.X);
             TractionCircleUpdateCursor(floatPosition.X);
-
             stripChartLastCursorPosInt = e.Location;
             stripChartLastCursorPosValid = true;
+            #endregion
         }
         private void stripChart_MouseUp(object sender, MouseEventArgs e)
         {
@@ -1358,6 +1358,11 @@ namespace YamuraLog
             stripChartPanelBounds.Y = stripChartPanelBorder;
             stripChartPanelBounds.Width = stripChartPanel.Width - (2 * stripChartPanelBorder);
             stripChartPanelBounds.Height = stripChartPanel.Height - (2 * stripChartPanelBorder);
+        }
+        private void stripchartHScroll_Scroll(object sender, ScrollEventArgs e)
+        {
+            stripChartOffset[0] -= ((float)(e.NewValue - e.OldValue)/(float)stripchartHScroll.Width) * (globalDisplay.channelRanges[xChannelName][1] - globalDisplay.channelRanges[xChannelName][0]);
+            stripChartPanel.Invalidate();
         }
         #endregion
         #region data grid events
@@ -1475,6 +1480,7 @@ namespace YamuraLog
             return (float)rad;
         }
         #endregion
+
     }
     public partial class GlobalDisplay_Data
     {

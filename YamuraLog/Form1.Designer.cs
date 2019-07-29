@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btnOpenFile = new System.Windows.Forms.Button();
             this.openLogFile = new System.Windows.Forms.OpenFileDialog();
             this.mapPanel = new System.Windows.Forms.Panel();
@@ -59,6 +59,7 @@
             this.channelName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cmbXAxis = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.stripchartHScroll = new System.Windows.Forms.HScrollBar();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.channelDataGrid)).BeginInit();
             this.SuspendLayout();
@@ -115,7 +116,7 @@
             this.stripChartPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.stripChartPanel.Location = new System.Drawing.Point(12, 409);
             this.stripChartPanel.Name = "stripChartPanel";
-            this.stripChartPanel.Size = new System.Drawing.Size(777, 486);
+            this.stripChartPanel.Size = new System.Drawing.Size(777, 466);
             this.stripChartPanel.TabIndex = 6;
             this.stripChartPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.stripChart_Paint);
             this.stripChartPanel.Layout += new System.Windows.Forms.LayoutEventHandler(this.stripChartPanel_Layout);
@@ -308,8 +309,8 @@
             // channelName
             // 
             this.channelName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
-            this.channelName.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
+            this.channelName.DefaultCellStyle = dataGridViewCellStyle1;
             this.channelName.HeaderText = "Channel";
             this.channelName.Name = "channelName";
             // 
@@ -325,6 +326,7 @@
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 904);
             this.label1.Name = "label1";
@@ -332,11 +334,22 @@
             this.label1.TabIndex = 24;
             this.label1.Text = "Cursor position:";
             // 
+            // stripchartHScroll
+            // 
+            this.stripchartHScroll.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.stripchartHScroll.Location = new System.Drawing.Point(12, 878);
+            this.stripchartHScroll.Name = "stripchartHScroll";
+            this.stripchartHScroll.Size = new System.Drawing.Size(777, 17);
+            this.stripchartHScroll.TabIndex = 25;
+            this.stripchartHScroll.Scroll += new System.Windows.Forms.ScrollEventHandler(this.stripchartHScroll_Scroll);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1115, 925);
+            this.Controls.Add(this.stripchartHScroll);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cmbXAxis);
             this.Controls.Add(this.channelDataGrid);
@@ -392,6 +405,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn channelName;
         private System.Windows.Forms.ComboBox cmbXAxis;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.HScrollBar stripchartHScroll;
     }
 }
 
