@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="YamuraLog.exe" version="1.0.0.1" publicKeyToken="53478fa06b171c70" language="neutral" processorArchitecture="msil" type="win32" />
+  <asmv1:assemblyIdentity name="YamuraLog.exe" version="1.0.0.1" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
   <application />
   <entryPoint>
     <assemblyIdentity name="YamuraLog" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
@@ -66,14 +66,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="YamuraLog.exe" size="48608">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="YamuraLog.exe" size="48640">
       <assemblyIdentity name="YamuraLog" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>khPrRMBAZxNED1ZxAq7n7eyCU+0utZxuzL4tV+Wf1MU=</dsig:DigestValue>
+        <dsig:DigestValue>l1p4EQL5EWc9Ah2c6JpTsKd0cAhyQy9njf8Mx4xSDqQ=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -86,4 +86,4 @@
       <dsig:DigestValue>6N7MliNbVJSIAIPrecIshMbZ7zEoKLr5SQvud4LDUOw=</dsig:DigestValue>
     </hash>
   </file>
-<publisherIdentity name="CN=DESKTOP-QIB3LBH\bbsmi" issuerKeyHash="ed8b13730290c6c417c0205a3ac7f3cd2478bb0a" /><Signature Id="StrongNameSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>/YriT+DGReuz7kQQNMHgtnxSpsyiewQVCXRHFc7OT4Y=</DigestValue></Reference></SignedInfo><SignatureValue>Rg24Qf81TTtf1icz+5zmOJS+9XIhNMcQnlCtZPSeMnkJg5oIDdS3uM4DwEtwn6fwoxlzXdDJ/GDXl1Pf4uMrEZkFv0Hqd/ibFmR6wpoTjljuFGV0qLkwLQedu7yuCUKVTFPvZUlXpW6TuhqrgkNJbMYwBD7gUJSFBAgmaKHvmdQ=</SignatureValue><KeyInfo Id="StrongNameKeyInfo"><KeyValue><RSAKeyValue><Modulus>oeyFZAziBgPCRtMdsg55fKUbnykwoR3vqTqYDQEepYtNo9yMPXGgitQkA/l4e3DNOXT9bIuegT3L/b3qNNVrbRtSyl4Rys6YXAYn7+nR0P4Ivy57oi18K2IC9JRn9+3TwcQdUlt0j0GNFbWaP5wuGfQJnbtkcPpXW5ycBcZ+S7k=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><msrel:RelData xmlns:msrel="http://schemas.microsoft.com/windows/rel/2005/reldata"><r:license xmlns:r="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:as="http://schemas.microsoft.com/windows/pki/2005/Authenticode"><r:grant><as:ManifestInformation Hash="864fcece1547740915047ba2cca6527cb6e0c1341044eeb3eb45c6e04fe28afd" Description="" Url=""><as:assemblyIdentity name="YamuraLog.exe" version="1.0.0.1" publicKeyToken="53478fa06b171c70" language="neutral" processorArchitecture="msil" type="win32" /></as:ManifestInformation><as:SignedBy /><as:AuthenticodePublisher><as:X509SubjectName>CN=DESKTOP-QIB3LBH\bbsmi</as:X509SubjectName></as:AuthenticodePublisher></r:grant><r:issuer><Signature Id="AuthenticodeSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>/AMfHkU/EF0ZQwKngXCIs95hd8heoVG9g1Lo+dgF0Bs=</DigestValue></Reference></SignedInfo><SignatureValue>EwS1I2pdOWJJ43ZJzhsaAEAwIzBNjLaemVCN2iSv64ZRQcSyakwlfIoKRk2m4BxdNSDc0JbRIYUWeJJcBu7aUqK3mDVhligDykzmlf8TV4aqkazqwDerKf/lwFxlFs/kcrNPxv5eC4z0Omn2Ffq36f+a2w2eQbqsiSMlcXDh5C0=</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>oeyFZAziBgPCRtMdsg55fKUbnykwoR3vqTqYDQEepYtNo9yMPXGgitQkA/l4e3DNOXT9bIuegT3L/b3qNNVrbRtSyl4Rys6YXAYn7+nR0P4Ivy57oi18K2IC9JRn9+3TwcQdUlt0j0GNFbWaP5wuGfQJnbtkcPpXW5ycBcZ+S7k=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>MIIB7TCCAVagAwIBAgIQJcmuydPDrZtJr7jM2BdCqzANBgkqhkiG9w0BAQsFADA1MTMwMQYDVQQDHioARABFAFMASwBUAE8AUAAtAFEASQBCADMATABCAEgAXABiAGIAcwBtAGkwHhcNMTkwNzI0MDIwOTE3WhcNMjAwNzIzMDgwOTE3WjA1MTMwMQYDVQQDHioARABFAFMASwBUAE8AUAAtAFEASQBCADMATABCAEgAXABiAGIAcwBtAGkwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKHshWQM4gYDwkbTHbIOeXylG58pMKEd76k6mA0BHqWLTaPcjD1xoIrUJAP5eHtwzTl0/WyLnoE9y/296jTVa20bUspeEcrOmFwGJ+/p0dD+CL8ue6ItfCtiAvSUZ/ft08HEHVJbdI9BjRW1mj+cLhn0CZ27ZHD6V1ucnAXGfku5AgMBAAEwDQYJKoZIhvcNAQELBQADgYEAaujuNt+yasyhhXXcRyqPQAp8gR8iH+u0ThuudpURElF4JQ+usq7HQhgMQ1KtRyQ5gboKLnLK5dA6bNEUDholjgvlsdZpikrej2mPUxDi8/6EWRBEGJU/MRr36Ga8XsdDj4WpupnNZATqwc2JbipXldpsJI6rMqVfWumBVaNjOeg=</X509Certificate></X509Data></KeyInfo></Signature></r:issuer></r:license></msrel:RelData></KeyInfo></Signature></asmv1:assembly>
+</asmv1:assembly>

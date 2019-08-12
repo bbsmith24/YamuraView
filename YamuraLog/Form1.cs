@@ -164,8 +164,14 @@ namespace YamuraLog
             {
                 return;
             }
-            ReadLogFile(openLogFile.FileName);
-
+            if (openLogFile.FileName.EndsWith("TXT", StringComparison.CurrentCultureIgnoreCase))
+            {
+                ReadTXTFile(openLogFile.FileName);
+            }
+            else if (openLogFile.FileName.EndsWith("YLG", StringComparison.CurrentCultureIgnoreCase))
+            {
+                ReadYLGFile(openLogFile.FileName);
+            }
             DrawMap();
             DrawTraction();
             DrawSpeed();
@@ -196,7 +202,7 @@ namespace YamuraLog
             stripChartPanel.Invalidate();
         }
         #region read log file
-        private void ReadLogFile(String fileName)
+        private void ReadTXTFile(String fileName)
         {
             #region create a temp file to write cleaned up data stream
             String tempLogFile = fileName.Replace(".txt", ".tmp");
@@ -372,9 +378,9 @@ namespace YamuraLog
             #endregion
 
             #region update display info
-            foreach(RunData curRun in dataLogger.runData)
+            foreach (RunData curRun in dataLogger.runData)
             {
-                foreach(KeyValuePair<String, DataChannel> curChannel in curRun.channels)
+                foreach (KeyValuePair<String, DataChannel> curChannel in curRun.channels)
                 {
                     globalDisplay.AddChannel(curChannel.Key);
                     globalDisplay.channelRanges[curChannel.Key][0] = curChannel.Value.ChannelMin < globalDisplay.channelRanges[curChannel.Key][0] ? curChannel.Value.ChannelMin : globalDisplay.channelRanges[curChannel.Key][0];
@@ -382,7 +388,7 @@ namespace YamuraLog
                     globalDisplay.yAxisChannel[curChannel.Key] = false;
                 }
             }
-            foreach(KeyValuePair<String, float[]> kvp in globalDisplay.channelRanges)
+            foreach (KeyValuePair<String, float[]> kvp in globalDisplay.channelRanges)
             {
                 cmbXAxis.Items.Add(kvp.Key);
             }
@@ -422,7 +428,167 @@ namespace YamuraLog
 
 
         }
+        private void ReadYLGFile(String fileName)
+        {
+            char[] b = new char[3];
+            StringBuilder rStr = new StringBuilder();
+            float curTimeStamp = 0;
+            float lastTimeStamp = 0;
+            string newLineChar = "";
+            bool firstValue = true;
+            using (BinaryReader inFile = new BinaryReader(File.Open(fileName, FileMode.Open)))
+            {
+                while(true)
+                {
+                    try
+                    {
+                        b[0] = inFile.ReadChar();
+                    }
+                    catch
+                    {
+                        break;
+                    }
+
+                    // 'T', next 4 bytes are a unsigned long int
+                    if ((char)b[0] == 'T')
+                    {
+                        
+                        curTimeStamp = (float)inFile.ReadUInt32() / 1000000.0F;
+                        rStr.AppendFormat("{0}T{1}\t", newLineChar, curTimeStamp.ToString("N6"));
+                        newLineChar = System.Environment.NewLine;
+                        //if (firstValue)
+                        //{
+                        //    rStr.Append("0.000000\t 0.00\t");
+                        //    firstValue = false;
+                        //}
+                        //else
+                        //{
+                        //    rStr.AppendFormat("{0}\t{1}\t", (curTimeStamp - lastTimeStamp).ToString("N6"), (1.0F / (curTimeStamp - lastTimeStamp)).ToString("N2"));
+                        //}
+                        lastTimeStamp = curTimeStamp;
+                        continue;
+                    }
+                    try
+                    {
+                        b[1] = inFile.ReadChar();
+                        b[2] = inFile.ReadChar();
+                    }
+                    catch
+                    {
+                        break;
+                    }
+
+                    // sensor channel names
+                    // GPS (gps device) returns floats for lat, long, heading, speed, satellites in view
+                    // ACC (3 axis accelerometer) returns 3 float values
+                    // IM9 (9 dof IMU) returns 9 float values
+                    // 
+                    // change i2c channels return 1 value
+                    // A2D (analog)  float
+                    // DIG (digital) int
+                    // CNT (counter) int
+                    // RPM (rev/min) float
+                    // this will make it easier to parse
+                    //
+                    // G 'GPS'
+                    // 4 byte channel number followed by
+                    // 4 byte float latitude
+                    // 4 byte float longitude
+                    // 4 byte float speed
+                    // 4 byte float heading
+                    // 4 byte int satellites in view
+                    if ((b[0] == 'G') && (b[1] == 'P') && (b[2] == 'S'))
+                    {
+                        rStr.AppendFormat("GPS\t");//, inFile.ReadUInt32().ToString());
+                        rStr.AppendFormat("{0}\t", inFile.ReadSingle().ToString("N6"));
+                        rStr.AppendFormat("{0}\t", inFile.ReadSingle().ToString("N6"));
+                        rStr.AppendFormat("{0}\t", inFile.ReadSingle().ToString("N6"));
+                        rStr.AppendFormat("{0}\t", inFile.ReadSingle().ToString("N6"));
+                        rStr.AppendFormat("{0}\t", inFile.ReadSingle().ToString("N6"));
+                        rStr.AppendFormat("{0}\t", inFile.ReadUInt32().ToString());
+                    }
+                    //
+                    // accel channel
+                    // 4 byte channel number followed by 3 floats (X, Y, Z)
+                    //
+                    else if ((b[0] == 'A') && (b[1] == 'C') && (b[2] == 'C'))
+                    {
+                        rStr.AppendFormat("ACC {0}\t", inFile.ReadUInt32());
+                        for (int valIdx = 0; valIdx < 3; valIdx++)
+                        {
+                            rStr.AppendFormat("{0}\t", inFile.ReadSingle().ToString("N6"));
+                        }
+                    }
+                    // 
+                    // analog channel
+                    // 4 byte channel number followed by 1 float (value)
+                    //
+                    else if ((b[0] == 'A') && (b[1] == '2') && (b[2] == 'D'))
+                    {
+                        rStr.AppendFormat("A2D {0}\t", inFile.ReadUInt32());
+                        rStr.AppendFormat("{0}\t", inFile.ReadSingle().ToString("N6"));
+                    }
+                    else
+                    {
+                        rStr.AppendFormat("Unknown {0}{1}{2}", (char)b[0], (char)b[1], (char)b[2]);
+                    }
+                    rStr.Append("\t");
+                }
+                inFile.Close();
+            }
+            txtRunInfo.Text = rStr.ToString();
+        }
         #endregion
+
+        //#region update display info
+        //foreach (RunData curRun in dataLogger.runData)
+        //{
+        //    foreach (KeyValuePair<String, DataChannel> curChannel in curRun.channels)
+        //    {
+        //        globalDisplay.AddChannel(curChannel.Key);
+        //        globalDisplay.channelRanges[curChannel.Key][0] = curChannel.Value.ChannelMin < globalDisplay.channelRanges[curChannel.Key][0] ? curChannel.Value.ChannelMin : globalDisplay.channelRanges[curChannel.Key][0];
+        //        globalDisplay.channelRanges[curChannel.Key][1] = curChannel.Value.ChannelMax > globalDisplay.channelRanges[curChannel.Key][1] ? curChannel.Value.ChannelMax : globalDisplay.channelRanges[curChannel.Key][1];
+        //        globalDisplay.yAxisChannel[curChannel.Key] = false;
+        //    }
+        //}
+        //foreach (KeyValuePair<String, float[]> kvp in globalDisplay.channelRanges)
+        //{
+        //    cmbXAxis.Items.Add(kvp.Key);
+        //}
+        //cmbXAxis.SelectedText = "Time";
+        //#endregion
+
+        //for (int runIdx = 0; runIdx < dataLogger.runData.Count(); runIdx++)
+        //{
+        //    trackMapLastCursorPos.Add(new Point(0, 0));
+        //    trackMapLastCursorPosValid.Add(false);
+        //    tractionCircleLastCursorPos.Add(new Point(0, 0));
+        //    tractionCircleLastCursorPosValid.Add(false);
+        //}
+        //// auto align launches
+        //AutoAlign(0.10F);
+
+        //channelDataGrid.Rows.Clear();
+        //foreach (KeyValuePair<String, DataChannel> kvp in dataLogger.runData[0].channels)
+        //{
+        //    channelDataGrid.Rows.Add();
+        //    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["displayChannel"].Value = false;
+        //    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelName"].Value = kvp.Key.ToString();
+        //}
+        //runDataGrid.Rows.Clear();
+        //for (int runIdx = 0; runIdx < dataLogger.runData.Count(); runIdx++)
+        //{
+        //    runDataGrid.Rows.Add();
+        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runIdx + 1).ToString();
+        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = runDisplay[runIdx].showRun;
+        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = dataLogger.runData[runIdx].dateStr + " " + dataLogger.runData[runIdx].timeStr;
+        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMin;
+        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMax;
+        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = runDisplay[runIdx].stipchart_Offset[0];
+        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runIdx].fileName.ToString();
+        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
+        //}
+        //#endregion
         /// <summary>
         /// estimate launch point offset from speed data
         /// find first speed > 30, walk back to first speed = 0
@@ -1084,7 +1250,7 @@ namespace YamuraLog
                                                                      stripChartOffset[0] + globalDisplay.channelRanges[yChannelName][0],
                                                                      stripChartOffset[1] + runDisplay[runCount].stipchart_Offset[1],//stripChartOffset[1] + globalDisplay.channelRanges[channelName][1],
                                                                      stripChartPanelBounds);
-                            if (initialValue)
+                            if ((initialValue) && (startPt.X < stripChartPanelBounds.Width) && (endPt.X > 0))
                             {
                                 mapGraphics.DrawLine(drawPen, startPt, endPt);
                             }
@@ -1240,7 +1406,7 @@ namespace YamuraLog
             #endregion
             #region update position info text
             StringBuilder positionStr = new StringBuilder();
-            positionStr.AppendFormat("X={0}", floatPosition.X.ToString());
+            positionStr.AppendFormat("{0}={1}", xChannelName, floatPosition.X.ToString());
             foreach (KeyValuePair<String, bool> kvp in globalDisplay.yAxisChannel)
             {
                 if (!kvp.Value)
@@ -1258,13 +1424,13 @@ namespace YamuraLog
             }
             txtCursorPos.Text = positionStr.ToString();
             #endregion
-
+            #region update cursor positions
             stripChartLastCursorPos = floatPosition;
             TrackMapUpdateCursor(floatPosition.X);
             TractionCircleUpdateCursor(floatPosition.X);
-
             stripChartLastCursorPosInt = e.Location;
             stripChartLastCursorPosValid = true;
+            #endregion
         }
         private void stripChart_MouseUp(object sender, MouseEventArgs e)
         {
@@ -1358,6 +1524,11 @@ namespace YamuraLog
             stripChartPanelBounds.Y = stripChartPanelBorder;
             stripChartPanelBounds.Width = stripChartPanel.Width - (2 * stripChartPanelBorder);
             stripChartPanelBounds.Height = stripChartPanel.Height - (2 * stripChartPanelBorder);
+        }
+        private void stripchartHScroll_Scroll(object sender, ScrollEventArgs e)
+        {
+            stripChartOffset[0] -= ((float)(e.NewValue - e.OldValue)/(float)stripchartHScroll.Width) * (globalDisplay.channelRanges[xChannelName][1] - globalDisplay.channelRanges[xChannelName][0]);
+            stripChartPanel.Invalidate();
         }
         #endregion
         #region data grid events
@@ -1475,6 +1646,7 @@ namespace YamuraLog
             return (float)rad;
         }
         #endregion
+
     }
     public partial class GlobalDisplay_Data
     {

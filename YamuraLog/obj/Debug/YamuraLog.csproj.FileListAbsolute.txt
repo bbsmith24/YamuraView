@@ -32,3 +32,4 @@ C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\bin\Debug\Win32Interop.Gdi
 C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\bin\Debug\Win32Interop.User32.pdb
 C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.exe.manifest
 C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.application
+C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.csprojResolveAssemblyReference.cache
