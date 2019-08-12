@@ -33,3 +33,4 @@ C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\bin\Debug\Win32Interop.Use
 C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.exe.manifest
 C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.application
 C:\Users\bbsmi\OneDrive\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.csprojResolveAssemblyReference.cache
+C:\Users\bsmith\Documents\GitHub\YamuraView\YamuraLog\obj\Debug\YamuraLog.csprojResolveAssemblyReference.cache

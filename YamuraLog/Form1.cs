@@ -425,21 +425,34 @@ namespace YamuraLog
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runIdx].fileName.ToString();
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
             }
-
-
         }
         private void ReadYLGFile(String fileName)
         {
+            int logRunsIdx = 0;
             char[] b = new char[3];
-            StringBuilder rStr = new StringBuilder();
-            float curTimeStamp = 0;
-            float lastTimeStamp = 0;
-            string newLineChar = "";
-            bool firstValue = true;
+            uint timeStamp = 0;
+            float timestampSeconds = 0;
+            float priorLatVal = 0.0F;
+            float priorLongVal = 0.0F;
+            bool gpsDistanceValid = false;
+
+            dataLogger.runData.Add(new RunData());
+            runDisplay.Add(new RunDisplay_Data());
+
+            logRunsIdx = dataLogger.runData.Count - 1;
+            dataLogger.runData[logRunsIdx].AddChannel("Time", "Timestamp", "Internal", 1.0F);
+
+            runDisplay[logRunsIdx].runColor = penColors[logRunsIdx % penColors.Count()];
+            runDisplay[logRunsIdx].stipchart_Offset[0] = 0.0F;
+            runDisplay[logRunsIdx].stipchart_Offset[1] = 0.0F;
+
+            dataLogger.runData[logRunsIdx].fileName = System.IO.Path.GetFileName(fileName);
+
             using (BinaryReader inFile = new BinaryReader(File.Open(fileName, FileMode.Open)))
             {
                 while(true)
                 {
+                    #region readf 1 char, exception on EOF
                     try
                     {
                         b[0] = inFile.ReadChar();
@@ -448,26 +461,20 @@ namespace YamuraLog
                     {
                         break;
                     }
-
+                    #endregion
+                    #region timestamp
                     // 'T', next 4 bytes are a unsigned long int
                     if ((char)b[0] == 'T')
                     {
-                        
-                        curTimeStamp = (float)inFile.ReadUInt32() / 1000000.0F;
-                        rStr.AppendFormat("{0}T{1}\t", newLineChar, curTimeStamp.ToString("N6"));
-                        newLineChar = System.Environment.NewLine;
-                        //if (firstValue)
-                        //{
-                        //    rStr.Append("0.000000\t 0.00\t");
-                        //    firstValue = false;
-                        //}
-                        //else
-                        //{
-                        //    rStr.AppendFormat("{0}\t{1}\t", (curTimeStamp - lastTimeStamp).ToString("N6"), (1.0F / (curTimeStamp - lastTimeStamp)).ToString("N2"));
-                        //}
-                        lastTimeStamp = curTimeStamp;
+                        timeStamp = inFile.ReadUInt32();
+                        byte[] tsBytes = BitConverter.GetBytes(timeStamp);
+
+                        timestampSeconds = (float)timeStamp / 1000000.0F;
+                        dataLogger.runData[logRunsIdx].channels["Time"].AddPoint(timestampSeconds, timestampSeconds);
                         continue;
                     }
+                    #endregion
+                    #region get channel type chars
                     try
                     {
                         b[1] = inFile.ReadChar();
@@ -477,118 +484,354 @@ namespace YamuraLog
                     {
                         break;
                     }
-
-                    // sensor channel names
-                    // GPS (gps device) returns floats for lat, long, heading, speed, satellites in view
-                    // ACC (3 axis accelerometer) returns 3 float values
-                    // IM9 (9 dof IMU) returns 9 float values
-                    // 
-                    // change i2c channels return 1 value
-                    // A2D (analog)  float
-                    // DIG (digital) int
-                    // CNT (counter) int
-                    // RPM (rev/min) float
-                    // this will make it easier to parse
-                    //
-                    // G 'GPS'
-                    // 4 byte channel number followed by
-                    // 4 byte float latitude
-                    // 4 byte float longitude
-                    // 4 byte float speed
-                    // 4 byte float heading
-                    // 4 byte int satellites in view
+                    #endregion
+                    #region GPS
+                    // GPS (gps device) returns NMEA strings
+                    // 4 byte channel number followed by NMEA string
                     if ((b[0] == 'G') && (b[1] == 'P') && (b[2] == 'S'))
                     {
-                        rStr.AppendFormat("GPS\t");//, inFile.ReadUInt32().ToString());
-                        rStr.AppendFormat("{0}\t", inFile.ReadSingle().ToString("N6"));
-                        rStr.AppendFormat("{0}\t", inFile.ReadSingle().ToString("N6"));
-                        rStr.AppendFormat("{0}\t", inFile.ReadSingle().ToString("N6"));
-                        rStr.AppendFormat("{0}\t", inFile.ReadSingle().ToString("N6"));
-                        rStr.AppendFormat("{0}\t", inFile.ReadSingle().ToString("N6"));
-                        rStr.AppendFormat("{0}\t", inFile.ReadUInt32().ToString());
+                        inFile.ReadUInt32();
+
+                        float lat = 0.0F;
+                        string ns = "";
+                        float lng = 0.0F;
+                        string ew = "";
+                        float hd = 0.0F;
+                        float speed = 0.0F;
+                        int sat = 0;
+                        string date = "";
+                        int utcHr = 0;
+                        int utcMin = 0;
+                        Single utcSec = 0.0F;
+                        if (ParseGPS_NMEA(inFile, out date, out utcHr, out utcMin, out utcSec, out lat, out ns, out lng, out ew, out hd, out speed, out sat))
+                        {
+                            dataLogger.runData[logRunsIdx].AddChannel("Latitude", "GPS Latitude", "GPS", 1.0F);
+                            dataLogger.runData[logRunsIdx].AddChannel("Longitude", "GPS Longitude", "GPS", 1.0F);
+                            dataLogger.runData[logRunsIdx].AddChannel("Speed-GPS", "GPS Speed", "GPS", 1.0F);
+                            dataLogger.runData[logRunsIdx].AddChannel("Heading-GPS", "GPS Heading", "GPS", 1.0F);
+                            dataLogger.runData[logRunsIdx].AddChannel("Distance-GPS", "GPS Distance", "GPS", 1.0F);
+                            // add data to channel
+                            dataLogger.runData[logRunsIdx].channels["Latitude"].AddPoint(timestampSeconds, lat);
+                            dataLogger.runData[logRunsIdx].channels["Longitude"].AddPoint(timestampSeconds, lng);
+                            dataLogger.runData[logRunsIdx].channels["Speed-GPS"].AddPoint(timestampSeconds, speed);
+                            dataLogger.runData[logRunsIdx].channels["Heading-GPS"].AddPoint(timestampSeconds, hd);
+                            if (!gpsDistanceValid)
+                            {
+                                dataLogger.runData[logRunsIdx].channels["Distance-GPS"].AddPoint(timestampSeconds, 0.0F);
+                                priorLatVal = lat;
+                                priorLongVal = lng;
+                                gpsDistanceValid = true;
+                            }
+                            else
+                            {
+                                gpsDist += GPSDistance(priorLatVal, priorLongVal, lat, lng);
+                                dataLogger.runData[logRunsIdx].channels["Distance-GPS"].AddPoint(timestampSeconds, gpsDist);
+                            }
+                        }
                     }
+                    #endregion
+                    #region ACC
                     //
                     // accel channel
-                    // 4 byte channel number followed by 3 floats (X, Y, Z)
+                    // ACC (3 axis accelerometer) returns byte channel number followed by 3 float values
                     //
                     else if ((b[0] == 'A') && (b[1] == 'C') && (b[2] == 'C'))
                     {
-                        rStr.AppendFormat("ACC {0}\t", inFile.ReadUInt32());
+                        inFile.ReadUInt32();
+                        // add channel (only if needed)
+                        dataLogger.runData[logRunsIdx].AddChannel("gX", "X Axis Acceleration", "Accelerometer", 1.0F);
+                        dataLogger.runData[logRunsIdx].AddChannel("gY", "Y Axis Acceleration", "Accelerometer", 1.0F);
+                        dataLogger.runData[logRunsIdx].AddChannel("gZ", "Z Axis Acceleration", "Accelerometer", 1.0F);
+                        Single accelVal = 0.0F;
                         for (int valIdx = 0; valIdx < 3; valIdx++)
                         {
-                            rStr.AppendFormat("{0}\t", inFile.ReadSingle().ToString("N6"));
+                            accelVal = inFile.ReadSingle();
+                            // add data to channel
+                            if (valIdx == 0)
+                            {
+                                dataLogger.runData[logRunsIdx].channels["gX"].AddPoint(timestampSeconds, accelVal);
+                            }
+                            else if (valIdx == 1)
+                            {
+                                dataLogger.runData[logRunsIdx].channels["gY"].AddPoint(timestampSeconds, accelVal);
+                            }
+                            else if (valIdx == 2)
+                            {
+                                dataLogger.runData[logRunsIdx].channels["gZ"].AddPoint(timestampSeconds, accelVal);
+                            }
                         }
                     }
+                    #endregion
+                    #region IMU
+                    // not implemented
+                    #endregion
+                    #region A2D/DIG/CNT/RPM
                     // 
                     // analog channel
                     // 4 byte channel number followed by 1 float (value)
                     //
                     else if ((b[0] == 'A') && (b[1] == '2') && (b[2] == 'D'))
                     {
-                        rStr.AppendFormat("A2D {0}\t", inFile.ReadUInt32());
-                        rStr.AppendFormat("{0}\t", inFile.ReadSingle().ToString("N6"));
+                        uint channelNum = inFile.ReadUInt32();
+                        Single channelVal = inFile.ReadSingle();
+                        String channelName = "A2D" + channelNum.ToString();
+                        dataLogger.runData[logRunsIdx].AddChannel(channelName, "Analog to Digital channel " + channelName, "A2D", 1.0F);
+                        dataLogger.runData[logRunsIdx].channels[channelName].AddPoint(timestampSeconds, channelVal);
+
                     }
-                    else
-                    {
-                        rStr.AppendFormat("Unknown {0}{1}{2}", (char)b[0], (char)b[1], (char)b[2]);
-                    }
-                    rStr.Append("\t");
+                    #endregion
                 }
                 inFile.Close();
             }
-            txtRunInfo.Text = rStr.ToString();
+            #region update display info
+            foreach (RunData curRun in dataLogger.runData)
+            {
+                foreach (KeyValuePair<String, DataChannel> curChannel in curRun.channels)
+                {
+                    globalDisplay.AddChannel(curChannel.Key);
+                    globalDisplay.channelRanges[curChannel.Key][0] = curChannel.Value.ChannelMin < globalDisplay.channelRanges[curChannel.Key][0] ? curChannel.Value.ChannelMin : globalDisplay.channelRanges[curChannel.Key][0];
+                    globalDisplay.channelRanges[curChannel.Key][1] = curChannel.Value.ChannelMax > globalDisplay.channelRanges[curChannel.Key][1] ? curChannel.Value.ChannelMax : globalDisplay.channelRanges[curChannel.Key][1];
+                    globalDisplay.yAxisChannel[curChannel.Key] = false;
+                }
+            }
+            foreach (KeyValuePair<String, float[]> kvp in globalDisplay.channelRanges)
+            {
+                cmbXAxis.Items.Add(kvp.Key);
+            }
+            cmbXAxis.SelectedText = "Time";
+            #endregion
+
+            for (int runIdx = 0; runIdx < dataLogger.runData.Count(); runIdx++)
+            {
+                trackMapLastCursorPos.Add(new Point(0, 0));
+                trackMapLastCursorPosValid.Add(false);
+                tractionCircleLastCursorPos.Add(new Point(0, 0));
+                tractionCircleLastCursorPosValid.Add(false);
+            }
+            // auto align launches
+            AutoAlign(0.10F);
+
+            channelDataGrid.Rows.Clear();
+            foreach (KeyValuePair<String, DataChannel> kvp in dataLogger.runData[0].channels)
+            {
+                channelDataGrid.Rows.Add();
+                channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["displayChannel"].Value = false;
+                channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelName"].Value = kvp.Key.ToString();
+            }
+            runDataGrid.Rows.Clear();
+            for (int runIdx = 0; runIdx < dataLogger.runData.Count(); runIdx++)
+            {
+                runDataGrid.Rows.Add();
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runIdx + 1).ToString();
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = runDisplay[runIdx].showRun;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = dataLogger.runData[runIdx].dateStr + " " + dataLogger.runData[runIdx].timeStr;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMin;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMax;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = runDisplay[runIdx].stipchart_Offset[0];
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runIdx].fileName.ToString();
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
+            }
+        }
+        /// <summary>
+        /// very specific NMEA parser for the output from Sparkfun QWIIC GPS breakout
+        /// see the Titan datasheet for more info
+        /// 
+        /// GGA - Time, position and fix type data.
+        /// $GPGGA -
+        /// $GNGGA -
+        ///
+        /// GSA - GNSS receiver operating mode, active satellites used in the position solution and DOP values.
+        /// $GPGSA
+        /// $GLGSA
+        ///
+        /// GSV - The number of GPS satellites in view satellite ID numbers, elevation, azimuth, and SNR values.
+        /// $GPGSV
+        /// $GLGSV
+        ///
+        /// RMC - Time, date, position, course and speed data. The recommended minimum navigation information.
+        /// $GPRMC
+        /// $GNRMC
+        /// 
+        /// Course and speed information relative to the ground.
+        /// $GPVTG
+        /// $GNVTG
+        /// 
+        /// </summary>
+        /// <param name="inFile"></param>
+        public bool ParseGPS_NMEA(BinaryReader inFile, out string date, out int hr, out int min, out float sec, out float lat, out string ns, out float lng, out string ew, out float hd, out float speed, out int sat)
+        {
+            bool rVal = false;
+            int utcHour = -1;
+            int utcMin = -1;
+            int utcSec = -1;
+            int utcmSec = -1;
+            int latDeg = -1;
+            int latMin = -1;
+            int latMinDecimal = -1;
+            int longDeg = -1;
+            int longMin = -1;
+            int longMinDecimal = -1;
+            int fixType = -1;
+            int satellites = -1;
+            Single speedKnotsPH = 0.0F;
+            Single speedKmPH = 0.0F;
+            Single heading = 0.0F;
+            String dateStr = "";
+            String nsIndication = "";
+            String ewIndication = "";
+            String dataValid = "";
+            lat = 0.0F;
+            ns = "X";
+            lng = 0.0F;
+            ew = "X";
+            hd = 0.0F;
+            speed = 0.0F;
+            sat = 0;
+            date = "xx/xx/xxxx";
+            hr = 0;
+            min = 0;
+            sec = 0F;
+
+
+            System.Diagnostics.Debug.WriteLine("Parse NMEA string");
+            char c;
+            String dataSentence;
+            // sentance always begins with '$', ends with 0x0D
+            while (inFile.PeekChar() == '$')
+            {
+                #region read sentence
+                dataSentence = "";
+                c = inFile.ReadChar();
+                while (c != 0x0D)
+                {
+                    dataSentence += c;
+                    c = inFile.ReadChar();
+                }
+                String[] words = dataSentence.Split(new char[] { ',' });
+                #endregion
+                try
+                {
+                    #region GGA - Time, position and fix type data.
+                    if ((dataSentence.StartsWith("$GPGGA")) || // GPS
+                        (dataSentence.StartsWith("$GNGGA")))   // 
+                    {
+                        utcHour = Convert.ToInt32(words[1].Substring(0, 2));
+                        utcMin = Convert.ToInt32(words[1].Substring(2, 2));
+                        utcSec = Convert.ToInt32(words[1].Substring(4, 2));
+                        utcmSec = Convert.ToInt32(words[1].Substring(7, 3));
+
+                        latDeg = Convert.ToInt32(words[2].Substring(0, 2));
+                        latMin = Convert.ToInt32(words[2].Substring(2, 2));
+                        latMinDecimal = Convert.ToInt32(words[2].Substring(5, 4));
+
+                        nsIndication = words[3];
+
+                        longDeg = Convert.ToInt32(words[4].Substring(0, 3));
+                        longMin = Convert.ToInt32(words[4].Substring(3, 2));
+                        longMinDecimal = Convert.ToInt32(words[4].Substring(6, 4));
+
+                        ewIndication = words[5];
+
+                        fixType = Convert.ToInt32(words[6]);
+
+                        satellites = Convert.ToInt32(words[7]);
+                    }
+                    #endregion
+                    #region GSA - GNSS receiver operating mode, active satellites used in the position solution and DOP values.
+                    else if ((dataSentence.StartsWith("$GPGSA")) || // GPS, GNSS
+                             (dataSentence.StartsWith("$GLGSA"))) // GPS+GLONASS
+                    {
+
+                    }
+                    #endregion
+                    #region GSV - The number of GPS satellites in view satellite ID numbers, elevation, azimuth, and SNR values.
+                    else if ((dataSentence.StartsWith("$GPGSV")) || // GPS, GNSS
+                             (dataSentence.StartsWith("$GLGSV"))) // GPS + GLONASS
+                    {
+
+                    }
+                    #endregion
+                    #region RMC - Time, date, position, course and speed data. The recommended minimum navigation information.
+                    else if ((dataSentence.StartsWith("$GPRMC")) || // GPS
+                             (dataSentence.StartsWith("$GNRMC"))) // GNSS
+                    {
+                        utcHour = Convert.ToInt32(words[1].Substring(0, 2));
+                        utcMin = Convert.ToInt32(words[1].Substring(2, 2));
+                        utcSec = Convert.ToInt32(words[1].Substring(4, 2));
+                        utcmSec = Convert.ToInt32(words[1].Substring(7, 3));
+
+                        dataValid = words[2];
+
+                        latDeg = Convert.ToInt32(words[3].Substring(0, 2));
+                        latMin = Convert.ToInt32(words[3].Substring(2, 2));
+                        latMinDecimal = Convert.ToInt32(words[3].Substring(5, 4));
+
+                        nsIndication = words[4];
+
+                        longDeg = Convert.ToInt32(words[5].Substring(0, 3));
+                        longMin = Convert.ToInt32(words[5].Substring(3, 2));
+                        longMinDecimal = Convert.ToInt32(words[5].Substring(6, 4));
+
+                        ewIndication = words[6];
+
+                        speedKnotsPH = Convert.ToSingle(words[7]);
+                        heading = Convert.ToSingle(words[8]);
+                        dateStr = words[9];
+                    }
+                    #endregion
+                    #region VTG - Course and speed information relative to the ground.
+                    else if ((dataSentence.StartsWith("$GPVTG")) || // GPS
+                             (dataSentence.StartsWith("$GNVTG"))) // GNSS
+                    {
+                        heading = Convert.ToSingle(words[1]);
+                        speedKnotsPH = Convert.ToSingle(words[5]);
+                        speedKmPH = Convert.ToSingle(words[7]);
+                    }
+                    #endregion
+                    #region unknown/deformed sentances - ignore
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("Unknown NMEA string " + dataSentence);
+                    }
+                    #endregion
+                }
+                catch
+                { }
+            }
+            if(latDeg == -1)
+            {
+                rVal = false;
+            }
+            else
+            { 
+                rVal = true;
+                if (dateStr.Length < 6)
+                {
+                    date = "xx/xx/xxxx";
+                }
+                else
+                {
+                    date = dateStr.Substring(2, 2) + "/" + dateStr.Substring(0, 2) + "/20" + dateStr.Substring(4, 2);
+                }
+                hr = utcHour;
+                min = utcMin;
+                sec= (Single)utcSec + (Single)utcmSec/1000.0F;
+
+                lat = (Single)latDeg + ((Single)latMin + ((Single)latMinDecimal / 10000.0F)) / 60.0F;
+                ns = nsIndication;
+                lng = (Single)longDeg + ((Single)longMin + ((Single)longMinDecimal / 10000.0F)) / 60.0F;
+                ew =ewIndication;
+                hd = heading;
+                if((speedKmPH == -1.0F) && (speedKnotsPH != -1.0F))
+                {
+                    speedKmPH = speedKnotsPH * 1.852F;
+                }
+                speed = speedKmPH;
+                sat = satellites;
+            }
+            return rVal;
         }
         #endregion
-
-        //#region update display info
-        //foreach (RunData curRun in dataLogger.runData)
-        //{
-        //    foreach (KeyValuePair<String, DataChannel> curChannel in curRun.channels)
-        //    {
-        //        globalDisplay.AddChannel(curChannel.Key);
-        //        globalDisplay.channelRanges[curChannel.Key][0] = curChannel.Value.ChannelMin < globalDisplay.channelRanges[curChannel.Key][0] ? curChannel.Value.ChannelMin : globalDisplay.channelRanges[curChannel.Key][0];
-        //        globalDisplay.channelRanges[curChannel.Key][1] = curChannel.Value.ChannelMax > globalDisplay.channelRanges[curChannel.Key][1] ? curChannel.Value.ChannelMax : globalDisplay.channelRanges[curChannel.Key][1];
-        //        globalDisplay.yAxisChannel[curChannel.Key] = false;
-        //    }
-        //}
-        //foreach (KeyValuePair<String, float[]> kvp in globalDisplay.channelRanges)
-        //{
-        //    cmbXAxis.Items.Add(kvp.Key);
-        //}
-        //cmbXAxis.SelectedText = "Time";
-        //#endregion
-
-        //for (int runIdx = 0; runIdx < dataLogger.runData.Count(); runIdx++)
-        //{
-        //    trackMapLastCursorPos.Add(new Point(0, 0));
-        //    trackMapLastCursorPosValid.Add(false);
-        //    tractionCircleLastCursorPos.Add(new Point(0, 0));
-        //    tractionCircleLastCursorPosValid.Add(false);
-        //}
-        //// auto align launches
-        //AutoAlign(0.10F);
-
-        //channelDataGrid.Rows.Clear();
-        //foreach (KeyValuePair<String, DataChannel> kvp in dataLogger.runData[0].channels)
-        //{
-        //    channelDataGrid.Rows.Add();
-        //    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["displayChannel"].Value = false;
-        //    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelName"].Value = kvp.Key.ToString();
-        //}
-        //runDataGrid.Rows.Clear();
-        //for (int runIdx = 0; runIdx < dataLogger.runData.Count(); runIdx++)
-        //{
-        //    runDataGrid.Rows.Add();
-        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runIdx + 1).ToString();
-        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = runDisplay[runIdx].showRun;
-        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = dataLogger.runData[runIdx].dateStr + " " + dataLogger.runData[runIdx].timeStr;
-        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMin;
-        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMax;
-        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = runDisplay[runIdx].stipchart_Offset[0];
-        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runIdx].fileName.ToString();
-        //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
-        //}
-        //#endregion
         /// <summary>
         /// estimate launch point offset from speed data
         /// find first speed > 30, walk back to first speed = 0
