@@ -1406,6 +1406,7 @@ namespace YamuraLog
                 channelCount++;
             }
             #endregion
+            bool drawTrace = false;
             xChannelName = cmbXAxis.Text;
             using (Graphics mapGraphics = stripChartPanel.CreateGraphics())
             {
@@ -1416,27 +1417,58 @@ namespace YamuraLog
                     stripChartExtentsX[1] = globalDisplay.channelRanges[xChannelName][1] + stripChartOffset[0];
                 }
 
-                foreach (KeyValuePair<String, bool> kvp in globalDisplay.yAxisChannel)
+                //foreach (KeyValuePair<String, bool> kvp in globalDisplay.yAxisChannel)
+                //{
+                //    yChannelName = kvp.Key;
+                //    if (globalDisplay.yAxisChannel[yChannelName] == false)
+                //    {
+                //        continue;
+                //    }
+                //    stripChartScaleY.Add(yChannelName, (float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.channelRanges[yChannelName][1] - globalDisplay.channelRanges[yChannelName][0]));
+                //
+                runCount = 0;
+                stripChartScaleY.Clear();
+
+                foreach (RunData curRun in dataLogger.runData)
                 {
-                    yChannelName = kvp.Key;
-                    if (globalDisplay.yAxisChannel[yChannelName] == false)
+                    foreach(KeyValuePair<String,DataChannel> curChan in curRun.channels)
                     {
-                        continue;
-                    }
-                    stripChartScaleY.Add(yChannelName, (float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.channelRanges[yChannelName][1] - globalDisplay.channelRanges[yChannelName][0]));
-
-                    runCount = 0;
-
-
-                    foreach (RunData  curRun in dataLogger.runData)
-                    {
-                        if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
+                        drawTrace = false;
+                        for (int rowIdx = 0; rowIdx < channelDataGrid.Rows.Count; rowIdx++)
                         {
-                            runCount++;
+                            if ((bool)channelDataGrid.Rows[rowIdx].Cells["displayChannel"].Value == false)
+                            {
+                                continue;
+                            }
+                            System.Diagnostics.Debug.WriteLine("Test " + (runCount + 1).ToString() + " " + curChan.Key + " == " + Convert.ToInt32(channelDataGrid.Rows[rowIdx].Cells["runName"].Value) + " " + (string)channelDataGrid.Rows[rowIdx].Cells["channelName"].Value);
+                            // displayed, done
+                            if (((bool)channelDataGrid.Rows[rowIdx].Cells["displayChannel"].Value == true) &&
+                                (Convert.ToInt32(channelDataGrid.Rows[rowIdx].Cells["runName"].Value) == (runCount + 1)) &&
+                                ((string)channelDataGrid.Rows[rowIdx].Cells["channelName"].Value == curChan.Key))
+                            {
+                                yChannelName = curChan.Key;
+                                System.Diagnostics.Debug.WriteLine((runCount + 1).ToString() + " " + curChan.Key + " SHOWN!");
+                                drawTrace = true;
+                                break;
+                            }
+
+                        }
+                        if(!drawTrace)
+                        {
                             continue;
                         }
-                        drawPen = new Pen(runDisplay[runCount].runColor);
-                        
+                        if (!stripChartScaleY.ContainsKey(yChannelName))
+                        {
+                            stripChartScaleY.Add(yChannelName, (float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.channelRanges[yChannelName][1] - globalDisplay.channelRanges[yChannelName][0]));
+                        }
+                        //if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
+                        //{
+                        //    runCount++;
+                        //    continue;
+                        //}
+                        //drawPen = new Pen(runDisplay[runCount].runColor);
+                        drawPen = new Pen(curRun.channels[yChannelName].ChannelColor);
+
                         initialValue = false;
                         foreach (KeyValuePair<float, DataPoint> curData in curRun.channels[yChannelName].DataPoints)
                         {
@@ -1466,13 +1498,14 @@ namespace YamuraLog
                             startPt.Y = endPt.Y;
                             initialValue = true;
                         }
-                        runCount++;
                     }
+                    runCount++;
                 }
             }
         }
         private void stripChart_MouseMove(object sender, MouseEventArgs e)
         {
+            return;
             stripChartPanel.Focus();
             PointF floatPosition = new PointF(e.X, e.Y);
             floatPosition = globalDisplay.ScaleDisplayToData(floatPosition,
@@ -1795,15 +1828,16 @@ namespace YamuraLog
         #region Y axis channel grid events
         private void YAxisChannelDataGrid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            // Ignore clicks that are not on button cells. 
-            if (e.RowIndex >= 0 && e.ColumnIndex == channelDataGrid.Columns["displayChannel"].Index)
-            {
-                // note - at this point, the checkbox value hasn't been updated, so just toggle the channel display value
-                //        the checkbox will catch up...
-                globalDisplay.yAxisChannel[channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString()] = !globalDisplay.yAxisChannel[channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString()];// (bool)channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value;
+            //// Ignore clicks that are not on button cells. 
+            //if (e.RowIndex >= 0 && e.ColumnIndex == channelDataGrid.Columns["displayChannel"].Index)
+            //{
+            //    // note - at this point, the checkbox value hasn't been updated, so just toggle the channel display value
+            //    //        the checkbox will catch up...
+            //    globalDisplay.yAxisChannel[channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString()] = !globalDisplay.yAxisChannel[channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString()];// (bool)channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value;
 
-                stripChartPanel.Invalidate();
-            }
+            //    stripChartPanel.Invalidate();
+            //}
+            stripChartPanel.Invalidate();
             return;
         }
         #endregion
