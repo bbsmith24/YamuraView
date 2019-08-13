@@ -1,0 +1,59 @@
+GGA
+---
+Time, position and fix type data. 
+
+GSA
+--- 
+GNSS receiver operating mode, active satellites used in the position solution and DOP values. 
+
+GSV
+--- 
+The number of GPS satellites in view satellite ID numbers, elevation, azimuth, and SNR values. 
+
+RMC
+--- 
+Time, date, position, course and speed data. The recommended minimum navigation information. 
+
+VTG
+--- 
+Course and speed information relative to the ground.
+
+Log file viewer only parses 
+ GGA - Time, position and fix type data - $GPGGA/$GNGGA
+ RMC - Time, date, position, course and speed data. The recommended minimum navigation information. - $GPRMC/$GNRMC
+ VTG - Course and speed information relative to the ground - $GPVTG/$GNVTG
+ 
+from the standpoint of the log file viewer, GGA and RMC data are redundant - only extra data supplied by GGA is the satellites in use count
+GSV just takes up space - it's details on the satellites used that is completely ignored and there are usually 2-3 sentences worth of data... 
+
+SET_NMEA_OUTPUT command
+ 
+Data Field:
+There are totally 19 data fields that present output frequencies for the 19 supported
+NMEA sentences individually.
+Supported NMEA Sentences
+0 NMEA_SEN_GLL, // GPGLL interval - Geographic Position - Latitude longitude
+1 NMEA_SEN_RMC, // GPRMC interval - Recommended Minimum Specific GNSS Sentence
+2 NMEA_SEN_VTG, // GPVTG interval - Course over Ground and Ground Speed
+3 NMEA_SEN_GGA, // GPGGA interval - GPS Fix Data
+4 NMEA_SEN_GSA, // GPGSA interval - GNSS DOPS and Active Satellites
+5 NMEA_SEN_GSV, // GPGSV interval - GNSS Satellites in View
+6 //Reserved
+7 //Reserved
+13 //Reserved
+14 //Reserved
+15 //Reserved
+16 //Reserved
+17 NMEA_SEN_ZDA, // GPZDA interval – Time & Date
+18 NMEA_SEN_MCHN, // PMTKCHN interval – GPS channel status
+
+Supported Frequency Setting
+0 - Disabled or not supported sentence
+1 - Output once every one position fix
+2 - Output once every two position fixes
+3 - Output once every three position fixes
+4 - Output once every four position fixes
+5 - Output once every five position fixes
+
+Example:
+$PMTK314,1,1,1,1,1,5,0,0,0,0,0,0,0,0,0,0,0,0,0*2C<CR><LF>
