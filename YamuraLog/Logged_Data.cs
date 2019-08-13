@@ -335,7 +335,14 @@ namespace YamuraLog
         }
         public void AddPoint(float timeStamp, float value)
         {
-            DataPoints.Add(timeStamp, new DataPoint(value));
+            if(DataPoints.ContainsKey(timeStamp))
+            {
+                DataPoints[timeStamp].PointValue = value;
+            }
+            else
+            {
+                DataPoints.Add(timeStamp, new DataPoint(value));
+            }
             TimeMin = value < TimeMin ? value : TimeMin;
             TimeMax = value > TimeMax ? value : TimeMax;
             ChannelMin = value < ChannelMin ? value : ChannelMin;

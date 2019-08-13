@@ -573,10 +573,10 @@ namespace YamuraLog
                     else if ((b[0] == 'A') && (b[1] == '2') && (b[2] == 'D'))
                     {
                         uint channelNum = inFile.ReadUInt32();
-                        Single channelVal = inFile.ReadSingle();
+                        UInt32 channelVal = inFile.ReadUInt32();
                         String channelName = "A2D" + channelNum.ToString();
                         dataLogger.runData[logRunsIdx].AddChannel(channelName, "Analog to Digital channel " + channelName, "A2D", 1.0F);
-                        dataLogger.runData[logRunsIdx].channels[channelName].AddPoint(timestampSeconds, channelVal);
+                        dataLogger.runData[logRunsIdx].channels[channelName].AddPoint(timestampSeconds, (float)channelVal);
 
                     }
                     #endregion
