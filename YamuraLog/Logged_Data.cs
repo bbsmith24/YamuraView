@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -212,6 +213,7 @@ namespace YamuraLog
         String channelDescription;
         String channelSource;
         float channelScale;
+        Color channelColor = Color.Black;
         float timeMin = float.MaxValue;
         float timeMax = float.MinValue;
         float channelMin = float.MaxValue;
@@ -311,6 +313,18 @@ namespace YamuraLog
             set
             {
                 channelMax = value;
+            }
+        }
+        public Color ChannelColor
+        {
+            get
+            {
+                return channelColor;
+            }
+
+            set
+            {
+                channelColor = value;
             }
         }
         public DataChannel(String name, String desc, String src, float scale)

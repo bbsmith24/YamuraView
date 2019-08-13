@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btnOpenFile = new System.Windows.Forms.Button();
             this.openLogFile = new System.Windows.Forms.OpenFileDialog();
             this.mapPanel = new System.Windows.Forms.Panel();
@@ -55,11 +55,13 @@
             this.btnAutoAlign = new System.Windows.Forms.Button();
             this.txtAutoAlignThreshold = new System.Windows.Forms.TextBox();
             this.channelDataGrid = new System.Windows.Forms.DataGridView();
-            this.displayChannel = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.channelName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cmbXAxis = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.stripchartHScroll = new System.Windows.Forms.HScrollBar();
+            this.displayChannel = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.channelColor = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.runName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.channelName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.channelDataGrid)).BeginInit();
             this.SuspendLayout();
@@ -67,9 +69,9 @@
             // btnOpenFile
             // 
             this.btnOpenFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenFile.Location = new System.Drawing.Point(795, 196);
+            this.btnOpenFile.Location = new System.Drawing.Point(512, 201);
             this.btnOpenFile.Name = "btnOpenFile";
-            this.btnOpenFile.Size = new System.Drawing.Size(162, 23);
+            this.btnOpenFile.Size = new System.Drawing.Size(90, 23);
             this.btnOpenFile.TabIndex = 0;
             this.btnOpenFile.Text = "Add Runs";
             this.btnOpenFile.UseVisualStyleBackColor = true;
@@ -132,14 +134,14 @@
             this.txtRunInfo.Multiline = true;
             this.txtRunInfo.Name = "txtRunInfo";
             this.txtRunInfo.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtRunInfo.Size = new System.Drawing.Size(562, 205);
+            this.txtRunInfo.Size = new System.Drawing.Size(279, 205);
             this.txtRunInfo.TabIndex = 7;
             // 
             // label2
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(792, 226);
+            this.label2.Location = new System.Drawing.Point(532, 266);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(111, 13);
             this.label2.TabIndex = 14;
@@ -149,7 +151,7 @@
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(792, 266);
+            this.label3.Location = new System.Drawing.Point(795, 12);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(110, 13);
             this.label3.TabIndex = 15;
@@ -178,7 +180,7 @@
             this.runDataGrid.Location = new System.Drawing.Point(11, 12);
             this.runDataGrid.Name = "runDataGrid";
             this.runDataGrid.RowHeadersVisible = false;
-            this.runDataGrid.Size = new System.Drawing.Size(1091, 180);
+            this.runDataGrid.Size = new System.Drawing.Size(778, 180);
             this.runDataGrid.TabIndex = 18;
             // 
             // colRunNumber
@@ -268,7 +270,7 @@
             // 
             this.btnAutoAlign.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAutoAlign.Enabled = false;
-            this.btnAutoAlign.Location = new System.Drawing.Point(963, 197);
+            this.btnAutoAlign.Location = new System.Drawing.Point(616, 201);
             this.btnAutoAlign.Name = "btnAutoAlign";
             this.btnAutoAlign.Size = new System.Drawing.Size(75, 23);
             this.btnAutoAlign.TabIndex = 20;
@@ -280,7 +282,7 @@
             // 
             this.txtAutoAlignThreshold.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.txtAutoAlignThreshold.Enabled = false;
-            this.txtAutoAlignThreshold.Location = new System.Drawing.Point(1044, 199);
+            this.txtAutoAlignThreshold.Location = new System.Drawing.Point(697, 203);
             this.txtAutoAlignThreshold.Name = "txtAutoAlignThreshold";
             this.txtAutoAlignThreshold.Size = new System.Drawing.Size(58, 20);
             this.txtAutoAlignThreshold.TabIndex = 21;
@@ -293,32 +295,20 @@
             this.channelDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.channelDataGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.displayChannel,
+            this.channelColor,
+            this.runName,
             this.channelName});
-            this.channelDataGrid.Location = new System.Drawing.Point(795, 282);
+            this.channelDataGrid.Location = new System.Drawing.Point(795, 28);
             this.channelDataGrid.Name = "channelDataGrid";
             this.channelDataGrid.RowHeadersVisible = false;
-            this.channelDataGrid.Size = new System.Drawing.Size(314, 121);
+            this.channelDataGrid.Size = new System.Drawing.Size(314, 375);
             this.channelDataGrid.TabIndex = 22;
-            // 
-            // displayChannel
-            // 
-            this.displayChannel.HeaderText = "Show";
-            this.displayChannel.Name = "displayChannel";
-            this.displayChannel.Width = 50;
-            // 
-            // channelName
-            // 
-            this.channelName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
-            this.channelName.DefaultCellStyle = dataGridViewCellStyle1;
-            this.channelName.HeaderText = "Channel";
-            this.channelName.Name = "channelName";
             // 
             // cmbXAxis
             // 
             this.cmbXAxis.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbXAxis.FormattingEnabled = true;
-            this.cmbXAxis.Location = new System.Drawing.Point(795, 242);
+            this.cmbXAxis.Location = new System.Drawing.Point(535, 282);
             this.cmbXAxis.Name = "cmbXAxis";
             this.cmbXAxis.Size = new System.Drawing.Size(220, 21);
             this.cmbXAxis.TabIndex = 23;
@@ -343,6 +333,32 @@
             this.stripchartHScroll.Size = new System.Drawing.Size(777, 17);
             this.stripchartHScroll.TabIndex = 25;
             this.stripchartHScroll.Scroll += new System.Windows.Forms.ScrollEventHandler(this.stripchartHScroll_Scroll);
+            // 
+            // displayChannel
+            // 
+            this.displayChannel.HeaderText = "Show";
+            this.displayChannel.Name = "displayChannel";
+            this.displayChannel.Width = 50;
+            // 
+            // channelColor
+            // 
+            this.channelColor.HeaderText = "Color";
+            this.channelColor.Name = "channelColor";
+            this.channelColor.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.channelColor.Width = 50;
+            // 
+            // runName
+            // 
+            this.runName.HeaderText = "Run";
+            this.runName.Name = "runName";
+            // 
+            // channelName
+            // 
+            this.channelName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
+            this.channelName.DefaultCellStyle = dataGridViewCellStyle2;
+            this.channelName.HeaderText = "Channel";
+            this.channelName.Name = "channelName";
             // 
             // Form1
             // 
@@ -401,11 +417,13 @@
         private System.Windows.Forms.Button btnAutoAlign;
         private System.Windows.Forms.TextBox txtAutoAlignThreshold;
         private System.Windows.Forms.DataGridView channelDataGrid;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn displayChannel;
-        private System.Windows.Forms.DataGridViewTextBoxColumn channelName;
         private System.Windows.Forms.ComboBox cmbXAxis;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.HScrollBar stripchartHScroll;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn displayChannel;
+        private System.Windows.Forms.DataGridViewTextBoxColumn channelColor;
+        private System.Windows.Forms.DataGridViewTextBoxColumn runName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn channelName;
     }
 }
 

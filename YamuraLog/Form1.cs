@@ -376,55 +376,7 @@ namespace YamuraLog
             readTemp.Close();
             System.IO.File.Delete(tempLogFile);
             #endregion
-
-            #region update display info
-            foreach (RunData curRun in dataLogger.runData)
-            {
-                foreach (KeyValuePair<String, DataChannel> curChannel in curRun.channels)
-                {
-                    globalDisplay.AddChannel(curChannel.Key);
-                    globalDisplay.channelRanges[curChannel.Key][0] = curChannel.Value.ChannelMin < globalDisplay.channelRanges[curChannel.Key][0] ? curChannel.Value.ChannelMin : globalDisplay.channelRanges[curChannel.Key][0];
-                    globalDisplay.channelRanges[curChannel.Key][1] = curChannel.Value.ChannelMax > globalDisplay.channelRanges[curChannel.Key][1] ? curChannel.Value.ChannelMax : globalDisplay.channelRanges[curChannel.Key][1];
-                    globalDisplay.yAxisChannel[curChannel.Key] = false;
-                }
-            }
-            foreach (KeyValuePair<String, float[]> kvp in globalDisplay.channelRanges)
-            {
-                cmbXAxis.Items.Add(kvp.Key);
-            }
-            cmbXAxis.SelectedText = "Time";
-            #endregion
-
-            for (int runIdx = 0; runIdx < dataLogger.runData.Count(); runIdx++)
-            {
-                trackMapLastCursorPos.Add(new Point(0, 0));
-                trackMapLastCursorPosValid.Add(false);
-                tractionCircleLastCursorPos.Add(new Point(0, 0));
-                tractionCircleLastCursorPosValid.Add(false);
-            }
-            // auto align launches
-            AutoAlign(0.10F);
-
-            channelDataGrid.Rows.Clear();
-            foreach (KeyValuePair<String, DataChannel> kvp in dataLogger.runData[0].channels)
-            {
-                channelDataGrid.Rows.Add();
-                channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["displayChannel"].Value = false;
-                channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelName"].Value = kvp.Key.ToString();
-            }
-            runDataGrid.Rows.Clear();
-            for (int runIdx = 0; runIdx < dataLogger.runData.Count(); runIdx++)
-            {
-                runDataGrid.Rows.Add();
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runIdx + 1).ToString();
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = runDisplay[runIdx].showRun;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = dataLogger.runData[runIdx].dateStr + " " + dataLogger.runData[runIdx].timeStr;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMin;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMax;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = runDisplay[runIdx].stipchart_Offset[0];
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runIdx].fileName.ToString();
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
-            }
+            UpdateData();
         }
         private void ReadYLGFile(String fileName)
         {
@@ -583,54 +535,7 @@ namespace YamuraLog
                 }
                 inFile.Close();
             }
-            #region update display info
-            foreach (RunData curRun in dataLogger.runData)
-            {
-                foreach (KeyValuePair<String, DataChannel> curChannel in curRun.channels)
-                {
-                    globalDisplay.AddChannel(curChannel.Key);
-                    globalDisplay.channelRanges[curChannel.Key][0] = curChannel.Value.ChannelMin < globalDisplay.channelRanges[curChannel.Key][0] ? curChannel.Value.ChannelMin : globalDisplay.channelRanges[curChannel.Key][0];
-                    globalDisplay.channelRanges[curChannel.Key][1] = curChannel.Value.ChannelMax > globalDisplay.channelRanges[curChannel.Key][1] ? curChannel.Value.ChannelMax : globalDisplay.channelRanges[curChannel.Key][1];
-                    globalDisplay.yAxisChannel[curChannel.Key] = false;
-                }
-            }
-            foreach (KeyValuePair<String, float[]> kvp in globalDisplay.channelRanges)
-            {
-                cmbXAxis.Items.Add(kvp.Key);
-            }
-            cmbXAxis.SelectedText = "Time";
-            #endregion
-
-            for (int runIdx = 0; runIdx < dataLogger.runData.Count(); runIdx++)
-            {
-                trackMapLastCursorPos.Add(new Point(0, 0));
-                trackMapLastCursorPosValid.Add(false);
-                tractionCircleLastCursorPos.Add(new Point(0, 0));
-                tractionCircleLastCursorPosValid.Add(false);
-            }
-            // auto align launches
-            AutoAlign(0.10F);
-
-            channelDataGrid.Rows.Clear();
-            foreach (KeyValuePair<String, DataChannel> kvp in dataLogger.runData[0].channels)
-            {
-                channelDataGrid.Rows.Add();
-                channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["displayChannel"].Value = false;
-                channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelName"].Value = kvp.Key.ToString();
-            }
-            runDataGrid.Rows.Clear();
-            for (int runIdx = 0; runIdx < dataLogger.runData.Count(); runIdx++)
-            {
-                runDataGrid.Rows.Add();
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runIdx + 1).ToString();
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = runDisplay[runIdx].showRun;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = dataLogger.runData[runIdx].dateStr + " " + dataLogger.runData[runIdx].timeStr;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMin;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMax;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = runDisplay[runIdx].stipchart_Offset[0];
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runIdx].fileName.ToString();
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
-            }
+            UpdateData();
         }
         /// <summary>
         /// very specific NMEA parser for the output from Sparkfun QWIIC GPS breakout
@@ -830,6 +735,66 @@ namespace YamuraLog
                 sat = satellites;
             }
             return rVal;
+        }
+        public void UpdateData()
+        {
+            int channelIdx = 0;
+            #region update display info
+            foreach (RunData curRun in dataLogger.runData)
+            {
+                channelIdx = 0;
+                foreach (KeyValuePair<String, DataChannel> curChannel in curRun.channels)
+                {
+                    curChannel.Value.ChannelColor = penColors[channelIdx % penColors.Count()];
+                    globalDisplay.AddChannel(curChannel.Key);
+                    globalDisplay.channelRanges[curChannel.Key][0] = curChannel.Value.ChannelMin<globalDisplay.channelRanges[curChannel.Key][0] ? curChannel.Value.ChannelMin : globalDisplay.channelRanges[curChannel.Key][0];
+                    globalDisplay.channelRanges[curChannel.Key][1] = curChannel.Value.ChannelMax > globalDisplay.channelRanges[curChannel.Key][1] ? curChannel.Value.ChannelMax : globalDisplay.channelRanges[curChannel.Key][1];
+                    globalDisplay.yAxisChannel[curChannel.Key] = false;
+                    channelIdx++;
+                }
+            }
+            foreach (KeyValuePair<String, float[]> kvp in globalDisplay.channelRanges)
+            {
+                cmbXAxis.Items.Add(kvp.Key);
+            }
+            cmbXAxis.SelectedText = "Time";
+            #endregion
+
+            for (int runIdx = 0; runIdx<dataLogger.runData.Count(); runIdx++)
+            {
+                trackMapLastCursorPos.Add(new Point(0, 0));
+                trackMapLastCursorPosValid.Add(false);
+                tractionCircleLastCursorPos.Add(new Point(0, 0));
+                tractionCircleLastCursorPosValid.Add(false);
+            }
+            // auto align launches
+            AutoAlign(0.10F);
+
+            channelDataGrid.Rows.Clear();
+            for (int runIdx = 0; runIdx < dataLogger.runData.Count; runIdx++)
+            {
+                foreach (KeyValuePair<String, DataChannel> kvp in dataLogger.runData[runIdx].channels)
+                {
+                    channelDataGrid.Rows.Add();
+                    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["displayChannel"].Value = false;
+                    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelColor"].Style.BackColor = kvp.Value.ChannelColor;
+                    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["runName"].Value = (runIdx+1).ToString();
+                    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelName"].Value = kvp.Key.ToString();
+                }
+            }
+            runDataGrid.Rows.Clear();
+            for (int runIdx = 0; runIdx < dataLogger.runData.Count(); runIdx++)
+            {
+                runDataGrid.Rows.Add();
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runIdx + 1).ToString();
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = runDisplay[runIdx].showRun;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = dataLogger.runData[runIdx].dateStr + " " + dataLogger.runData[runIdx].timeStr;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMin;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMax;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = runDisplay[runIdx].stipchart_Offset[0];
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runIdx].fileName.ToString();
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
+            }
         }
         #endregion
         /// <summary>
