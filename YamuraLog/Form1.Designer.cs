@@ -34,7 +34,6 @@
             this.mapPanel = new System.Windows.Forms.Panel();
             this.tractionCirclePanel = new System.Windows.Forms.Panel();
             this.stripChartPanel = new System.Windows.Forms.Panel();
-            this.txtRunInfo = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.runDataGrid = new System.Windows.Forms.DataGridView();
@@ -56,6 +55,8 @@
             this.txtAutoAlignThreshold = new System.Windows.Forms.TextBox();
             this.channelDataGrid = new System.Windows.Forms.DataGridView();
             this.displayChannel = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.channelColor = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.runName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.channelName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cmbXAxis = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -67,9 +68,9 @@
             // btnOpenFile
             // 
             this.btnOpenFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenFile.Location = new System.Drawing.Point(795, 196);
+            this.btnOpenFile.Location = new System.Drawing.Point(1019, 7);
             this.btnOpenFile.Name = "btnOpenFile";
-            this.btnOpenFile.Size = new System.Drawing.Size(162, 23);
+            this.btnOpenFile.Size = new System.Drawing.Size(90, 23);
             this.btnOpenFile.TabIndex = 0;
             this.btnOpenFile.Text = "Add Runs";
             this.btnOpenFile.UseVisualStyleBackColor = true;
@@ -81,9 +82,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.mapPanel.BackColor = System.Drawing.Color.White;
             this.mapPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.mapPanel.Location = new System.Drawing.Point(795, 409);
+            this.mapPanel.Location = new System.Drawing.Point(795, 574);
             this.mapPanel.Name = "mapPanel";
-            this.mapPanel.Size = new System.Drawing.Size(314, 486);
+            this.mapPanel.Size = new System.Drawing.Size(314, 321);
             this.mapPanel.TabIndex = 4;
             this.mapPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.trackMap_Paint);
             this.mapPanel.Layout += new System.Windows.Forms.LayoutEventHandler(this.trackMap_Layout);
@@ -93,13 +94,12 @@
             // 
             // tractionCirclePanel
             // 
-            this.tractionCirclePanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tractionCirclePanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.tractionCirclePanel.BackColor = System.Drawing.Color.White;
             this.tractionCirclePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tractionCirclePanel.Location = new System.Drawing.Point(12, 198);
+            this.tractionCirclePanel.Location = new System.Drawing.Point(795, 409);
             this.tractionCirclePanel.Name = "tractionCirclePanel";
-            this.tractionCirclePanel.Size = new System.Drawing.Size(209, 205);
+            this.tractionCirclePanel.Size = new System.Drawing.Size(314, 159);
             this.tractionCirclePanel.TabIndex = 5;
             this.tractionCirclePanel.Paint += new System.Windows.Forms.PaintEventHandler(this.tractionCircle_Paint);
             this.tractionCirclePanel.Layout += new System.Windows.Forms.LayoutEventHandler(this.tractionCircle_Layout);
@@ -114,9 +114,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.stripChartPanel.BackColor = System.Drawing.Color.White;
             this.stripChartPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.stripChartPanel.Location = new System.Drawing.Point(12, 409);
+            this.stripChartPanel.Location = new System.Drawing.Point(11, 198);
             this.stripChartPanel.Name = "stripChartPanel";
-            this.stripChartPanel.Size = new System.Drawing.Size(777, 466);
+            this.stripChartPanel.Size = new System.Drawing.Size(778, 677);
             this.stripChartPanel.TabIndex = 6;
             this.stripChartPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.stripChart_Paint);
             this.stripChartPanel.Layout += new System.Windows.Forms.LayoutEventHandler(this.stripChartPanel_Layout);
@@ -125,21 +125,11 @@
             this.stripChartPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.stripChart_MouseUp);
             this.stripChartPanel.Resize += new System.EventHandler(this.stripChart_Resize);
             // 
-            // txtRunInfo
-            // 
-            this.txtRunInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtRunInfo.Location = new System.Drawing.Point(227, 198);
-            this.txtRunInfo.Multiline = true;
-            this.txtRunInfo.Name = "txtRunInfo";
-            this.txtRunInfo.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtRunInfo.Size = new System.Drawing.Size(562, 205);
-            this.txtRunInfo.TabIndex = 7;
-            // 
             // label2
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(792, 226);
+            this.label2.Location = new System.Drawing.Point(795, 17);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(111, 13);
             this.label2.TabIndex = 14;
@@ -149,7 +139,7 @@
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(792, 266);
+            this.label3.Location = new System.Drawing.Point(796, 64);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(110, 13);
             this.label3.TabIndex = 15;
@@ -178,7 +168,7 @@
             this.runDataGrid.Location = new System.Drawing.Point(11, 12);
             this.runDataGrid.Name = "runDataGrid";
             this.runDataGrid.RowHeadersVisible = false;
-            this.runDataGrid.Size = new System.Drawing.Size(1091, 180);
+            this.runDataGrid.Size = new System.Drawing.Size(778, 180);
             this.runDataGrid.TabIndex = 18;
             // 
             // colRunNumber
@@ -268,9 +258,9 @@
             // 
             this.btnAutoAlign.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAutoAlign.Enabled = false;
-            this.btnAutoAlign.Location = new System.Drawing.Point(963, 197);
+            this.btnAutoAlign.Location = new System.Drawing.Point(1019, 31);
             this.btnAutoAlign.Name = "btnAutoAlign";
-            this.btnAutoAlign.Size = new System.Drawing.Size(75, 23);
+            this.btnAutoAlign.Size = new System.Drawing.Size(90, 23);
             this.btnAutoAlign.TabIndex = 20;
             this.btnAutoAlign.Text = "AutoAlign";
             this.btnAutoAlign.UseVisualStyleBackColor = true;
@@ -280,7 +270,7 @@
             // 
             this.txtAutoAlignThreshold.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.txtAutoAlignThreshold.Enabled = false;
-            this.txtAutoAlignThreshold.Location = new System.Drawing.Point(1044, 199);
+            this.txtAutoAlignThreshold.Location = new System.Drawing.Point(1019, 57);
             this.txtAutoAlignThreshold.Name = "txtAutoAlignThreshold";
             this.txtAutoAlignThreshold.Size = new System.Drawing.Size(58, 20);
             this.txtAutoAlignThreshold.TabIndex = 21;
@@ -293,11 +283,13 @@
             this.channelDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.channelDataGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.displayChannel,
+            this.channelColor,
+            this.runName,
             this.channelName});
-            this.channelDataGrid.Location = new System.Drawing.Point(795, 282);
+            this.channelDataGrid.Location = new System.Drawing.Point(795, 83);
             this.channelDataGrid.Name = "channelDataGrid";
             this.channelDataGrid.RowHeadersVisible = false;
-            this.channelDataGrid.Size = new System.Drawing.Size(314, 121);
+            this.channelDataGrid.Size = new System.Drawing.Size(314, 320);
             this.channelDataGrid.TabIndex = 22;
             // 
             // displayChannel
@@ -305,6 +297,18 @@
             this.displayChannel.HeaderText = "Show";
             this.displayChannel.Name = "displayChannel";
             this.displayChannel.Width = 50;
+            // 
+            // channelColor
+            // 
+            this.channelColor.HeaderText = "Color";
+            this.channelColor.Name = "channelColor";
+            this.channelColor.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.channelColor.Width = 50;
+            // 
+            // runName
+            // 
+            this.runName.HeaderText = "Run";
+            this.runName.Name = "runName";
             // 
             // channelName
             // 
@@ -318,7 +322,7 @@
             // 
             this.cmbXAxis.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbXAxis.FormattingEnabled = true;
-            this.cmbXAxis.Location = new System.Drawing.Point(795, 242);
+            this.cmbXAxis.Location = new System.Drawing.Point(795, 33);
             this.cmbXAxis.Name = "cmbXAxis";
             this.cmbXAxis.Size = new System.Drawing.Size(220, 21);
             this.cmbXAxis.TabIndex = 23;
@@ -359,7 +363,6 @@
             this.Controls.Add(this.runDataGrid);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.txtRunInfo);
             this.Controls.Add(this.stripChartPanel);
             this.Controls.Add(this.tractionCirclePanel);
             this.Controls.Add(this.mapPanel);
@@ -380,7 +383,6 @@
         private System.Windows.Forms.Panel mapPanel;
         private System.Windows.Forms.Panel tractionCirclePanel;
         private System.Windows.Forms.Panel stripChartPanel;
-        private System.Windows.Forms.TextBox txtRunInfo;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.DataGridView runDataGrid;
@@ -401,11 +403,13 @@
         private System.Windows.Forms.Button btnAutoAlign;
         private System.Windows.Forms.TextBox txtAutoAlignThreshold;
         private System.Windows.Forms.DataGridView channelDataGrid;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn displayChannel;
-        private System.Windows.Forms.DataGridViewTextBoxColumn channelName;
         private System.Windows.Forms.ComboBox cmbXAxis;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.HScrollBar stripchartHScroll;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn displayChannel;
+        private System.Windows.Forms.DataGridViewTextBoxColumn channelColor;
+        private System.Windows.Forms.DataGridViewTextBoxColumn runName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn channelName;
     }
 }
 
