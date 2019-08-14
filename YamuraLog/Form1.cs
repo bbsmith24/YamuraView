@@ -755,9 +755,13 @@ namespace YamuraLog
             }
             foreach (KeyValuePair<String, float[]> kvp in globalDisplay.channelRanges)
             {
-                cmbXAxis.Items.Add(kvp.Key);
+
+                if(!cmbXAxis.Items.Contains(kvp.Key))
+                {
+                    cmbXAxis.Items.Add(kvp.Key);
+                }
             }
-            cmbXAxis.SelectedText = "Time";
+            cmbXAxis.SelectedIndex = 0;
             #endregion
 
             for (int runIdx = 0; runIdx<dataLogger.runData.Count(); runIdx++)
@@ -917,16 +921,19 @@ namespace YamuraLog
 
                         endTime = curData.Key;
 
-                        if (endTime < stripChartExtentsX[0])
+                        if (stripChartExtentsX[0] != stripChartExtentsX[1])
                         {
-                            startPt.X = endPt.X;
-                            startPt.Y = endPt.Y;
-                            startTime = endTime;
-                            continue;
-                        }
-                        if (startTime > stripChartExtentsX[1])
-                        {
-                            break;
+                            if (endTime < stripChartExtentsX[0])
+                            {
+                                startPt.X = endPt.X;
+                                startPt.Y = endPt.Y;
+                                startTime = endTime;
+                                continue;
+                            }
+                            if (startTime > stripChartExtentsX[1])
+                            {
+                                break;
+                            }
                         }
                         if (initialValue)
                         {
@@ -1169,13 +1176,16 @@ namespace YamuraLog
                                                                  tractionCircleOffset[1],
                                                                  tractionCircleBounds);
                         endTime = (float)curData.Key;
-                        if (endTime < stripChartExtentsX[0])
+                        if (stripChartExtentsX[0] != stripChartExtentsX[1])
                         {
-                            continue;
-                        }
-                        if (startTime > stripChartExtentsX[1])
-                        {
-                            break;
+                            if (endTime < stripChartExtentsX[0])
+                            {
+                                continue;
+                            }
+                            if (startTime > stripChartExtentsX[1])
+                            {
+                                break;
+                            }
                         }
                         if (initialValue)
                         {
@@ -1379,6 +1389,26 @@ namespace YamuraLog
             {
                 return;
             }
+            int channelCount = 0;
+            #region get count of displayed channels
+            for (int rowIdx = 0; rowIdx < channelDataGrid.Rows.Count; rowIdx++)
+            //foreach(KeyValuePair<String, bool> kvp in globalDisplay.yAxisChannel)
+            {
+                //yChannelName = kvp.Key;
+                //if (globalDisplay.yAxisChannel[yChannelName] == false)
+                //{
+                //    continue;
+                //}
+                if ((bool)channelDataGrid.Rows[rowIdx].Cells["displayChannel"].Value == true)
+                {
+                    channelCount++;
+                }
+            }
+            if (channelCount == 0)
+            {
+                return;
+            }
+            #endregion
             stripChartLastPosValid = false;
             stripChartStartPosValid = false;
             stripChartLastCursorPosValid = false;
@@ -1392,20 +1422,6 @@ namespace YamuraLog
             Pen drawPen = new Pen(Color.Black, 1);
             bool initialValue = false;
             int runCount = 0;
-            int channelCount = 0;
-
-            #region get count of displayed channels
-            //for (int rowIdx = 0; rowIdx < channelDataGrid.Rows.Count; rowIdx++)
-            foreach(KeyValuePair<String, bool> kvp in globalDisplay.yAxisChannel)
-            {
-                yChannelName = kvp.Key;
-                if (globalDisplay.yAxisChannel[yChannelName] == false)
-                {
-                    continue;
-                }
-                channelCount++;
-            }
-            #endregion
             bool drawTrace = false;
             xChannelName = cmbXAxis.Text;
             using (Graphics mapGraphics = stripChartPanel.CreateGraphics())
@@ -1440,14 +1456,14 @@ namespace YamuraLog
                             {
                                 continue;
                             }
-                            System.Diagnostics.Debug.WriteLine("Test " + (runCount + 1).ToString() + " " + curChan.Key + " == " + Convert.ToInt32(channelDataGrid.Rows[rowIdx].Cells["runName"].Value) + " " + (string)channelDataGrid.Rows[rowIdx].Cells["channelName"].Value);
+//System.Diagnostics.Debug.WriteLine("Test " + (runCount + 1).ToString() + " " + curChan.Key + " == " + Convert.ToInt32(channelDataGrid.Rows[rowIdx].Cells["runName"].Value) + " " + (string)channelDataGrid.Rows[rowIdx].Cells["channelName"].Value);
                             // displayed, done
                             if (((bool)channelDataGrid.Rows[rowIdx].Cells["displayChannel"].Value == true) &&
                                 (Convert.ToInt32(channelDataGrid.Rows[rowIdx].Cells["runName"].Value) == (runCount + 1)) &&
                                 ((string)channelDataGrid.Rows[rowIdx].Cells["channelName"].Value == curChan.Key))
                             {
                                 yChannelName = curChan.Key;
-                                System.Diagnostics.Debug.WriteLine((runCount + 1).ToString() + " " + curChan.Key + " SHOWN!");
+//System.Diagnostics.Debug.WriteLine((runCount + 1).ToString() + " " + curChan.Key + " SHOWN!");
                                 drawTrace = true;
                                 break;
                             }
@@ -1457,6 +1473,7 @@ namespace YamuraLog
                         {
                             continue;
                         }
+System.Diagnostics.Debug.WriteLine("Drawing run " + runCount.ToString() + " " + curChan.Key);
                         if (!stripChartScaleY.ContainsKey(yChannelName))
                         {
                             stripChartScaleY.Add(yChannelName, (float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.channelRanges[yChannelName][1] - globalDisplay.channelRanges[yChannelName][0]));
@@ -1505,7 +1522,7 @@ namespace YamuraLog
         }
         private void stripChart_MouseMove(object sender, MouseEventArgs e)
         {
-            return;
+            //return;
             stripChartPanel.Focus();
             PointF floatPosition = new PointF(e.X, e.Y);
             floatPosition = globalDisplay.ScaleDisplayToData(floatPosition,
@@ -1828,16 +1845,31 @@ namespace YamuraLog
         #region Y axis channel grid events
         private void YAxisChannelDataGrid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
+            if(e.RowIndex < 0)
+            {
+                return;
+            }
             //// Ignore clicks that are not on button cells. 
-            //if (e.RowIndex >= 0 && e.ColumnIndex == channelDataGrid.Columns["displayChannel"].Index)
-            //{
-            //    // note - at this point, the checkbox value hasn't been updated, so just toggle the channel display value
-            //    //        the checkbox will catch up...
-            //    globalDisplay.yAxisChannel[channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString()] = !globalDisplay.yAxisChannel[channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString()];// (bool)channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value;
+            if (e.ColumnIndex == channelDataGrid.Columns["displayChannel"].Index)
+            {
+                globalDisplay.yAxisChannel[channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString()] = !globalDisplay.yAxisChannel[channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString()];// 
+                channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value = !(bool)channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value;
+                stripChartPanel.Invalidate();
+            }
+            else if (e.ColumnIndex == channelDataGrid.Columns["channelColor"].Index)
+            {
+                if(colorDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    Color resultColor = colorDialog1.Color;
+                    channelDataGrid.Rows[e.RowIndex].Cells["channelColor"].Style.BackColor = resultColor;
+                    channelDataGrid.Rows[e.RowIndex].Cells["channelColor"].Style.SelectionBackColor = resultColor;
+                    int runNum = Convert.ToInt32(channelDataGrid.Rows[e.RowIndex].Cells["runName"].Value.ToString()) - 1;
+                    dataLogger.runData[runNum].channels[channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString()].ChannelColor = resultColor;
+                    channelDataGrid.Invalidate();
 
-            //    stripChartPanel.Invalidate();
-            //}
-            stripChartPanel.Invalidate();
+                }
+                stripChartPanel.Invalidate();
+            }
             return;
         }
         #endregion
@@ -1888,7 +1920,6 @@ namespace YamuraLog
             return (float)rad;
         }
         #endregion
-
     }
     public partial class GlobalDisplay_Data
     {
