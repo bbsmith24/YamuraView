@@ -755,9 +755,13 @@ namespace YamuraLog
             }
             foreach (KeyValuePair<String, float[]> kvp in globalDisplay.channelRanges)
             {
-                cmbXAxis.Items.Add(kvp.Key);
+
+                if(!cmbXAxis.Items.Contains(kvp.Key))
+                {
+                    cmbXAxis.Items.Add(kvp.Key);
+                }
             }
-            cmbXAxis.SelectedText = "Time";
+            cmbXAxis.SelectedIndex = 0;
             #endregion
 
             for (int runIdx = 0; runIdx<dataLogger.runData.Count(); runIdx++)
