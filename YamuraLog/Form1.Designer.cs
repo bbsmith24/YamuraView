@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btnOpenFile = new System.Windows.Forms.Button();
             this.openLogFile = new System.Windows.Forms.OpenFileDialog();
             this.mapPanel = new System.Windows.Forms.Panel();
@@ -37,18 +37,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.runDataGrid = new System.Windows.Forms.DataGridView();
-            this.colRunNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colShowRun = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.colTraceColor = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMinTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMaxTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colOffsetTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colAccelX = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colAccelY = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colAccelZ = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colSpeed = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colSourceFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.txtCursorPos = new System.Windows.Forms.TextBox();
             this.btnAutoAlign = new System.Windows.Forms.Button();
@@ -62,6 +50,14 @@
             this.label1 = new System.Windows.Forms.Label();
             this.stripchartHScroll = new System.Windows.Forms.HScrollBar();
             this.btnClearAll = new System.Windows.Forms.Button();
+            this.colRunNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colShowRun = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.colTraceColor = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMinTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMaxTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colOffsetTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colSourceFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.channelDataGrid)).BeginInit();
             this.SuspendLayout();
@@ -161,90 +157,12 @@
             this.colMinTime,
             this.colMaxTime,
             this.colOffsetTime,
-            this.colAccelX,
-            this.colAccelY,
-            this.colAccelZ,
-            this.colSpeed,
             this.colSourceFile});
             this.runDataGrid.Location = new System.Drawing.Point(11, 12);
             this.runDataGrid.Name = "runDataGrid";
             this.runDataGrid.RowHeadersVisible = false;
-            this.runDataGrid.Size = new System.Drawing.Size(778, 180);
+            this.runDataGrid.Size = new System.Drawing.Size(661, 180);
             this.runDataGrid.TabIndex = 18;
-            // 
-            // colRunNumber
-            // 
-            this.colRunNumber.HeaderText = "Run";
-            this.colRunNumber.Name = "colRunNumber";
-            this.colRunNumber.ReadOnly = true;
-            this.colRunNumber.Width = 50;
-            // 
-            // colShowRun
-            // 
-            this.colShowRun.HeaderText = "Show";
-            this.colShowRun.Name = "colShowRun";
-            this.colShowRun.Width = 50;
-            // 
-            // colTraceColor
-            // 
-            this.colTraceColor.HeaderText = "Color";
-            this.colTraceColor.Name = "colTraceColor";
-            this.colTraceColor.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.colTraceColor.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.colTraceColor.Width = 50;
-            // 
-            // colDate
-            // 
-            this.colDate.HeaderText = "Date/Time";
-            this.colDate.Name = "colDate";
-            this.colDate.ReadOnly = true;
-            // 
-            // colMinTime
-            // 
-            this.colMinTime.HeaderText = "Start";
-            this.colMinTime.Name = "colMinTime";
-            this.colMinTime.ReadOnly = true;
-            // 
-            // colMaxTime
-            // 
-            this.colMaxTime.HeaderText = "End";
-            this.colMaxTime.Name = "colMaxTime";
-            this.colMaxTime.ReadOnly = true;
-            // 
-            // colOffsetTime
-            // 
-            this.colOffsetTime.HeaderText = "Offset";
-            this.colOffsetTime.Name = "colOffsetTime";
-            // 
-            // colAccelX
-            // 
-            this.colAccelX.HeaderText = "X";
-            this.colAccelX.Name = "colAccelX";
-            this.colAccelX.ReadOnly = true;
-            // 
-            // colAccelY
-            // 
-            this.colAccelY.HeaderText = "Y";
-            this.colAccelY.Name = "colAccelY";
-            this.colAccelY.ReadOnly = true;
-            // 
-            // colAccelZ
-            // 
-            this.colAccelZ.HeaderText = "Z";
-            this.colAccelZ.Name = "colAccelZ";
-            this.colAccelZ.ReadOnly = true;
-            // 
-            // colSpeed
-            // 
-            this.colSpeed.HeaderText = "Speed";
-            this.colSpeed.Name = "colSpeed";
-            this.colSpeed.ReadOnly = true;
-            // 
-            // colSourceFile
-            // 
-            this.colSourceFile.HeaderText = "Source";
-            this.colSourceFile.Name = "colSourceFile";
-            this.colSourceFile.ReadOnly = true;
             // 
             // txtCursorPos
             // 
@@ -314,8 +232,8 @@
             // channelName
             // 
             this.channelName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
-            this.channelName.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
+            this.channelName.DefaultCellStyle = dataGridViewCellStyle2;
             this.channelName.HeaderText = "Channel";
             this.channelName.Name = "channelName";
             // 
@@ -360,6 +278,68 @@
             this.btnClearAll.UseVisualStyleBackColor = true;
             this.btnClearAll.Click += new System.EventHandler(this.btnClearAll_Click);
             // 
+            // colRunNumber
+            // 
+            this.colRunNumber.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.colRunNumber.HeaderText = "Run";
+            this.colRunNumber.Name = "colRunNumber";
+            this.colRunNumber.ReadOnly = true;
+            this.colRunNumber.Width = 52;
+            // 
+            // colShowRun
+            // 
+            this.colShowRun.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.colShowRun.HeaderText = "Show";
+            this.colShowRun.Name = "colShowRun";
+            this.colShowRun.Width = 40;
+            // 
+            // colTraceColor
+            // 
+            this.colTraceColor.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.colTraceColor.HeaderText = "Color";
+            this.colTraceColor.Name = "colTraceColor";
+            this.colTraceColor.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.colTraceColor.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.colTraceColor.Width = 37;
+            // 
+            // colDate
+            // 
+            this.colDate.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colDate.HeaderText = "Date/Time";
+            this.colDate.Name = "colDate";
+            this.colDate.ReadOnly = true;
+            this.colDate.Width = 83;
+            // 
+            // colMinTime
+            // 
+            this.colMinTime.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colMinTime.HeaderText = "Start";
+            this.colMinTime.Name = "colMinTime";
+            this.colMinTime.ReadOnly = true;
+            this.colMinTime.Width = 54;
+            // 
+            // colMaxTime
+            // 
+            this.colMaxTime.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colMaxTime.HeaderText = "End";
+            this.colMaxTime.Name = "colMaxTime";
+            this.colMaxTime.ReadOnly = true;
+            this.colMaxTime.Width = 51;
+            // 
+            // colOffsetTime
+            // 
+            this.colOffsetTime.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colOffsetTime.HeaderText = "Offset";
+            this.colOffsetTime.Name = "colOffsetTime";
+            this.colOffsetTime.Width = 60;
+            // 
+            // colSourceFile
+            // 
+            this.colSourceFile.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colSourceFile.HeaderText = "Source";
+            this.colSourceFile.Name = "colSourceFile";
+            this.colSourceFile.ReadOnly = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -401,18 +381,6 @@
         private System.Windows.Forms.DataGridView runDataGrid;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.TextBox txtCursorPos;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colRunNumber;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn colShowRun;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colTraceColor;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colDate;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colMinTime;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colMaxTime;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colOffsetTime;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colAccelX;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colAccelY;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colAccelZ;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colSpeed;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colSourceFile;
         private System.Windows.Forms.Button btnAutoAlign;
         private System.Windows.Forms.TextBox txtAutoAlignThreshold;
         private System.Windows.Forms.DataGridView channelDataGrid;
@@ -424,6 +392,14 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn runName;
         private System.Windows.Forms.DataGridViewTextBoxColumn channelName;
         private System.Windows.Forms.Button btnClearAll;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colRunNumber;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn colShowRun;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colTraceColor;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colDate;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colMinTime;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colMaxTime;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colOffsetTime;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colSourceFile;
     }
 }
 

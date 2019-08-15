@@ -55,7 +55,6 @@ namespace YamuraLog
         Point trackMapStartPos = new Point(0, 0);
         bool trackMapStartPosValid = false;
         Point trackMapLastPos = new Point(0, 0);
-        bool trackMapLastPosValid = false;
         #endregion
         #region cursor
         List<Point> trackMapLastCursorPos = new List<Point>();
@@ -77,7 +76,6 @@ namespace YamuraLog
         Point tractionCircleStartPos = new Point(0, 0);
         bool tractionCircleStartPosValid = false;
         Point tractionCircleLastPos = new Point(0, 0);
-        bool tractionCircleLastPosValid = false;
         #endregion
         #region cursor
         List<Point> tractionCircleLastCursorPos = new List<Point>();
@@ -99,7 +97,6 @@ namespace YamuraLog
         Point stripChartStartPos = new Point(0, 0);
         bool stripChartStartPosValid = false;
         Point stripChartLastPos = new Point(0, 0);
-        bool stripChartLastPosValid = false;
         #endregion
         #region cursor
         PointF stripChartStartCursorPos = new Point(0, 0);
@@ -275,16 +272,11 @@ namespace YamuraLog
                     timestampOffsetValid = false;
                     timestampOffset = 0;
                     dataLogger.runData.Add(new RunData());
-                    runDisplay.Add(new RunDisplay_Data());
                     logRunsIdx = dataLogger.runData.Count - 1;
                     // set run file name in run data
                     dataLogger.runData[logRunsIdx].fileName = System.IO.Path.GetFileName(fileName);
                     // add timestamp here, since it is always present
                     dataLogger.runData[logRunsIdx].AddChannel("Time", "Timestamp", "Internal", 1.0F);
-                    // initialize run display color and offset
-                    runDisplay[logRunsIdx].runColor = penColors[logRunsIdx % penColors.Count()];
-                    runDisplay[logRunsIdx].stipchart_Offset[0] = 0.0F;
-                    runDisplay[logRunsIdx].stipchart_Offset[1] = 0.0F;
                     continue;
                 }
                 #endregion
@@ -402,14 +394,9 @@ namespace YamuraLog
             bool gpsDistanceValid = false;
 
             dataLogger.runData.Add(new RunData());
-            runDisplay.Add(new RunDisplay_Data());
 
             logRunsIdx = dataLogger.runData.Count - 1;
             dataLogger.runData[logRunsIdx].AddChannel("Time", "Timestamp", "Internal", 1.0F);
-
-            runDisplay[logRunsIdx].runColor = penColors[logRunsIdx % penColors.Count()];
-            runDisplay[logRunsIdx].stipchart_Offset[0] = 0.0F;
-            runDisplay[logRunsIdx].stipchart_Offset[1] = 0.0F;
 
             dataLogger.runData[logRunsIdx].fileName = System.IO.Path.GetFileName(fileName);
 
@@ -751,17 +738,29 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
         public void UpdateData()
         {
             int channelIdx = 0;
+            int runIdx = 0;
             #region update display info
             foreach (RunData curRun in dataLogger.runData)
             {
+                runDisplay.Add(new RunDisplay_Data());
+                runIdx = runDisplay.Count - 1;
+                runDisplay[runIdx].runColor = penColors[runIdx % penColors.Count()];
+                runDisplay[runIdx].stipchart_Offset[0] = 0.0F;
+                runDisplay[runIdx].stipchart_Offset[1] = 0.0F;
+
+                trackMapLastCursorPos.Add(new Point(0, 0));
+                trackMapLastCursorPosValid.Add(false);
+                tractionCircleLastCursorPos.Add(new Point(0, 0));
+                tractionCircleLastCursorPosValid.Add(false);
+
                 channelIdx = 0;
                 foreach (KeyValuePair<String, DataChannel> curChannel in curRun.channels)
                 {
-                    curChannel.Value.ChannelColor = penColors[channelIdx % penColors.Count()];
                     globalDisplay.AddChannel(curChannel.Key);
                     globalDisplay.channelRanges[curChannel.Key][0] = curChannel.Value.ChannelMin<globalDisplay.channelRanges[curChannel.Key][0] ? curChannel.Value.ChannelMin : globalDisplay.channelRanges[curChannel.Key][0];
                     globalDisplay.channelRanges[curChannel.Key][1] = curChannel.Value.ChannelMax > globalDisplay.channelRanges[curChannel.Key][1] ? curChannel.Value.ChannelMax : globalDisplay.channelRanges[curChannel.Key][1];
-                    globalDisplay.yAxisChannel[curChannel.Key] = false;
+                    runDisplay[runIdx].channelDisplay.Add(curChannel.Key, false);
+                    runDisplay[runIdx].channelColor.Add(curChannel.Key, penColors[channelIdx % penColors.Count()]);
                     channelIdx++;
                 }
             }
@@ -776,39 +775,33 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
             cmbXAxis.SelectedIndex = 0;
             #endregion
 
-            for (int runIdx = 0; runIdx<dataLogger.runData.Count(); runIdx++)
-            {
-                trackMapLastCursorPos.Add(new Point(0, 0));
-                trackMapLastCursorPosValid.Add(false);
-                tractionCircleLastCursorPos.Add(new Point(0, 0));
-                tractionCircleLastCursorPosValid.Add(false);
-            }
+
             // auto align launches
             AutoAlign(0.10F);
 
             channelDataGrid.Rows.Clear();
-            for (int runIdx = 0; runIdx < dataLogger.runData.Count; runIdx++)
+            for (int runGridIdx = 0; runGridIdx < dataLogger.runData.Count; runGridIdx++)
             {
-                foreach (KeyValuePair<String, DataChannel> kvp in dataLogger.runData[runIdx].channels)
+                foreach (KeyValuePair<String, DataChannel> kvp in dataLogger.runData[runGridIdx].channels)
                 {
                     channelDataGrid.Rows.Add();
-                    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["displayChannel"].Value = false;
-                    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelColor"].Style.BackColor = kvp.Value.ChannelColor;
-                    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["runName"].Value = (runIdx+1).ToString();
+                    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["displayChannel"].Value = runDisplay[runGridIdx].channelDisplay[kvp.Key];
+                    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelColor"].Style.BackColor = runDisplay[runGridIdx].channelColor[kvp.Key];
+                    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["runName"].Value = (runGridIdx + 1).ToString();
                     channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelName"].Value = kvp.Key.ToString();
                 }
             }
             runDataGrid.Rows.Clear();
-            for (int runIdx = 0; runIdx < dataLogger.runData.Count(); runIdx++)
+            for (int runGridIdx = 0; runGridIdx < dataLogger.runData.Count(); runGridIdx++)
             {
                 runDataGrid.Rows.Add();
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runIdx + 1).ToString();
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = runDisplay[runIdx].showRun;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = dataLogger.runData[runIdx].dateStr + " " + dataLogger.runData[runIdx].timeStr;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMin;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runIdx].channels["Time"].ChannelMax;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = runDisplay[runIdx].stipchart_Offset[0];
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runIdx].fileName.ToString();
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runGridIdx + 1).ToString();
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = runDisplay[runGridIdx].showRun;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = dataLogger.runData[runGridIdx].dateStr + " " + dataLogger.runData[runGridIdx].timeStr;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runGridIdx].channels["Time"].ChannelMin;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runGridIdx].channels["Time"].ChannelMax;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = runDisplay[runGridIdx].stipchart_Offset[0];
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runGridIdx].fileName.ToString();
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
             }
             foreach (RunData curRun in dataLogger.runData)
@@ -982,7 +975,6 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
                     trackMapStartPos = e.Location;
                 }
             }
-            trackMapLastPosValid = true;
             trackMapLastPos = e.Location;
         }
         private void trackMap_MouseUp(object sender, MouseEventArgs e)
@@ -993,7 +985,6 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
                 trackMapOffset[1] += ((float)(e.Location.Y - trackMapStartPos.Y) / trackMapScale);
             }
             trackMapStartPosValid = false;
-            trackMapLastPosValid = false;
             mapPanel.Invalidate();
         }
         private void trackMap_KeyDown(object sender, KeyPressEventArgs e)
@@ -1158,7 +1149,6 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
         private void tractionCircle_Paint(object sender, PaintEventArgs e)
         {
             tractionCircleStartPosValid = false;
-            tractionCircleLastPosValid = false;
             for (int validIdx = 0; validIdx < trackMapLastCursorPosValid.Count(); validIdx++)
             {
                 trackMapLastCursorPosValid[validIdx] = false;
@@ -1238,7 +1228,6 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
                 }
             }
             tractionCircleLastPos = e.Location;
-            tractionCircleLastPosValid = true;
         }
         private void tractionCircle_MouseUp(object sender, MouseEventArgs e)
         {
@@ -1248,7 +1237,6 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
                 tractionCircleOffset[1] += ((float)(e.Location.Y - tractionCircleStartPos.Y) / tractionCircleScale);
             }
             tractionCircleStartPosValid = false;
-            tractionCircleLastPosValid = false;
             tractionCirclePanel.Invalidate();
         }
         private void tractionCircle_KeyDown(object sender, KeyPressEventArgs e)
@@ -1419,13 +1407,7 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
             int channelCount = 0;
             #region get count of displayed channels
             for (int rowIdx = 0; rowIdx < channelDataGrid.Rows.Count; rowIdx++)
-            //foreach(KeyValuePair<String, bool> kvp in globalDisplay.yAxisChannel)
             {
-                //yChannelName = kvp.Key;
-                //if (globalDisplay.yAxisChannel[yChannelName] == false)
-                //{
-                //    continue;
-                //}
                 if ((bool)channelDataGrid.Rows[rowIdx].Cells["displayChannel"].Value == true)
                 {
                     channelCount++;
@@ -1436,7 +1418,6 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
                 return;
             }
             #endregion
-            stripChartLastPosValid = false;
             stripChartStartPosValid = false;
             stripChartLastCursorPosValid = false;
 
@@ -1449,7 +1430,6 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
             Pen drawPen = new Pen(Color.Black, 1);
             bool initialValue = false;
             int runCount = 0;
-            bool drawTrace = false;
             xChannelName = cmbXAxis.Text;
             using (Graphics mapGraphics = stripChartPanel.CreateGraphics())
             {
@@ -1466,25 +1446,9 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
                 {
                     foreach(KeyValuePair<String,DataChannel> curChan in curRun.channels)
                     {
-                        drawTrace = false;
-                        for (int rowIdx = 0; rowIdx < channelDataGrid.Rows.Count; rowIdx++)
-                        {
-                            if ((bool)channelDataGrid.Rows[rowIdx].Cells["displayChannel"].Value == false)
-                            {
-                                continue;
-                            }
-                            // displayed, done
-                            if (((bool)channelDataGrid.Rows[rowIdx].Cells["displayChannel"].Value == true) &&
-                                (Convert.ToInt32(channelDataGrid.Rows[rowIdx].Cells["runName"].Value) == (runCount + 1)) &&
-                                ((string)channelDataGrid.Rows[rowIdx].Cells["channelName"].Value == curChan.Key))
-                            {
-                                yChannelName = curChan.Key;
-                                drawTrace = true;
-                                break;
-                            }
-
-                        }
-                        if(!drawTrace)
+                        yChannelName = curChan.Key;
+                        // if not displayed, skip
+                        if (!runDisplay[runCount].channelDisplay[yChannelName])
                         {
                             continue;
                         }
@@ -1492,7 +1456,7 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
                         {
                             stripChartScaleY.Add(yChannelName, (float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.channelRanges[yChannelName][1] - globalDisplay.channelRanges[yChannelName][0]));
                         }
-                        drawPen = new Pen(curRun.channels[yChannelName].ChannelColor);
+                        drawPen = new Pen(runDisplay[runCount].channelColor[yChannelName]);
 
                         initialValue = false;
                         foreach (KeyValuePair<float, DataPoint> curData in curRun.channels[yChannelName].DataPoints)
@@ -1509,11 +1473,15 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
                                 endPt.X = tst.PointValue - globalDisplay.channelRanges[xChannelName][0] + runDisplay[runCount].stipchart_Offset[0];// curRun.channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key > curData.Key).Value.PointValue;// curData.Value.PointValue - (float)globalDisplay.channelRanges[xChannelName][0];
                                 endPt.Y = curData.Value.PointValue - globalDisplay.channelRanges[yChannelName][0];
                             }
+                            //
+                            // at this point, the value is already offset on the X axis by any user defined time shift
+                            // just need to offset by the stripchart panned position (H scrollbar)
+                            //
                             endPt = globalDisplay.ScaleDataToDisplay(endPt,                                                                // point
                                                                      stripChartScaleX * stripChartScaleFactorX,                            // scale X
                                                                      stripChartScaleY[yChannelName] * stripChartScaleFactorY,              // scale Y
-                                                                     0,//stripChartOffset[0] + runDisplay[runCount].stipchart_Offset[0],       // offset X
-                                                                     0,//stripChartOffset[1] + globalDisplay.channelRanges[yChannelName][0],   // offset Y
+                                                                     stripChartOffset[0],                                                                    // offset X
+                                                                     0,                                                                    // offset Y
                                                                      stripChartPanelBounds);
                             if ((initialValue) && (startPt.X < stripChartPanelBounds.Width) && (endPt.X > 0))
                             {
@@ -1533,6 +1501,7 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
             //return;
             stripChartPanel.Focus();
             PointF floatPosition = new PointF(e.X, e.Y);
+            // floatPosition should be offset by the stripchart hScroll position....
             floatPosition = globalDisplay.ScaleDisplayToData(floatPosition,
                                              stripChartScaleX * stripChartScaleFactorX,   // X scale
                                              1,                                           // Y scale
@@ -1674,42 +1643,6 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
             StringBuilder positionStr = new StringBuilder();
             positionStr.AppendFormat("{0}={1}", xChannelName, floatPosition.X.ToString());
 
-            //foreach (RunData curRun in dataLogger.runData)
-            //{
-            //    foreach (KeyValuePair<String, DataChannel> curChan in curRun.channels)
-            //    {
-            //        for (int rowIdx = 0; rowIdx < channelDataGrid.Rows.Count; rowIdx++)
-            //        {
-            //            if ((bool)channelDataGrid.Rows[rowIdx].Cells["displayChannel"].Value == false)
-            //            {
-            //                continue;
-            //            }
-            //            floatPosition = new PointF(e.X, e.Y);
-            //            floatPosition = globalDisplay.ScaleDisplayToData(floatPosition,
-            //                                                             stripChartScaleX * stripChartScaleFactorX,           // X scale
-            //                                                             stripChartScaleY[curChan.Key] * stripChartScaleFactorY,  // Y scale
-            //                                                             stripChartOffset[0],                                 // X offset
-            //                                                             stripChartOffset[1],                                 // Y offset
-            //                                                             stripChartPanelBounds);
-            //            positionStr.AppendFormat(" {0}={1}", curChan.Key, floatPosition.Y.ToString());
-            //        }
-            //    }
-            //}
-            foreach (KeyValuePair<String, bool> kvp in globalDisplay.yAxisChannel)
-            {
-                if (!kvp.Value)
-                {
-                    continue;
-                }
-                floatPosition = new PointF(e.X, e.Y);
-                floatPosition = globalDisplay.ScaleDisplayToData(floatPosition,
-                                                 stripChartScaleX * stripChartScaleFactorX,           // X scale
-                                                 stripChartScaleY[kvp.Key] * stripChartScaleFactorY,  // Y scale
-                                                 0,//stripChartOffset[0],                                 // X offset
-                                                 0,//globalDisplay.channelRanges[yChannelName][0],                                 // Y offset
-                                                 stripChartPanelBounds);
-                positionStr.AppendFormat(" {0}={1}", kvp.Key, floatPosition.Y.ToString());
-            }
             txtCursorPos.Text = positionStr.ToString();
             #endregion
             #region update cursor positions
@@ -1738,7 +1671,6 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
 
                 // update associated views to show only current zoomed area
                 stripChartStartPosValid = false;
-                stripChartLastPosValid = false;
                 stripChartPanel.Invalidate();
                 mapPanel.Invalidate();
                 tractionCirclePanel.Invalidate();
@@ -1779,7 +1711,6 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
                 TrackMapClearCursor();
                 TractionCircleClearCursor();
             }
-            stripChartLastPosValid = false;
             stripChartLastCursorPosValid = false;
         }
         private void stripChart_KeyDown(object sender, KeyPressEventArgs e)
@@ -1879,11 +1810,15 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
             {
                 return;
             }
+            int runNum = Convert.ToInt32(channelDataGrid.Rows[e.RowIndex].Cells["runName"].Value.ToString()) - 1;
+            String channelName = channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString();
             //// Ignore clicks that are not on button cells. 
             if (e.ColumnIndex == channelDataGrid.Columns["displayChannel"].Index)
             {
-                globalDisplay.yAxisChannel[channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString()] = !globalDisplay.yAxisChannel[channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString()];// 
                 channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value = !(bool)channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value;
+
+                runDisplay[runNum].channelDisplay[channelName] = (bool)channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value;
+
                 stripChartPanel.Invalidate();
             }
             else if (e.ColumnIndex == channelDataGrid.Columns["channelColor"].Index)
@@ -1893,8 +1828,7 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
                     Color resultColor = colorDialog1.Color;
                     channelDataGrid.Rows[e.RowIndex].Cells["channelColor"].Style.BackColor = resultColor;
                     channelDataGrid.Rows[e.RowIndex].Cells["channelColor"].Style.SelectionBackColor = resultColor;
-                    int runNum = Convert.ToInt32(channelDataGrid.Rows[e.RowIndex].Cells["runName"].Value.ToString()) - 1;
-                    dataLogger.runData[runNum].channels[channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString()].ChannelColor = resultColor;
+                    runDisplay[runNum].channelColor[channelName] = resultColor;
                     channelDataGrid.Invalidate();
 
                 }
@@ -1952,20 +1886,20 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
         #endregion
 
     }
+    /// <summary>
+    /// display info for all data
+    /// </summary>
     public partial class GlobalDisplay_Data
     {
+        // ranges for all data in a channel for all runs
+        // for example, if 'Time' in run 1 is 0-120 and 'Time' in run 2 is 0-360, channelRange["Time"] will be 0-360
         public Dictionary<String, float[]> channelRanges = new Dictionary<string, float[]>();
-        public Dictionary<String, bool> yAxisChannel = new Dictionary<string, bool>();
 
         public void AddChannel(String channelName)
         {
             if(!channelRanges.ContainsKey(channelName))
             {
-            channelRanges.Add(channelName, new float[] { float.MaxValue, float.MinValue });
-            }
-            if (!yAxisChannel.ContainsKey(channelName))
-            {
-                yAxisChannel.Add(channelName, false);
+                channelRanges.Add(channelName, new float[] { float.MaxValue, float.MinValue });
             }
         }
         public void UpdateChannelRange(String channelName, float value)
@@ -1973,6 +1907,16 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
             channelRanges[channelName][0] = value < channelRanges[channelName][0] ? value : channelRanges[channelName][0];
             channelRanges[channelName][1] = value > channelRanges[channelName][1] ? value : channelRanges[channelName][1];
         }
+        /// <summary>
+        /// convert sourcePt from data units to display units
+        /// </summary>
+        /// <param name="sourcePt"></param>
+        /// <param name="scaleX"></param>
+        /// <param name="scaleY"></param>
+        /// <param name="offsetX"></param>
+        /// <param name="offsetY"></param>
+        /// <param name="bounds"></param>
+        /// <returns></returns>
         public PointF ScaleDataToDisplay(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
         {
             PointF rPt = new PointF(sourcePt.X, sourcePt.Y);
@@ -1980,6 +1924,16 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
             rPt.Y = bounds.Height - ((rPt.Y - offsetY) * scaleY) + bounds.Y;
             return rPt;
         }
+        /// <summary>
+        /// convert sourcePt from display units to data units
+        /// </summary>
+        /// <param name="sourcePt"></param>
+        /// <param name="scaleX"></param>
+        /// <param name="scaleY"></param>
+        /// <param name="offsetX"></param>
+        /// <param name="offsetY"></param>
+        /// <param name="bounds"></param>
+        /// <returns></returns>
         public PointF ScaleDisplayToData(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
         {
             PointF rPt = new PointF(sourcePt.X, sourcePt.Y);
@@ -1990,13 +1944,23 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
         public void Reset()
         {
             channelRanges.Clear();
-            yAxisChannel.Clear();
         }
     }
+    /// <summary>
+    /// display infor for runs and channels
+    /// </summary>
     public partial class RunDisplay_Data
     {
         public Color runColor = Color.Black;
         public float[] stipchart_Offset = new float[] { 0.0F, 0.0F };
         public bool showRun = true;
+        public Dictionary<String, bool> channelDisplay = new Dictionary<string, bool>();
+        public Dictionary<String, Color> channelColor = new Dictionary<string, Color>();
+        public void Reset()
+        {
+            stipchart_Offset = new float[] { 0.0F, 0.0F };
+            channelDisplay.Clear();
+            channelColor.Clear();
+        }
     }
 }

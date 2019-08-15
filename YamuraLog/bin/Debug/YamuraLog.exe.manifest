@@ -66,14 +66,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="YamuraLog.exe" size="57856">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="YamuraLog.exe" size="56832">
       <assemblyIdentity name="YamuraLog" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>HJwqK5R4+lj9r73fRHErg4LfwMKIsSdlROCPKPnXfpc=</dsig:DigestValue>
+        <dsig:DigestValue>4caL1rMx/QTCCRp8Qql5QnPjdiT/t1i/l42QnY27aXA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
