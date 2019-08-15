@@ -434,7 +434,6 @@ namespace YamuraLog
                     {
                         timeStamp = inFile.ReadUInt32();
                         timestampSeconds = (float)timeStamp / 1000000.0F;
-System.Diagnostics.Debug.WriteLine("TS " + timeStamp.ToString() + " TS(float) " + timestampSeconds.ToString());
                         dataLogger.runData[logRunsIdx].channels["Time"].AddPoint(timestampSeconds, timestampSeconds);
                         continue;
                     }
@@ -541,7 +540,7 @@ System.Diagnostics.Debug.WriteLine("TS " + timeStamp.ToString() + " TS(float) " 
                         UInt32 channelVal = inFile.ReadUInt32();
                         float channelValF = (float)channelVal;
                         String channelName = "A2D" + channelNum.ToString();
-                        System.Diagnostics.Debug.WriteLine(channelName + " " + channelVal.ToString() + " " + channelValF.ToString());
+System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + channelVal.ToString() + " " + channelValF.ToString());
                         dataLogger.runData[logRunsIdx].AddChannel(channelName, "Analog to Digital channel " + channelName, "A2D", 1.0F);
                         dataLogger.runData[logRunsIdx].channels[channelName].AddPoint(timestampSeconds, channelValF);
 
@@ -613,11 +612,11 @@ System.Diagnostics.Debug.WriteLine("TS " + timeStamp.ToString() + " TS(float) " 
             sec = 0F;
 
 
-            System.Diagnostics.Debug.WriteLine("Parse NMEA string");
             char c;
             String dataSentence;
-            // sentance always begins with '$', ends with 0x0D
-            while (inFile.PeekChar() == '$')
+            // sentence always begins with '$', ends with 0x0D
+            // except when it doesn't - sometimes the '$' gets dropped....
+            while ((inFile.PeekChar() == '$') || (inFile.PeekChar() == 'G'))
             {
                 #region read sentence
                 dataSentence = "";
@@ -710,9 +709,7 @@ System.Diagnostics.Debug.WriteLine("TS " + timeStamp.ToString() + " TS(float) " 
                     #endregion
                     #region SKIP unknown/deformed sentances - ignore
                     else
-                    {
-                        System.Diagnostics.Debug.WriteLine("Unknown NMEA string " + dataSentence);
-                    }
+                    { }
                     #endregion
                 }
                 catch
@@ -814,7 +811,18 @@ System.Diagnostics.Debug.WriteLine("TS " + timeStamp.ToString() + " TS(float) " 
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runIdx].fileName.ToString();
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
             }
+            foreach (RunData curRun in dataLogger.runData)
+            {
+                foreach (KeyValuePair<String, DataChannel> curChan in curRun.channels)
+                {
+                    System.Diagnostics.Debug.WriteLine(curChan.Key + " Range " +
+                                                       curChan.Value.ChannelMin + " - " + curChan.Value.ChannelMax + " Scale " +
+                                                       curChan.Value.ChannelScale + " Points" +
+                                                       curChan.Value.DataPoints.Count);
+                }
+            }
         }
+
         #endregion
         /// <summary>
         /// estimate launch point offset from speed data
@@ -1451,16 +1459,6 @@ System.Diagnostics.Debug.WriteLine("TS " + timeStamp.ToString() + " TS(float) " 
                     stripChartExtentsX[0] = globalDisplay.channelRanges[xChannelName][0] - stripChartOffset[0];
                     stripChartExtentsX[1] = globalDisplay.channelRanges[xChannelName][1] + stripChartOffset[0];
                 }
-
-                //foreach (KeyValuePair<String, bool> kvp in globalDisplay.yAxisChannel)
-                //{
-                //    yChannelName = kvp.Key;
-                //    if (globalDisplay.yAxisChannel[yChannelName] == false)
-                //    {
-                //        continue;
-                //    }
-                //    stripChartScaleY.Add(yChannelName, (float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.channelRanges[yChannelName][1] - globalDisplay.channelRanges[yChannelName][0]));
-                //
                 runCount = 0;
                 stripChartScaleY.Clear();
 
@@ -1475,14 +1473,12 @@ System.Diagnostics.Debug.WriteLine("TS " + timeStamp.ToString() + " TS(float) " 
                             {
                                 continue;
                             }
-//System.Diagnostics.Debug.WriteLine("Test " + (runCount + 1).ToString() + " " + curChan.Key + " == " + Convert.ToInt32(channelDataGrid.Rows[rowIdx].Cells["runName"].Value) + " " + (string)channelDataGrid.Rows[rowIdx].Cells["channelName"].Value);
                             // displayed, done
                             if (((bool)channelDataGrid.Rows[rowIdx].Cells["displayChannel"].Value == true) &&
                                 (Convert.ToInt32(channelDataGrid.Rows[rowIdx].Cells["runName"].Value) == (runCount + 1)) &&
                                 ((string)channelDataGrid.Rows[rowIdx].Cells["channelName"].Value == curChan.Key))
                             {
                                 yChannelName = curChan.Key;
-//System.Diagnostics.Debug.WriteLine((runCount + 1).ToString() + " " + curChan.Key + " SHOWN!");
                                 drawTrace = true;
                                 break;
                             }
@@ -1492,17 +1488,10 @@ System.Diagnostics.Debug.WriteLine("TS " + timeStamp.ToString() + " TS(float) " 
                         {
                             continue;
                         }
-System.Diagnostics.Debug.WriteLine("Drawing run " + runCount.ToString() + " " + curChan.Key);
                         if (!stripChartScaleY.ContainsKey(yChannelName))
                         {
                             stripChartScaleY.Add(yChannelName, (float)(stripChartPanel.Height - (stripChartPanelBorder * 2)) / (float)Math.Abs(globalDisplay.channelRanges[yChannelName][1] - globalDisplay.channelRanges[yChannelName][0]));
                         }
-                        //if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
-                        //{
-                        //    runCount++;
-                        //    continue;
-                        //}
-                        //drawPen = new Pen(runDisplay[runCount].runColor);
                         drawPen = new Pen(curRun.channels[yChannelName].ChannelColor);
 
                         initialValue = false;
@@ -1520,11 +1509,11 @@ System.Diagnostics.Debug.WriteLine("Drawing run " + runCount.ToString() + " " + 
                                 endPt.X = tst.PointValue - globalDisplay.channelRanges[xChannelName][0] + runDisplay[runCount].stipchart_Offset[0];// curRun.channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key > curData.Key).Value.PointValue;// curData.Value.PointValue - (float)globalDisplay.channelRanges[xChannelName][0];
                                 endPt.Y = curData.Value.PointValue - globalDisplay.channelRanges[yChannelName][0];
                             }
-                            endPt = globalDisplay.ScaleDataToDisplay(endPt,
-                                                                     stripChartScaleX * stripChartScaleFactorX,
-                                                                     stripChartScaleY[yChannelName] * stripChartScaleFactorY,
-                                                                     stripChartOffset[0] + globalDisplay.channelRanges[yChannelName][0],
-                                                                     stripChartOffset[1] + runDisplay[runCount].stipchart_Offset[1],//stripChartOffset[1] + globalDisplay.channelRanges[channelName][1],
+                            endPt = globalDisplay.ScaleDataToDisplay(endPt,                                                                // point
+                                                                     stripChartScaleX * stripChartScaleFactorX,                            // scale X
+                                                                     stripChartScaleY[yChannelName] * stripChartScaleFactorY,              // scale Y
+                                                                     0,//stripChartOffset[0] + runDisplay[runCount].stipchart_Offset[0],       // offset X
+                                                                     0,//stripChartOffset[1] + globalDisplay.channelRanges[yChannelName][0],   // offset Y
                                                                      stripChartPanelBounds);
                             if ((initialValue) && (startPt.X < stripChartPanelBounds.Width) && (endPt.X > 0))
                             {
@@ -1545,10 +1534,10 @@ System.Diagnostics.Debug.WriteLine("Drawing run " + runCount.ToString() + " " + 
             stripChartPanel.Focus();
             PointF floatPosition = new PointF(e.X, e.Y);
             floatPosition = globalDisplay.ScaleDisplayToData(floatPosition,
-                                             stripChartScaleX * stripChartScaleFactorX,
-                                             1,
-                                             stripChartOffset[0],
-                                             stripChartOffset[1],
+                                             stripChartScaleX * stripChartScaleFactorX,   // X scale
+                                             1,                                           // Y scale
+                                             stripChartOffset[0],                         // X offset
+                                             stripChartOffset[1],                         // Y offset
                                              stripChartPanelBounds);
 
             #region left mouse button down - dragging zoom region 
@@ -1684,6 +1673,28 @@ System.Diagnostics.Debug.WriteLine("Drawing run " + runCount.ToString() + " " + 
             #region update position info text
             StringBuilder positionStr = new StringBuilder();
             positionStr.AppendFormat("{0}={1}", xChannelName, floatPosition.X.ToString());
+
+            //foreach (RunData curRun in dataLogger.runData)
+            //{
+            //    foreach (KeyValuePair<String, DataChannel> curChan in curRun.channels)
+            //    {
+            //        for (int rowIdx = 0; rowIdx < channelDataGrid.Rows.Count; rowIdx++)
+            //        {
+            //            if ((bool)channelDataGrid.Rows[rowIdx].Cells["displayChannel"].Value == false)
+            //            {
+            //                continue;
+            //            }
+            //            floatPosition = new PointF(e.X, e.Y);
+            //            floatPosition = globalDisplay.ScaleDisplayToData(floatPosition,
+            //                                                             stripChartScaleX * stripChartScaleFactorX,           // X scale
+            //                                                             stripChartScaleY[curChan.Key] * stripChartScaleFactorY,  // Y scale
+            //                                                             stripChartOffset[0],                                 // X offset
+            //                                                             stripChartOffset[1],                                 // Y offset
+            //                                                             stripChartPanelBounds);
+            //            positionStr.AppendFormat(" {0}={1}", curChan.Key, floatPosition.Y.ToString());
+            //        }
+            //    }
+            //}
             foreach (KeyValuePair<String, bool> kvp in globalDisplay.yAxisChannel)
             {
                 if (!kvp.Value)
@@ -1692,10 +1703,10 @@ System.Diagnostics.Debug.WriteLine("Drawing run " + runCount.ToString() + " " + 
                 }
                 floatPosition = new PointF(e.X, e.Y);
                 floatPosition = globalDisplay.ScaleDisplayToData(floatPosition,
-                                                 stripChartScaleX * stripChartScaleFactorX,
-                                                 stripChartScaleY[kvp.Key] * stripChartScaleFactorY,
-                                                 stripChartOffset[0],
-                                                 stripChartOffset[1],
+                                                 stripChartScaleX * stripChartScaleFactorX,           // X scale
+                                                 stripChartScaleY[kvp.Key] * stripChartScaleFactorY,  // Y scale
+                                                 0,//stripChartOffset[0],                                 // X offset
+                                                 0,//globalDisplay.channelRanges[yChannelName][0],                                 // Y offset
                                                  stripChartPanelBounds);
                 positionStr.AppendFormat(" {0}={1}", kvp.Key, floatPosition.Y.ToString());
             }
