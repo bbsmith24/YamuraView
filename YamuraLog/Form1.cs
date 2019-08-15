@@ -49,7 +49,6 @@ namespace YamuraLog
         List<RunDisplay_Data> runDisplay = new List<RunDisplay_Data>();
 
         float gpsDist = 0.0F;
-        //DataEvents channelData = new DataEvents();
 
         #region track map
         #region mouse move points
@@ -158,6 +157,20 @@ namespace YamuraLog
             runDataGrid.CellValueChanged += new DataGridViewCellEventHandler(RunDataGrid_CellValueChanged);
             runDataGrid.CellMouseUp += new DataGridViewCellMouseEventHandler(RunDataGrid_CellMouseUp);
         }
+
+        private void btnClearAll_Click(object sender, EventArgs e)
+        {
+            runDataGrid.Rows.Clear();
+            channelDataGrid.Rows.Clear();
+            dataLogger.Reset();
+            globalDisplay.Reset();
+            runDisplay.Clear();
+
+            stripChartPanel.Invalidate();
+            mapPanel.Invalidate();
+            tractionCirclePanel.Invalidate();
+        }
+
         private void btnOpenFile_Click(object sender, EventArgs e)
         {
             if (openLogFile.ShowDialog() != DialogResult.OK)
@@ -402,16 +415,17 @@ namespace YamuraLog
 
             using (BinaryReader inFile = new BinaryReader(File.Open(fileName, FileMode.Open)))
             {
-                while(true)
+                // check for EOF
+                while (inFile.BaseStream.Position != inFile.BaseStream.Length)
                 {
                     #region readf 1 char, exception on EOF
                     try
                     {
-                        b[0] = inFile.ReadChar();
+                        b[0] = (char)inFile.ReadByte();// inFile.ReadChar();
                     }
                     catch
                     {
-                        break;
+                        continue;
                     }
                     #endregion
                     #region timestamp
@@ -419,9 +433,8 @@ namespace YamuraLog
                     if ((char)b[0] == 'T')
                     {
                         timeStamp = inFile.ReadUInt32();
-                        byte[] tsBytes = BitConverter.GetBytes(timeStamp);
-
                         timestampSeconds = (float)timeStamp / 1000000.0F;
+System.Diagnostics.Debug.WriteLine("TS " + timeStamp.ToString() + " TS(float) " + timestampSeconds.ToString());
                         dataLogger.runData[logRunsIdx].channels["Time"].AddPoint(timestampSeconds, timestampSeconds);
                         continue;
                     }
@@ -429,8 +442,8 @@ namespace YamuraLog
                     #region get channel type chars
                     try
                     {
-                        b[1] = inFile.ReadChar();
-                        b[2] = inFile.ReadChar();
+                        b[1] = (char)inFile.ReadByte(); //inFile.ReadChar();
+                        b[2] = (char)inFile.ReadByte(); //inFile.ReadChar();
                     }
                     catch
                     {
@@ -526,9 +539,11 @@ namespace YamuraLog
                     {
                         uint channelNum = inFile.ReadUInt32();
                         UInt32 channelVal = inFile.ReadUInt32();
+                        float channelValF = (float)channelVal;
                         String channelName = "A2D" + channelNum.ToString();
+                        System.Diagnostics.Debug.WriteLine(channelName + " " + channelVal.ToString() + " " + channelValF.ToString());
                         dataLogger.runData[logRunsIdx].AddChannel(channelName, "Analog to Digital channel " + channelName, "A2D", 1.0F);
-                        dataLogger.runData[logRunsIdx].channels[channelName].AddPoint(timestampSeconds, (float)channelVal);
+                        dataLogger.runData[logRunsIdx].channels[channelName].AddPoint(timestampSeconds, channelValF);
 
                     }
                     #endregion
@@ -610,13 +625,13 @@ namespace YamuraLog
                 while (c != 0x0D)
                 {
                     dataSentence += c;
-                    c = inFile.ReadChar();
+                    c = (char)inFile.ReadByte();
                 }
                 String[] words = dataSentence.Split(new char[] { ',' });
                 #endregion
                 try
                 {
-                    #region GGA - Time, position and fix type data.
+                    #region PARSE GGA - Time, position and fix type data.
                     if ((dataSentence.StartsWith("$GPGGA")) || // GPS
                         (dataSentence.StartsWith("$GNGGA")))   // 
                     {
@@ -642,21 +657,7 @@ namespace YamuraLog
                         satellites = Convert.ToInt32(words[7]);
                     }
                     #endregion
-                    #region GSA - GNSS receiver operating mode, active satellites used in the position solution and DOP values.
-                    else if ((dataSentence.StartsWith("$GPGSA")) || // GPS, GNSS
-                             (dataSentence.StartsWith("$GLGSA"))) // GPS+GLONASS
-                    {
-
-                    }
-                    #endregion
-                    #region GSV - The number of GPS satellites in view satellite ID numbers, elevation, azimuth, and SNR values.
-                    else if ((dataSentence.StartsWith("$GPGSV")) || // GPS, GNSS
-                             (dataSentence.StartsWith("$GLGSV"))) // GPS + GLONASS
-                    {
-
-                    }
-                    #endregion
-                    #region RMC - Time, date, position, course and speed data. The recommended minimum navigation information.
+                    #region PARSE RMC - Time, date, position, course and speed data. The recommended minimum navigation information.
                     else if ((dataSentence.StartsWith("$GPRMC")) || // GPS
                              (dataSentence.StartsWith("$GNRMC"))) // GNSS
                     {
@@ -684,7 +685,7 @@ namespace YamuraLog
                         dateStr = words[9];
                     }
                     #endregion
-                    #region VTG - Course and speed information relative to the ground.
+                    #region PARSE VTG - Course and speed information relative to the ground.
                     else if ((dataSentence.StartsWith("$GPVTG")) || // GPS
                              (dataSentence.StartsWith("$GNVTG"))) // GNSS
                     {
@@ -693,7 +694,21 @@ namespace YamuraLog
                         speedKmPH = Convert.ToSingle(words[7]);
                     }
                     #endregion
-                    #region unknown/deformed sentances - ignore
+                    #region SKIP: GSA - GNSS receiver operating mode, active satellites used in the position solution and DOP values.
+                    else if ((dataSentence.StartsWith("$GPGSA")) || // GPS, GNSS
+                             (dataSentence.StartsWith("$GLGSA"))) // GPS+GLONASS
+                    {
+
+                    }
+                    #endregion
+                    #region SKIP: GSV - The number of GPS satellites in view satellite ID numbers, elevation, azimuth, and SNR values.
+                    else if ((dataSentence.StartsWith("$GPGSV")) || // GPS, GNSS
+                             (dataSentence.StartsWith("$GLGSV"))) // GPS + GLONASS
+                    {
+
+                    }
+                    #endregion
+                    #region SKIP unknown/deformed sentances - ignore
                     else
                     {
                         System.Diagnostics.Debug.WriteLine("Unknown NMEA string " + dataSentence);
@@ -1019,6 +1034,10 @@ namespace YamuraLog
             {
                 foreach (RunData curRun in dataLogger.runData)
                 {
+                    if(!curRun.channels.ContainsKey("Longitude"))
+                    {
+                        continue;
+                    }
                     if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
                     {
                         runCount++;
@@ -1920,6 +1939,7 @@ System.Diagnostics.Debug.WriteLine("Drawing run " + runCount.ToString() + " " + 
             return (float)rad;
         }
         #endregion
+
     }
     public partial class GlobalDisplay_Data
     {
@@ -1955,6 +1975,11 @@ System.Diagnostics.Debug.WriteLine("Drawing run " + runCount.ToString() + " " + 
             rPt.X = (rPt.X / scaleX) - offsetX;
             rPt.Y = -1.0F * ((rPt.Y - (float)bounds.Height ) / scaleY) - offsetY;
             return rPt;
+        }
+        public void Reset()
+        {
+            channelRanges.Clear();
+            yAxisChannel.Clear();
         }
     }
     public partial class RunDisplay_Data

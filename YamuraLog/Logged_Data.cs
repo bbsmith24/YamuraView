@@ -28,76 +28,20 @@ namespace YamuraLog
             channelRanges[channelName][0] = curVal < channelRanges[channelName][0] ? curVal : channelRanges[channelName][0];
             channelRanges[channelName][1] = curVal > channelRanges[channelName][1] ? curVal : channelRanges[channelName][1];
         }
-        //public void UpdateDataRanges(float timeStamp, GPS_Data gps, Accel_Data accel)
-        //{
-        //    if (timeStamp < minMaxTimestamp[0])
-        //    {
-        //        minMaxTimestamp[0] = timeStamp;
-        //    }
-        //    if (timeStamp > minMaxTimestamp[1])
-        //    {
-        //        minMaxTimestamp[1] = timeStamp;
-        //    }
-        //    if (gps.isValid)
-        //    {
-        //        if (gps.latVal < minMaxLat[0])
-        //        {
-        //            minMaxLat[0] = gps.latVal;
-        //        }
-        //        if (gps.latVal > minMaxLat[1])
-        //        {
-        //            minMaxLat[1] = gps.latVal;
-        //        }
-        //        //
-        //        if (gps.longVal < minMaxLong[0])
-        //        {
-        //            minMaxLong[0] = gps.longVal;
-        //        }
-        //        if (gps.longVal > minMaxLong[1])
-        //        {
-        //            minMaxLong[1] = gps.longVal;
-        //        }
-        //        //
-        //        if (gps.mph < minMaxSpeed[0])
-        //        {
-        //            minMaxSpeed[0] = gps.mph;
-        //        }
-        //        if (gps.mph > minMaxSpeed[1])
-        //        {
-        //            minMaxSpeed[1] = gps.mph;
-        //        }
-        //    }
-        //    if(accel.isValid)
-        //    {
-        //        if (accel.xAccel > minMaxAccel[0][1])
-        //        {
-        //            minMaxAccel[0][1] = accel.xAccel;
-        //        }
-        //        if (accel.xAccel < minMaxAccel[0][0])
-        //        {
-        //            minMaxAccel[0][0] = accel.xAccel;
-        //        }
-        //        //
-        //        if (accel.yAccel < minMaxAccel[1][0])
-        //        {
-        //            minMaxAccel[1][0] = accel.yAccel;
-        //        }
-        //        if (accel.yAccel > minMaxAccel[1][1])
-        //        {
-        //            minMaxAccel[1][1] = accel.yAccel;
-        //        }
-        //        //
-        //        if (accel.zAccel > minMaxAccel[2][1])
-        //        {
-        //            minMaxAccel[2][1] = accel.zAccel;
-        //        }
-        //        if (accel.zAccel < minMaxAccel[2][0])
-        //        {
-        //            minMaxAccel[2][0] = accel.zAccel;
-        //        }
-        //    }
-        //}
+        public void Reset()
+        {
+            runData.Clear();
+            channelRanges.Clear();
+            minMaxTimestamp = new float[] { float.MaxValue, float.MinValue };
+            minMaxLong = new float[] { float.MaxValue, float.MinValue };
+            minMaxLat = new float[] { float.MaxValue, float.MinValue };
+            minMaxSpeed = new float[] { float.MaxValue, float.MinValue };
+
+            minMaxAccel = new float[][] {new float[] {float.MaxValue, float.MinValue},
+                                                          new float[] {float.MaxValue, float.MinValue},
+                                                          new float[] {float.MaxValue, float.MinValue}};
     }
+}
     class RunData
     {
         public Dictionary<String, float[]> channelRanges = new Dictionary<string, float[]>();

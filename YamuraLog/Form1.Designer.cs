@@ -61,6 +61,7 @@
             this.cmbXAxis = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.stripchartHScroll = new System.Windows.Forms.HScrollBar();
+            this.btnClearAll = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.channelDataGrid)).BeginInit();
             this.SuspendLayout();
@@ -258,7 +259,7 @@
             // 
             this.btnAutoAlign.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAutoAlign.Enabled = false;
-            this.btnAutoAlign.Location = new System.Drawing.Point(1019, 31);
+            this.btnAutoAlign.Location = new System.Drawing.Point(1019, 57);
             this.btnAutoAlign.Name = "btnAutoAlign";
             this.btnAutoAlign.Size = new System.Drawing.Size(90, 23);
             this.btnAutoAlign.TabIndex = 20;
@@ -270,7 +271,7 @@
             // 
             this.txtAutoAlignThreshold.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.txtAutoAlignThreshold.Enabled = false;
-            this.txtAutoAlignThreshold.Location = new System.Drawing.Point(1019, 57);
+            this.txtAutoAlignThreshold.Location = new System.Drawing.Point(957, 57);
             this.txtAutoAlignThreshold.Name = "txtAutoAlignThreshold";
             this.txtAutoAlignThreshold.Size = new System.Drawing.Size(58, 20);
             this.txtAutoAlignThreshold.TabIndex = 21;
@@ -348,11 +349,23 @@
             this.stripchartHScroll.TabIndex = 25;
             this.stripchartHScroll.Scroll += new System.Windows.Forms.ScrollEventHandler(this.stripchartHScroll_Scroll);
             // 
+            // btnClearAll
+            // 
+            this.btnClearAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClearAll.Location = new System.Drawing.Point(1019, 31);
+            this.btnClearAll.Name = "btnClearAll";
+            this.btnClearAll.Size = new System.Drawing.Size(90, 23);
+            this.btnClearAll.TabIndex = 26;
+            this.btnClearAll.Text = "Clear Runs";
+            this.btnClearAll.UseVisualStyleBackColor = true;
+            this.btnClearAll.Click += new System.EventHandler(this.btnClearAll_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1115, 925);
+            this.Controls.Add(this.btnClearAll);
             this.Controls.Add(this.stripchartHScroll);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cmbXAxis);
@@ -410,6 +423,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn channelColor;
         private System.Windows.Forms.DataGridViewTextBoxColumn runName;
         private System.Windows.Forms.DataGridViewTextBoxColumn channelName;
+        private System.Windows.Forms.Button btnClearAll;
     }
 }
 
