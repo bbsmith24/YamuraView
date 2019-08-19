@@ -32,11 +32,34 @@ namespace YamuraLog
             get { return displayScale; }
             set { displayScale = value; }
         }
+        float displayOffset = 0.0F;
+        public float DisplayOffset
+        {
+            get { return displayOffset; }
+            set { displayOffset = value; }
+        }
+        bool showAxis = false;
+        public bool ShowAxis
+        {
+            get { return showAxis; }
+            set { showAxis = value; }
+        }
     }
     class ChannelInfo
     {
         int runIndex = 0;
+        public int RunIndex
+        {
+            get { return runIndex; }
+            set { runIndex = value; }
+        }
         string channelName = "unnamed";
+        public String ChannelName
+        {
+            get { return channelName; }
+            set { channelName = value; }
+        }
+
         public ChannelInfo(int idx, string name)
         {
             runIndex = idx;
