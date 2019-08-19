@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btnOpenFile = new System.Windows.Forms.Button();
             this.openLogFile = new System.Windows.Forms.OpenFileDialog();
             this.mapPanel = new System.Windows.Forms.Panel();
@@ -51,20 +52,26 @@
             this.btnAutoAlign = new System.Windows.Forms.Button();
             this.txtAutoAlignThreshold = new System.Windows.Forms.TextBox();
             this.channelDataGrid = new System.Windows.Forms.DataGridView();
+            this.displayChannel = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.channelColor = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.runName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.channelName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.channelDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.channelsContext = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.channelExtents = new System.Windows.Forms.ToolStripMenuItem();
             this.cmbXAxis = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.stripchartHScroll = new System.Windows.Forms.HScrollBar();
             this.btnClearAll = new System.Windows.Forms.Button();
-            this.displayChannel = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.channelColor = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.runName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.channelName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.channelDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.yAxisDataGrid = new System.Windows.Forms.DataGridView();
+            this.yAxisUse = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.yAxisName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.axisMin = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.axisMax = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.channelDataGrid)).BeginInit();
             this.channelsContext.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.yAxisDataGrid)).BeginInit();
             this.SuspendLayout();
             // 
             // btnOpenFile
@@ -143,9 +150,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(796, 64);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(110, 13);
+            this.label3.Size = new System.Drawing.Size(125, 13);
             this.label3.TabIndex = 15;
-            this.label3.Text = "Stripchart Y Axis (any)";
+            this.label3.Text = "Stripchart Channels (any)";
             // 
             // runDataGrid
             // 
@@ -277,20 +284,57 @@
             this.channelDataGrid.Location = new System.Drawing.Point(795, 83);
             this.channelDataGrid.Name = "channelDataGrid";
             this.channelDataGrid.RowHeadersVisible = false;
-            this.channelDataGrid.Size = new System.Drawing.Size(314, 320);
+            this.channelDataGrid.Size = new System.Drawing.Size(314, 109);
             this.channelDataGrid.TabIndex = 22;
+            // 
+            // displayChannel
+            // 
+            this.displayChannel.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.displayChannel.HeaderText = "Show";
+            this.displayChannel.Name = "displayChannel";
+            this.displayChannel.Width = 40;
+            // 
+            // channelColor
+            // 
+            this.channelColor.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.channelColor.HeaderText = "Color";
+            this.channelColor.Name = "channelColor";
+            this.channelColor.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.channelColor.Width = 37;
+            // 
+            // runName
+            // 
+            this.runName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.runName.HeaderText = "Run";
+            this.runName.Name = "runName";
+            this.runName.Width = 52;
+            // 
+            // channelName
+            // 
+            this.channelName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
+            this.channelName.DefaultCellStyle = dataGridViewCellStyle1;
+            this.channelName.HeaderText = "Channel";
+            this.channelName.Name = "channelName";
+            this.channelName.Width = 71;
+            // 
+            // channelDescription
+            // 
+            this.channelDescription.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.channelDescription.HeaderText = "Description";
+            this.channelDescription.Name = "channelDescription";
             // 
             // channelsContext
             // 
             this.channelsContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.channelExtents});
             this.channelsContext.Name = "channelsContext";
-            this.channelsContext.Size = new System.Drawing.Size(160, 26);
+            this.channelsContext.Size = new System.Drawing.Size(159, 26);
             // 
             // channelExtents
             // 
             this.channelExtents.Name = "channelExtents";
-            this.channelExtents.Size = new System.Drawing.Size(159, 22);
+            this.channelExtents.Size = new System.Drawing.Size(158, 22);
             this.channelExtents.Text = "Channel Extents";
             this.channelExtents.Click += new System.EventHandler(this.channelExtents_Click);
             // 
@@ -335,48 +379,63 @@
             this.btnClearAll.UseVisualStyleBackColor = true;
             this.btnClearAll.Click += new System.EventHandler(this.btnClearAll_Click);
             // 
-            // displayChannel
+            // yAxisDataGrid
             // 
-            this.displayChannel.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.displayChannel.HeaderText = "Show";
-            this.displayChannel.Name = "displayChannel";
-            this.displayChannel.Width = 40;
+            this.yAxisDataGrid.AllowUserToAddRows = false;
+            this.yAxisDataGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.yAxisDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.yAxisDataGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.yAxisUse,
+            this.yAxisName,
+            this.axisMin,
+            this.axisMax});
+            this.yAxisDataGrid.ContextMenuStrip = this.channelsContext;
+            this.yAxisDataGrid.Location = new System.Drawing.Point(795, 198);
+            this.yAxisDataGrid.Name = "yAxisDataGrid";
+            this.yAxisDataGrid.RowHeadersVisible = false;
+            this.yAxisDataGrid.Size = new System.Drawing.Size(314, 205);
+            this.yAxisDataGrid.TabIndex = 27;
+            this.yAxisDataGrid.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.yAxisDataGrid_CellEndEdit);
+            this.yAxisDataGrid.CellValidated += new System.Windows.Forms.DataGridViewCellEventHandler(this.yAxisDataGrid_CellValidated);
+            this.yAxisDataGrid.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.yAxisDataGrid_CellValidating);
+            this.yAxisDataGrid.RowValidated += new System.Windows.Forms.DataGridViewCellEventHandler(this.yAxisDataGrid_RowValidated);
+            this.yAxisDataGrid.RowValidating += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.yAxisDataGrid_RowValidating);
             // 
-            // channelColor
+            // yAxisUse
             // 
-            this.channelColor.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
-            this.channelColor.HeaderText = "Color";
-            this.channelColor.Name = "channelColor";
-            this.channelColor.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.channelColor.Width = 37;
+            this.yAxisUse.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.yAxisUse.HeaderText = "Use";
+            this.yAxisUse.Name = "yAxisUse";
+            this.yAxisUse.Width = 32;
             // 
-            // runName
+            // yAxisName
             // 
-            this.runName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.runName.HeaderText = "Run";
-            this.runName.Name = "runName";
-            this.runName.Width = 52;
+            this.yAxisName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
+            this.yAxisName.DefaultCellStyle = dataGridViewCellStyle2;
+            this.yAxisName.HeaderText = "Axis Name";
+            this.yAxisName.Name = "yAxisName";
             // 
-            // channelName
+            // axisMin
             // 
-            this.channelName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
-            this.channelName.DefaultCellStyle = dataGridViewCellStyle1;
-            this.channelName.HeaderText = "Channel";
-            this.channelName.Name = "channelName";
-            this.channelName.Width = 71;
+            this.axisMin.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.axisMin.HeaderText = "Min";
+            this.axisMin.Name = "axisMin";
+            this.axisMin.Width = 49;
             // 
-            // channelDescription
+            // axisMax
             // 
-            this.channelDescription.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.channelDescription.HeaderText = "Description";
-            this.channelDescription.Name = "channelDescription";
+            this.axisMax.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.axisMax.HeaderText = "Max";
+            this.axisMax.Name = "axisMax";
+            this.axisMax.Width = 52;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1115, 925);
+            this.Controls.Add(this.yAxisDataGrid);
             this.Controls.Add(this.btnClearAll);
             this.Controls.Add(this.stripchartHScroll);
             this.Controls.Add(this.label1);
@@ -397,6 +456,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.channelDataGrid)).EndInit();
             this.channelsContext.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.yAxisDataGrid)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -436,6 +496,11 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn runName;
         private System.Windows.Forms.DataGridViewTextBoxColumn channelName;
         private System.Windows.Forms.DataGridViewTextBoxColumn channelDescription;
+        private System.Windows.Forms.DataGridView yAxisDataGrid;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn yAxisUse;
+        private System.Windows.Forms.DataGridViewTextBoxColumn yAxisName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn axisMin;
+        private System.Windows.Forms.DataGridViewTextBoxColumn axisMax;
     }
 }
 
