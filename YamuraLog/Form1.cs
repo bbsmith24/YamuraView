@@ -119,7 +119,7 @@ namespace YamuraLog
         float[] stripChartOffset = new float[] { 0.0F, 0.0F };
         float[] stripChartExtentsX = new float[] { 0.0F, 0.0F };
         #endregion
-        string xChannelName = "none";
+        string xChannelName = "Time";
         string yChannelName = "none";
         #endregion
 
