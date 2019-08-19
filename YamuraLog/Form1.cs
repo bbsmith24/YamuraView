@@ -45,6 +45,9 @@ namespace YamuraLog
         DataLogger dataLogger = new DataLogger();
         // global display data
         GlobalDisplay_Data globalDisplay = new GlobalDisplay_Data();
+        Dictionary<String, Axis> stripChartAxes = new Dictionary<String, Axis>();
+        Dictionary<String, Axis> trackMapAxes = new Dictionary<String, Axis>();
+        Dictionary<String, Axis> tractionCircleAxes = new Dictionary<String, Axis>();
         // run for display data
         List<RunDisplay_Data> runDisplay = new List<RunDisplay_Data>();
 
@@ -167,7 +170,6 @@ namespace YamuraLog
             mapPanel.Invalidate();
             tractionCirclePanel.Invalidate();
         }
-
         private void btnOpenFile_Click(object sender, EventArgs e)
         {
             if (openLogFile.ShowDialog() != DialogResult.OK)
@@ -756,11 +758,71 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
                 channelIdx = 0;
                 foreach (KeyValuePair<String, DataChannel> curChannel in curRun.channels)
                 {
+                    #region global display
                     globalDisplay.AddChannel(curChannel.Key);
-                    globalDisplay.channelRanges[curChannel.Key][0] = curChannel.Value.ChannelMin<globalDisplay.channelRanges[curChannel.Key][0] ? curChannel.Value.ChannelMin : globalDisplay.channelRanges[curChannel.Key][0];
-                    globalDisplay.channelRanges[curChannel.Key][1] = curChannel.Value.ChannelMax > globalDisplay.channelRanges[curChannel.Key][1] ? curChannel.Value.ChannelMax : globalDisplay.channelRanges[curChannel.Key][1];
+                    globalDisplay.channelRanges[curChannel.Key][0] = curChannel.Value.DataRange[0]<globalDisplay.channelRanges[curChannel.Key][0] ? curChannel.Value.DataRange[0] : globalDisplay.channelRanges[curChannel.Key][0];
+                    globalDisplay.channelRanges[curChannel.Key][1] = curChannel.Value.DataRange[1] > globalDisplay.channelRanges[curChannel.Key][1] ? curChannel.Value.DataRange[1] : globalDisplay.channelRanges[curChannel.Key][1];
+                    #endregion
+                    #region channel display
                     runDisplay[runIdx].channelDisplay.Add(curChannel.Key, false);
                     runDisplay[runIdx].channelColor.Add(curChannel.Key, penColors[channelIdx % penColors.Count()]);
+                    #endregion
+                    #region axes create/update
+                    #region strip chart
+                    if(stripChartAxes.ContainsKey(curChannel.Key))
+                    {
+                        stripChartAxes[curChannel.Key].AxisRange[0] = stripChartAxes[curChannel.Key].AxisRange[0] < curChannel.Value.DataRange[0] ? stripChartAxes[curChannel.Key].AxisRange[0] : curChannel.Value.DataRange[0];
+                        stripChartAxes[curChannel.Key].AxisRange[1] = stripChartAxes[curChannel.Key].AxisRange[1] > curChannel.Value.DataRange[1] ? stripChartAxes[curChannel.Key].AxisRange[1] : curChannel.Value.DataRange[1];
+                    }
+                    else
+                    {
+                        stripChartAxes.Add(curChannel.Key, new Axis());
+                        stripChartAxes[curChannel.Key].AxisRange[0] = curChannel.Value.DataRange[0];
+                        stripChartAxes[curChannel.Key].AxisRange[1] = curChannel.Value.DataRange[1];
+                    }
+                    stripChartAxes[curChannel.Key].AxisRange[2] = curChannel.Value.DataRange[1] - curChannel.Value.DataRange[0];
+                    stripChartAxes[curChannel.Key].AssociatedChannels.Add(new ChannelInfo(runIdx, curChannel.Key));
+                    stripChartAxes[curChannel.Key].DisplayScale[0] = stripChartAxes[curChannel.Key].AxisRange[2] / (float)stripChartPanelBounds.Width;
+                    stripChartAxes[curChannel.Key].DisplayScale[1] = stripChartAxes[curChannel.Key].AxisRange[2] / (float)stripChartPanelBounds.Height;
+                    System.Diagnostics.Debug.WriteLine("Strip Chart axis " + curChannel.Key + " Range " + stripChartAxes[curChannel.Key].AxisRange[0] + " to " + stripChartAxes[curChannel.Key].AxisRange[1] + curChannel.Key + " X scale " + stripChartAxes[curChannel.Key].DisplayScale[0] + " Y scale " + stripChartAxes[curChannel.Key].DisplayScale[1]);
+                    #endregion
+                    #region traction circle
+                    if (tractionCircleAxes.ContainsKey(curChannel.Key))
+                    {
+                        tractionCircleAxes[curChannel.Key].AxisRange[0] = tractionCircleAxes[curChannel.Key].AxisRange[0] < curChannel.Value.DataRange[0] ? tractionCircleAxes[curChannel.Key].AxisRange[0] : curChannel.Value.DataRange[0];
+                        tractionCircleAxes[curChannel.Key].AxisRange[1] = tractionCircleAxes[curChannel.Key].AxisRange[1] > curChannel.Value.DataRange[1] ? tractionCircleAxes[curChannel.Key].AxisRange[1] : curChannel.Value.DataRange[1];
+                    }
+                    else
+                    {
+                        tractionCircleAxes.Add(curChannel.Key, new Axis());
+                        tractionCircleAxes[curChannel.Key].AxisRange[0] = curChannel.Value.DataRange[0];
+                        tractionCircleAxes[curChannel.Key].AxisRange[1] = curChannel.Value.DataRange[1];
+                    }
+                    tractionCircleAxes[curChannel.Key].AxisRange[2] = curChannel.Value.DataRange[1] - curChannel.Value.DataRange[0];
+                    tractionCircleAxes[curChannel.Key].AssociatedChannels.Add(new ChannelInfo(runIdx, curChannel.Key));
+                    tractionCircleAxes[curChannel.Key].DisplayScale[0] = tractionCircleAxes[curChannel.Key].AxisRange[2] / (float)tractionCircleBounds.Width;
+                    tractionCircleAxes[curChannel.Key].DisplayScale[1] = tractionCircleAxes[curChannel.Key].AxisRange[2] / (float)tractionCircleBounds.Height;
+                    System.Diagnostics.Debug.WriteLine("Traction Circle axis " + curChannel.Key + " Range " + tractionCircleAxes[curChannel.Key].AxisRange[0] + " to " + tractionCircleAxes[curChannel.Key].AxisRange[1] + curChannel.Key + " X scale " + tractionCircleAxes[curChannel.Key].DisplayScale[0] + " Y scale " + tractionCircleAxes[curChannel.Key].DisplayScale[1]);
+                    #endregion
+                    #region trackmap
+                    if (trackMapAxes.ContainsKey(curChannel.Key))
+                    {
+                        trackMapAxes[curChannel.Key].AxisRange[0] = trackMapAxes[curChannel.Key].AxisRange[0] < curChannel.Value.DataRange[0] ? trackMapAxes[curChannel.Key].AxisRange[0] : curChannel.Value.DataRange[0];
+                        trackMapAxes[curChannel.Key].AxisRange[1] = trackMapAxes[curChannel.Key].AxisRange[1] > curChannel.Value.DataRange[1] ? trackMapAxes[curChannel.Key].AxisRange[1] : curChannel.Value.DataRange[1];
+                    }
+                    else
+                    {
+                        trackMapAxes.Add(curChannel.Key, new Axis());
+                        trackMapAxes[curChannel.Key].AxisRange[0] = curChannel.Value.DataRange[0];
+                        trackMapAxes[curChannel.Key].AxisRange[1] = curChannel.Value.DataRange[1];
+                    }
+                    trackMapAxes[curChannel.Key].AxisRange[2] = curChannel.Value.DataRange[1] - curChannel.Value.DataRange[0];
+                    trackMapAxes[curChannel.Key].AssociatedChannels.Add(new ChannelInfo(runIdx, curChannel.Key));
+                    trackMapAxes[curChannel.Key].DisplayScale[0] = trackMapAxes[curChannel.Key].AxisRange[2] / (float)trackMapBounds.Width;
+                    trackMapAxes[curChannel.Key].DisplayScale[1] = trackMapAxes[curChannel.Key].AxisRange[2] / (float)trackMapBounds.Height;
+                    System.Diagnostics.Debug.WriteLine("Track Map axis " + curChannel.Key  + " Range " + trackMapAxes[curChannel.Key].AxisRange[0] + " to " + trackMapAxes[curChannel.Key].AxisRange[1] + " X scale " + trackMapAxes[curChannel.Key].DisplayScale[0] + " Y scale " + trackMapAxes[curChannel.Key].DisplayScale[1]);
+                    #endregion
+                    #endregion
                     channelIdx++;
                 }
             }
@@ -774,7 +836,6 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
             }
             cmbXAxis.SelectedIndex = 0;
             #endregion
-
 
             // auto align launches
             AutoAlign(0.10F);
@@ -798,8 +859,8 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runGridIdx + 1).ToString();
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = runDisplay[runGridIdx].showRun;
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = dataLogger.runData[runGridIdx].dateStr + " " + dataLogger.runData[runGridIdx].timeStr;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runGridIdx].channels["Time"].ChannelMin;
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runGridIdx].channels["Time"].ChannelMax;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runGridIdx].channels["Time"].DataRange[0];
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runGridIdx].channels["Time"].DataRange[1];
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = runDisplay[runGridIdx].stipchart_Offset[0];
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runGridIdx].fileName.ToString();
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
@@ -809,7 +870,7 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
                 foreach (KeyValuePair<String, DataChannel> curChan in curRun.channels)
                 {
                     System.Diagnostics.Debug.WriteLine(curChan.Key + " Range " +
-                                                       curChan.Value.ChannelMin + " - " + curChan.Value.ChannelMax + " Scale " +
+                                                       curChan.Value.DataRange[0] + " - " + curChan.Value.DataRange[1] + " Scale " +
                                                        curChan.Value.ChannelScale + " Points" +
                                                        curChan.Value.DataPoints.Count);
                 }
@@ -1013,6 +1074,18 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
             trackMapBounds.Y = 5;
             trackMapBounds.Width = mapPanel.Width - 10;
             trackMapBounds.Height = mapPanel.Height - 10;
+
+            foreach (KeyValuePair<string, Axis> axisInfo in trackMapAxes)
+            {
+                axisInfo.Value.DisplayScale[0] = axisInfo.Value.AxisRange[2] / (float)trackMapBounds.Width;
+                axisInfo.Value.DisplayScale[1] = axisInfo.Value.AxisRange[2] / (float)trackMapBounds.Height;
+                System.Diagnostics.Debug.WriteLine("Track Map axis " +
+                    axisInfo.Key + " Range " +
+                    axisInfo.Value.AxisRange[0] + " to " +
+                    axisInfo.Value.AxisRange[1] + " X scale " +
+                    axisInfo.Value.DisplayScale[0] + " Y scale " +
+                    axisInfo.Value.DisplayScale[1]);
+            }
             mapPanel.Invalidate();
         }
         private void trackMap_Layout(object sender, LayoutEventArgs e)
@@ -1265,6 +1338,18 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
             tractionCircleBounds.Y = tractionCircleBorder;
             tractionCircleBounds.Width = tractionCirclePanel.Width - (2 * tractionCircleBorder);
             tractionCircleBounds.Height = tractionCirclePanel.Height - (2 * tractionCircleBorder);
+
+            foreach (KeyValuePair<string, Axis> axisInfo in tractionCircleAxes)
+            {
+                axisInfo.Value.DisplayScale[0] = axisInfo.Value.AxisRange[2] / (float)tractionCircleBounds.Width;
+                axisInfo.Value.DisplayScale[1] = axisInfo.Value.AxisRange[2] / (float)tractionCircleBounds.Height;
+                System.Diagnostics.Debug.WriteLine("Traction Circle axis " + 
+                    axisInfo.Key + " Range " +
+                    axisInfo.Value.AxisRange[0] + " to " +
+                    axisInfo.Value.AxisRange[1] + " X scale " +
+                    axisInfo.Value.DisplayScale[0] + " Y scale " + 
+                    axisInfo.Value.DisplayScale[1]);
+            }
             tractionCirclePanel.Invalidate();
         }
         private void tractionCircle_Layout(object sender, LayoutEventArgs e)
@@ -1735,6 +1820,20 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
             stripChartPanelBounds.Y = stripChartPanelBorder;
             stripChartPanelBounds.Width = stripChartPanel.Width - (2 * stripChartPanelBorder);
             stripChartPanelBounds.Height = stripChartPanel.Height - (2 * stripChartPanelBorder);
+
+
+            foreach(KeyValuePair<string, Axis> axisInfo in stripChartAxes)
+            {
+                axisInfo.Value.DisplayScale[0] = axisInfo.Value.AxisRange[2] / (float)stripChartPanel.Width;
+                axisInfo.Value.DisplayScale[1] = axisInfo.Value.AxisRange[2] / (float)stripChartPanel.Height;
+                System.Diagnostics.Debug.WriteLine("Stripchart axis " +
+                    axisInfo.Key + " Range " +
+                    axisInfo.Value.AxisRange[0] + " to " +
+                    axisInfo.Value.AxisRange[1] + " X scale " +
+                    axisInfo.Value.DisplayScale[0] + " Y scale " +
+                    axisInfo.Value.DisplayScale[1]);
+            }
+
             stripChartPanel.Invalidate();
         }
         private void stripChartPanel_Layout(object sender, LayoutEventArgs e)
@@ -1884,7 +1983,16 @@ System.Diagnostics.Debug.WriteLine(timestampSeconds + " " + channelName + " " + 
             return (float)rad;
         }
         #endregion
-
+        #region channel context menu handlers
+        private void channelExtents_Click(object sender, EventArgs e)
+        {
+            int runIndex = Convert.ToInt32(channelDataGrid.CurrentRow.Cells["runName"].Value.ToString()) - 1;
+            string channelName = channelDataGrid.CurrentRow.Cells["channelName"].Value.ToString();
+            float min = dataLogger.runData[runIndex].channels[channelName].DataRange[0];
+            float max = dataLogger.runData[runIndex].channels[channelName].DataRange[1];
+            MessageBox.Show(channelName + " " + min.ToString() + " to " + max.ToString());
+        }
+        #endregion
     }
     /// <summary>
     /// display info for all data

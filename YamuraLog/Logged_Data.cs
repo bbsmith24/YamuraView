@@ -157,10 +157,8 @@ namespace YamuraLog
         String channelDescription;
         String channelSource;
         float channelScale;
-        float timeMin = float.MaxValue;
-        float timeMax = float.MinValue;
-        float channelMin = float.MaxValue;
-        float channelMax = float.MinValue;
+        float[] timeRange = new float[] { float.MaxValue, float.MinValue };
+        float[] dataRange = new float[] { float.MaxValue, float.MinValue };
         public SortedList<float, DataPoint> dataPoints = new SortedList<float, DataPoint>();
         public string ChannelName
         {
@@ -210,53 +208,15 @@ namespace YamuraLog
                 channelScale = value;
             }
         }
-        public float TimeMin
+        public float[] TimeRange
         {
-            get
-            {
-                return timeMin;
-            }
-
-            set
-            {
-                timeMin = value;
-            }
+            get { return timeRange; }
+            set { timeRange = value; }
         }
-        public float TimeMax
+        public float[] DataRange
         {
-            get
-            {
-                return timeMax;
-            }
-
-            set
-            {
-                timeMax = value;
-            }
-        }
-        public float ChannelMin
-        {
-            get
-            {
-                return channelMin;
-            }
-
-            set
-            {
-                channelMin = value;
-            }
-        }
-        public float ChannelMax
-        {
-            get
-            {
-                return channelMax;
-            }
-
-            set
-            {
-                channelMax = value;
-            }
+            get { return dataRange; }
+            set { dataRange = value; }
         }
         public DataChannel(String name, String desc, String src, float scale)
         {
@@ -288,10 +248,10 @@ namespace YamuraLog
             {
                 DataPoints.Add(timeStamp, new DataPoint(value));
             }
-            TimeMin = value < TimeMin ? value : TimeMin;
-            TimeMax = value > TimeMax ? value : TimeMax;
-            ChannelMin = value < ChannelMin ? value : ChannelMin;
-            ChannelMax = value > ChannelMax ? value : ChannelMax;
+            timeRange[0] = value < timeRange[0] ? value : timeRange[0];
+            timeRange[1] = value > timeRange[1] ? value : timeRange[1];
+            dataRange[0] = value < dataRange[0] ? value : dataRange[0];
+            dataRange[1] = value > dataRange[1] ? value : dataRange[1];
         }
         public bool FindPointAtTime(float timeStamp, ref DataPoint foundPoint)
         {
