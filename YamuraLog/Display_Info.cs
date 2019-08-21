@@ -14,30 +14,35 @@ namespace YamuraLog
             get { return axisName; }
             set { axisName = value; }
         }
+
         float[] axisRange = new float[] { float.MaxValue, float.MinValue, float.MaxValue };
         public float[] AxisRange
         {
             get { return axisRange; }
             set { axisRange = value; }
         }
-        List<ChannelInfo> associatedChannels = new List<ChannelInfo>();
-        public List<ChannelInfo> AssociatedChannels
+
+        Dictionary<String, ChannelInfo> associatedChannels = new Dictionary<String, ChannelInfo>();
+        public Dictionary<String, ChannelInfo> AssociatedChannels
         {
             get { return associatedChannels; }
             set { associatedChannels = value; }
         }
+
         float[] displayScale = new float[] { 1.0F, 1.0F };
         public float[] DisplayScale
         {
             get { return displayScale; }
             set { displayScale = value; }
         }
+
         float displayOffset = 0.0F;
         public float DisplayOffset
         {
             get { return displayOffset; }
             set { displayOffset = value; }
         }
+
         bool showAxis = false;
         public bool ShowAxis
         {
@@ -53,6 +58,7 @@ namespace YamuraLog
             get { return runIndex; }
             set { runIndex = value; }
         }
+
         string channelName = "unnamed";
         public String ChannelName
         {
@@ -60,6 +66,12 @@ namespace YamuraLog
             set { channelName = value; }
         }
 
+        bool showChannel = false;
+        public bool ShowChannel
+        {
+            get { return showChannel; }
+            set { showChannel = value; }
+        }
         public ChannelInfo(int idx, string name)
         {
             runIndex = idx;

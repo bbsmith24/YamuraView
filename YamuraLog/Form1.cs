@@ -150,6 +150,12 @@ namespace YamuraLog
             runDataGrid.CellEndEdit += new DataGridViewCellEventHandler(RunDataGrid_CellEndEdit);
             runDataGrid.CellValueChanged += new DataGridViewCellEventHandler(RunDataGrid_CellValueChanged);
             runDataGrid.CellMouseUp += new DataGridViewCellMouseEventHandler(RunDataGrid_CellMouseUp);
+
+
+            ImageList imageListSmall = new ImageList();
+            imageListSmall.Images.Add(Bitmap.FromFile("C:\\Users\\bbsmi\\OneDrive\\Documents\\GitHub\\YamuraView\\YamuraLog\\MySmallImage1.bmp"));
+            imageListSmall.Images.Add(Bitmap.FromFile("C:\\Users\\bbsmi\\OneDrive\\Documents\\GitHub\\YamuraView\\YamuraLog\\MySmallImage2.bmp"));
+            axisChannelTree.ImageList = imageListSmall;
         }
 
         private void btnClearAll_Click(object sender, EventArgs e)
@@ -729,7 +735,8 @@ namespace YamuraLog
             int channelIdx = 0;
             int runIdx = 0;
             #region update display info
-            foreach (RunData curRun in dataLogger.runData)
+            RunData curRun = dataLogger.runData[dataLogger.runData.Count - 1];
+            //foreach (RunData curRun in dataLogger.runData)
             {
                 runDisplay.Add(new RunDisplay_Data());
                 runIdx = runDisplay.Count - 1;
@@ -763,7 +770,7 @@ namespace YamuraLog
                         axisName = "G";
                     }
                     #region strip chart
-                        if (stripChartAxes.ContainsKey(axisName))
+                    if (stripChartAxes.ContainsKey(axisName))
                     {
                         stripChartAxes[axisName].AxisRange[0] = stripChartAxes[axisName].AxisRange[0] < curChannel.Value.DataRange[0] ? stripChartAxes[axisName].AxisRange[0] : curChannel.Value.DataRange[0];
                         stripChartAxes[axisName].AxisRange[1] = stripChartAxes[axisName].AxisRange[1] > curChannel.Value.DataRange[1] ? stripChartAxes[axisName].AxisRange[1] : curChannel.Value.DataRange[1];
@@ -776,10 +783,10 @@ namespace YamuraLog
                     }
                     stripChartAxes[axisName].AxisName = axisName;
                     stripChartAxes[axisName].AxisRange[2] = stripChartAxes[axisName].AxisRange[1] - stripChartAxes[axisName].AxisRange[0];
-                    stripChartAxes[axisName].AssociatedChannels.Add(new ChannelInfo(runIdx, curChannel.Key));
+                    stripChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key),  new ChannelInfo(runIdx, curChannel.Key));
                     stripChartAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / stripChartAxes[axisName].AxisRange[2];
                     stripChartAxes[axisName].DisplayScale[1] =  (float)stripChartPanelBounds.Height / stripChartAxes[axisName].AxisRange[2];
-                    stripChartAxes[axisName].DisplayOffset = 0.0F;// stripChartAxes[axisName].DisplayScale[0];
+                    stripChartAxes[axisName].DisplayOffset = -1 * stripChartAxes[axisName].AxisRange[0];
                     if (!cmbXAxis.Items.Contains(axisName))
                     {
                         cmbXAxis.Items.Add(axisName);
@@ -799,7 +806,7 @@ namespace YamuraLog
                     }
                     tractionCircleAxes[axisName].AxisName = axisName;
                     tractionCircleAxes[axisName].AxisRange[2] = curChannel.Value.DataRange[1] - curChannel.Value.DataRange[0];
-                    tractionCircleAxes[axisName].AssociatedChannels.Add(new ChannelInfo(runIdx, axisName));
+                    tractionCircleAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, axisName));
                     tractionCircleAxes[axisName].DisplayScale[0] = (float)tractionCircleBounds.Width / tractionCircleAxes[axisName].AxisRange[2];
                     tractionCircleAxes[axisName].DisplayScale[1] = (float)tractionCircleBounds.Height / tractionCircleAxes[axisName].AxisRange[2];
                     tractionCircleAxes[axisName].DisplayOffset = 0.0F;//tractionCircleAxes[axisName].DisplayScale[0];
@@ -818,7 +825,7 @@ namespace YamuraLog
                     }
                     trackMapAxes[axisName].AxisName = axisName;
                     trackMapAxes[axisName].AxisRange[2] = curChannel.Value.DataRange[1] - curChannel.Value.DataRange[0];
-                    trackMapAxes[axisName].AssociatedChannels.Add(new ChannelInfo(runIdx, axisName));
+                    trackMapAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, axisName));
                     trackMapAxes[axisName].DisplayScale[0] = (float)trackMapBounds.Width / trackMapAxes[axisName].AxisRange[2];
                     trackMapAxes[axisName].DisplayScale[1] = (float)trackMapBounds.Height / trackMapAxes[axisName].AxisRange[2];
                     trackMapAxes[axisName].DisplayOffset =  0.0F;//trackMapAxes[axisName].DisplayScale[0];
@@ -835,11 +842,49 @@ namespace YamuraLog
                                                   " X scale " + curAxis.Value.DisplayScale[0] +
                                                   " Y scale " + curAxis.Value.DisplayScale[1] +
                                                   " Offset " + curAxis.Value.DisplayOffset);
-                yAxisDataGrid.Rows.Add();
-                yAxisDataGrid.Rows[yAxisDataGrid.Rows.Count - 1].Cells["yAxisUse"].Value = false;
-                yAxisDataGrid.Rows[yAxisDataGrid.Rows.Count - 1].Cells["yAxisName"].Value = curAxis.Value.AxisName;
-                yAxisDataGrid.Rows[yAxisDataGrid.Rows.Count - 1].Cells["axisMin"].Value = curAxis.Value.AxisRange[0];
-                yAxisDataGrid.Rows[yAxisDataGrid.Rows.Count - 1].Cells["axisMax"].Value = curAxis.Value.AxisRange[1];
+                #region old list
+                bool axisFound = false;
+                for (int rowIdx = 0; rowIdx < yAxisDataGrid.Rows.Count; rowIdx++)
+                {
+                    if (yAxisDataGrid.Rows[rowIdx].Cells["yAxisName"].Value.ToString() == curAxis.Value.AxisName)
+                    {
+                        axisFound = true;
+                        break;
+                    }
+                }
+                if (!axisFound)
+                {
+                    yAxisDataGrid.Rows.Add();
+                    yAxisDataGrid.Rows[yAxisDataGrid.Rows.Count - 1].Cells["yAxisUse"].Value = false;
+                    yAxisDataGrid.Rows[yAxisDataGrid.Rows.Count - 1].Cells["yAxisName"].Value = curAxis.Value.AxisName;
+                    yAxisDataGrid.Rows[yAxisDataGrid.Rows.Count - 1].Cells["axisMin"].Value = curAxis.Value.AxisRange[0];
+                    yAxisDataGrid.Rows[yAxisDataGrid.Rows.Count - 1].Cells["axisMax"].Value = curAxis.Value.AxisRange[1];
+                }
+                #endregion
+                #region tree list
+                axisFound = false;
+                foreach(TreeNode axisItem in axisChannelTree.Nodes)
+                {
+                    axisFound = false;
+                    if (axisItem.Name == curAxis.Key)
+                    {
+                        axisFound = true;
+                        break;
+                    }
+                }
+                if (!axisFound)
+                {
+                    axisChannelTree.Nodes.Add(curAxis.Key, curAxis.Key, 0);
+                }
+                foreach (KeyValuePair<string, ChannelInfo> associatedChannel in curAxis.Value.AssociatedChannels)
+                {
+                    if(axisChannelTree.Nodes[curAxis.Key].Nodes.ContainsKey(associatedChannel.Key))
+                    {
+                        continue;
+                    }
+                    axisChannelTree.Nodes[curAxis.Key].Nodes.Add(associatedChannel.Key, associatedChannel.Key, 1);
+                }
+                #endregion
             }
             foreach (KeyValuePair<String, Axis> curAxis in trackMapAxes)
             {
@@ -1527,16 +1572,15 @@ namespace YamuraLog
                     {
                         continue;
                     }
-                    foreach(ChannelInfo curChanInfo in yAxis.Value.AssociatedChannels)
+                    foreach(KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
                     {
-                        DataChannel curChannel = dataLogger.runData[curChanInfo.RunIndex].channels[curChanInfo.ChannelName];
-
                         // if not displayed, skip
-                        //if (!runDisplay[runCount].channelDisplay[yChannelName])
-                        //{
-                        //    continue;
-                        //}
-                        drawPen = new Pen(runDisplay[curChanInfo.RunIndex].channelColor[curChanInfo.ChannelName]);
+                        if (!curChanInfo.Value.ShowChannel)
+                        {
+                            continue;
+                        }
+                        DataChannel curChannel = dataLogger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
+                        drawPen = new Pen(runDisplay[curChanInfo.Value.RunIndex].channelColor[curChanInfo.Value.ChannelName]);
 
                         initialValue = false;
                         foreach (KeyValuePair<float, DataPoint> curData in curChannel.DataPoints)
@@ -1579,7 +1623,10 @@ namespace YamuraLog
         }
         private void stripChart_MouseMove(object sender, MouseEventArgs e)
         {
-            //return;
+            if(stripChartAxes.Count == 0)
+            {
+                return;
+            }
             stripChartPanel.Focus();
             PointF floatPosition = new PointF(e.X, e.Y);
             // floatPosition should be offset by the stripchart hScroll position....
@@ -1967,16 +2014,6 @@ namespace YamuraLog
             return (float)rad;
         }
         #endregion
-        #region channel context menu handlers
-        private void channelExtents_Click(object sender, EventArgs e)
-        {
-            int runIndex = Convert.ToInt32(channelDataGrid.CurrentRow.Cells["runName"].Value.ToString()) - 1;
-            string channelName = channelDataGrid.CurrentRow.Cells["channelName"].Value.ToString();
-            float min = dataLogger.runData[runIndex].channels[channelName].DataRange[0];
-            float max = dataLogger.runData[runIndex].channels[channelName].DataRange[1];
-            MessageBox.Show(channelName + " " + min.ToString() + " to " + max.ToString());
-        }
-        #endregion
 
         private void yAxisDataGrid_RowValidated(object sender, DataGridViewCellEventArgs e)
         {
@@ -1996,15 +2033,104 @@ namespace YamuraLog
 
         private void yAxisDataGrid_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
+            String axisName = yAxisDataGrid.Rows[e.RowIndex].Cells["yAxisName"].Value.ToString();
             if (e.ColumnIndex == yAxisDataGrid.Columns["yAxisUse"].Index)
             {
-                String axisName = yAxisDataGrid.Rows[e.RowIndex].Cells["yAxisName"].Value.ToString();
-
                 stripChartAxes[axisName].ShowAxis = (bool)(yAxisDataGrid.Rows[e.RowIndex].Cells["yAxisUse"].Value);
                 stripChartPanel.Invalidate();
             }
+            else if (e.ColumnIndex == yAxisDataGrid.Columns["axisMin"].Index)
+            {
+                stripChartAxes[axisName].AxisRange[0] = Convert.ToSingle(yAxisDataGrid.Rows[e.RowIndex].Cells["axisMin"].Value);
+                stripChartAxes[axisName].AxisRange[2] = stripChartAxes[axisName].AxisRange[1] - stripChartAxes[axisName].AxisRange[0];
+                stripChartAxes[axisName].DisplayOffset = stripChartAxes[axisName].AxisRange[0];
+
+                stripChartAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / stripChartAxes[axisName].AxisRange[2];
+                stripChartAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / stripChartAxes[axisName].AxisRange[2];
+            }
+            else if (e.ColumnIndex == yAxisDataGrid.Columns["axisMax"].Index)
+            {
+                stripChartAxes[axisName].AxisRange[1] = Convert.ToSingle(yAxisDataGrid.Rows[e.RowIndex].Cells["axisMax"].Value);
+                stripChartAxes[axisName].AxisRange[2] = stripChartAxes[axisName].AxisRange[1] - stripChartAxes[axisName].AxisRange[0];
+
+                stripChartAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / stripChartAxes[axisName].AxisRange[2];
+                stripChartAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / stripChartAxes[axisName].AxisRange[2];
+            }
             return;
         }
+
+        private void treeView1_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            // axis
+            if(e.Node.Parent == null)
+            {
+                stripChartAxes[e.Node.Name].ShowAxis = e.Node.Checked;
+            }
+            // channel
+            else
+            {
+                e.Node.Parent.Checked = e.Node.Checked;
+                stripChartAxes[e.Node.Parent.Name].AssociatedChannels[e.Node.Text].ShowChannel = e.Node.Checked;
+                stripChartAxes[e.Node.Parent.Name].ShowAxis = e.Node.Checked == true ? true : stripChartAxes[e.Node.Parent.Name].ShowAxis;
+            }
+            stripChartPanel.Invalidate();
+        }
+
+
+        #region channel context menu handlers
+        private void channelsContext_Opening(object sender, CancelEventArgs e)
+        {
+            if (axisChannelTree.SelectedNode.Parent == null)
+            {
+                channelsContext.Items["axisExtents"].Enabled = true;
+                channelsContext.Items["channelInfo"].Enabled = false;
+            }
+            else
+            {
+                channelsContext.Items["axisExtents"].Enabled = false;
+                channelsContext.Items["channelInfo"].Enabled = true;
+            }
+        }
+        private void axisInfo_Click(object sender, EventArgs e)
+        {
+            string axisName = axisChannelTree.SelectedNode.Text;
+
+            AxisInfo axisDlg = new AxisInfo();
+            axisDlg.Text = axisName + " Info";
+            axisDlg.RangeMinimum = stripChartAxes[axisName].AxisRange[0];
+            axisDlg.RangeMaximum = stripChartAxes[axisName].AxisRange[1];
+            if (axisDlg.ShowDialog() == DialogResult.OK)
+            {
+                stripChartAxes[axisName].AxisRange[0] = axisDlg.RangeMinimum;
+                stripChartAxes[axisName].AxisRange[1] = axisDlg.RangeMaximum;
+                stripChartAxes[axisName].AxisRange[2] = stripChartAxes[axisName].AxisRange[1] - stripChartAxes[axisName].AxisRange[0];
+                stripChartAxes[axisName].DisplayOffset = -1 * stripChartAxes[axisName].AxisRange[0];
+                stripChartAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / stripChartAxes[axisName].AxisRange[2];
+                stripChartAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / stripChartAxes[axisName].AxisRange[2];
+
+                stripChartPanel.Invalidate();
+            }
+        }
+        private void channelInfo_Click(object sender, EventArgs e)
+        {
+            string channelFullName = axisChannelTree.SelectedNode.Text;
+            int runIdx = Convert.ToInt32(channelFullName.Substring(0, channelFullName.IndexOf('-')));
+            string channelName = channelFullName.Substring(channelFullName.IndexOf('-') + 1);
+
+            ChannelInfoForm channelDlg = new ChannelInfoForm();
+            channelDlg.Text = channelFullName + " Info";
+
+            channelDlg.RangeMinimum = dataLogger.runData[runIdx].channels[channelName].DataRange[0];
+            channelDlg.RangeMaximum = dataLogger.runData[runIdx].channels[channelName].DataRange[1];
+            channelDlg.ChannelColor = runDisplay[runIdx].channelColor[channelName];
+
+            if (channelDlg.ShowDialog() == DialogResult.OK)
+            {
+                runDisplay[runIdx].channelColor[channelName] = channelDlg.ChannelColor;
+                stripChartPanel.Invalidate();
+            }
+        }
+        #endregion
     }
     /// <summary>
     /// display info for all data

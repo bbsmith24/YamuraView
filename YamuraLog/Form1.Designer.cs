@@ -58,7 +58,8 @@
             this.channelName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.channelDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.channelsContext = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.channelExtents = new System.Windows.Forms.ToolStripMenuItem();
+            this.axisExtents = new System.Windows.Forms.ToolStripMenuItem();
+            this.channelInfo = new System.Windows.Forms.ToolStripMenuItem();
             this.cmbXAxis = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.stripchartHScroll = new System.Windows.Forms.HScrollBar();
@@ -68,6 +69,8 @@
             this.yAxisName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.axisMin = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.axisMax = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.axisChannelTree = new System.Windows.Forms.TreeView();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.channelDataGrid)).BeginInit();
             this.channelsContext.SuspendLayout();
@@ -173,7 +176,7 @@
             this.runDataGrid.Location = new System.Drawing.Point(11, 12);
             this.runDataGrid.Name = "runDataGrid";
             this.runDataGrid.RowHeadersVisible = false;
-            this.runDataGrid.Size = new System.Drawing.Size(661, 180);
+            this.runDataGrid.Size = new System.Drawing.Size(453, 180);
             this.runDataGrid.TabIndex = 18;
             // 
             // colRunNumber
@@ -281,10 +284,10 @@
             this.channelName,
             this.channelDescription});
             this.channelDataGrid.ContextMenuStrip = this.channelsContext;
-            this.channelDataGrid.Location = new System.Drawing.Point(795, 83);
+            this.channelDataGrid.Location = new System.Drawing.Point(588, 12);
             this.channelDataGrid.Name = "channelDataGrid";
             this.channelDataGrid.RowHeadersVisible = false;
-            this.channelDataGrid.Size = new System.Drawing.Size(314, 109);
+            this.channelDataGrid.Size = new System.Drawing.Size(100, 68);
             this.channelDataGrid.TabIndex = 22;
             // 
             // displayChannel
@@ -327,16 +330,25 @@
             // channelsContext
             // 
             this.channelsContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.channelExtents});
+            this.axisExtents,
+            this.channelInfo});
             this.channelsContext.Name = "channelsContext";
-            this.channelsContext.Size = new System.Drawing.Size(159, 26);
+            this.channelsContext.Size = new System.Drawing.Size(153, 70);
+            this.channelsContext.Opening += new System.ComponentModel.CancelEventHandler(this.channelsContext_Opening);
             // 
-            // channelExtents
+            // axisExtents
             // 
-            this.channelExtents.Name = "channelExtents";
-            this.channelExtents.Size = new System.Drawing.Size(158, 22);
-            this.channelExtents.Text = "Channel Extents";
-            this.channelExtents.Click += new System.EventHandler(this.channelExtents_Click);
+            this.axisExtents.Name = "axisExtents";
+            this.axisExtents.Size = new System.Drawing.Size(152, 22);
+            this.axisExtents.Text = "Axis Info";
+            this.axisExtents.Click += new System.EventHandler(this.axisInfo_Click);
+            // 
+            // channelInfo
+            // 
+            this.channelInfo.Name = "channelInfo";
+            this.channelInfo.Size = new System.Drawing.Size(152, 22);
+            this.channelInfo.Text = "Channel Info";
+            this.channelInfo.Click += new System.EventHandler(this.channelInfo_Click);
             // 
             // cmbXAxis
             // 
@@ -390,10 +402,10 @@
             this.axisMin,
             this.axisMax});
             this.yAxisDataGrid.ContextMenuStrip = this.channelsContext;
-            this.yAxisDataGrid.Location = new System.Drawing.Point(795, 198);
+            this.yAxisDataGrid.Location = new System.Drawing.Point(471, 12);
             this.yAxisDataGrid.Name = "yAxisDataGrid";
             this.yAxisDataGrid.RowHeadersVisible = false;
-            this.yAxisDataGrid.Size = new System.Drawing.Size(314, 205);
+            this.yAxisDataGrid.Size = new System.Drawing.Size(111, 99);
             this.yAxisDataGrid.TabIndex = 27;
             this.yAxisDataGrid.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.yAxisDataGrid_CellEndEdit);
             this.yAxisDataGrid.CellValidated += new System.Windows.Forms.DataGridViewCellEventHandler(this.yAxisDataGrid_CellValidated);
@@ -430,17 +442,33 @@
             this.axisMax.Name = "axisMax";
             this.axisMax.Width = 52;
             // 
+            // axisChannelTree
+            // 
+            this.axisChannelTree.CheckBoxes = true;
+            this.axisChannelTree.ContextMenuStrip = this.channelsContext;
+            this.axisChannelTree.Location = new System.Drawing.Point(795, 86);
+            this.axisChannelTree.Name = "axisChannelTree";
+            this.axisChannelTree.Size = new System.Drawing.Size(314, 317);
+            this.axisChannelTree.TabIndex = 29;
+            this.axisChannelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCheck);
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1115, 925);
+            this.Controls.Add(this.channelDataGrid);
+            this.Controls.Add(this.axisChannelTree);
             this.Controls.Add(this.yAxisDataGrid);
             this.Controls.Add(this.btnClearAll);
             this.Controls.Add(this.stripchartHScroll);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cmbXAxis);
-            this.Controls.Add(this.channelDataGrid);
             this.Controls.Add(this.txtAutoAlignThreshold);
             this.Controls.Add(this.btnAutoAlign);
             this.Controls.Add(this.txtCursorPos);
@@ -490,7 +518,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colOffsetTime;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSourceFile;
         private System.Windows.Forms.ContextMenuStrip channelsContext;
-        private System.Windows.Forms.ToolStripMenuItem channelExtents;
+        private System.Windows.Forms.ToolStripMenuItem axisExtents;
         private System.Windows.Forms.DataGridViewCheckBoxColumn displayChannel;
         private System.Windows.Forms.DataGridViewTextBoxColumn channelColor;
         private System.Windows.Forms.DataGridViewTextBoxColumn runName;
@@ -501,6 +529,9 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn yAxisName;
         private System.Windows.Forms.DataGridViewTextBoxColumn axisMin;
         private System.Windows.Forms.DataGridViewTextBoxColumn axisMax;
+        private System.Windows.Forms.TreeView axisChannelTree;
+        private System.Windows.Forms.ToolStripMenuItem channelInfo;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
     }
 }
 
