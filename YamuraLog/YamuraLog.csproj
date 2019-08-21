@@ -82,6 +82,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AxisInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AxisInfo.Designer.cs">
+      <DependentUpon>AxisInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ChannelInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChannelInfo.Designer.cs">
+      <DependentUpon>ChannelInfo.cs</DependentUpon>
+    </Compile>
     <Compile Include="Display_Info.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -93,6 +105,12 @@
     <Compile Include="Logged_Data.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AxisInfo.resx">
+      <DependentUpon>AxisInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ChannelInfo.resx">
+      <DependentUpon>ChannelInfo.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
