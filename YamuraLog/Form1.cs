@@ -45,6 +45,8 @@ namespace YamuraLog
         DataLogger dataLogger = new DataLogger();
         // global display data
         GlobalDisplay_Data globalDisplay = new GlobalDisplay_Data();
+        Dictionary<String, Axis> globalAxes = new Dictionary<String, Axis>();
+
         Dictionary<String, Axis> stripChartAxes = new Dictionary<String, Axis>();
         Dictionary<String, Axis> trackMapAxes = new Dictionary<String, Axis>();
         Dictionary<String, Axis> tractionCircleAxes = new Dictionary<String, Axis>();
@@ -146,22 +148,22 @@ namespace YamuraLog
 
             // Add a CellClick handler to handle clicks in the button column.
             runDataGrid.CellClick += new DataGridViewCellEventHandler(RunDataGrid_CellClick);
-            channelDataGrid.CellClick += new DataGridViewCellEventHandler(YAxisChannelDataGrid_CellValueChanged);
+            //channelDataGrid.CellClick += new DataGridViewCellEventHandler(YAxisChannelDataGrid_CellValueChanged);
             runDataGrid.CellEndEdit += new DataGridViewCellEventHandler(RunDataGrid_CellEndEdit);
             runDataGrid.CellValueChanged += new DataGridViewCellEventHandler(RunDataGrid_CellValueChanged);
             runDataGrid.CellMouseUp += new DataGridViewCellMouseEventHandler(RunDataGrid_CellMouseUp);
 
 
             ImageList imageListSmall = new ImageList();
-            imageListSmall.Images.Add(Bitmap.FromFile("C:\\Users\\bbsmi\\OneDrive\\Documents\\GitHub\\YamuraView\\YamuraLog\\MySmallImage1.bmp"));
-            imageListSmall.Images.Add(Bitmap.FromFile("C:\\Users\\bbsmi\\OneDrive\\Documents\\GitHub\\YamuraView\\YamuraLog\\MySmallImage2.bmp"));
+            imageListSmall.Images.Add(Bitmap.FromFile("C:\\Users\\bsmith\\Documents\\GitHub\\YamuraView\\YamuraLog\\MySmallImage1.bmp"));
+            imageListSmall.Images.Add(Bitmap.FromFile("C:\\Users\\bsmith\\Documents\\GitHub\\YamuraView\\YamuraLog\\MySmallImage2.bmp"));
             axisChannelTree.ImageList = imageListSmall;
         }
 
         private void btnClearAll_Click(object sender, EventArgs e)
         {
             runDataGrid.Rows.Clear();
-            channelDataGrid.Rows.Clear();
+            //channelDataGrid.Rows.Clear();
             dataLogger.Reset();
             globalDisplay.Reset();
             runDisplay.Clear();
@@ -184,9 +186,9 @@ namespace YamuraLog
             {
                 ReadYLGFile(openLogFile.FileName);
             }
-            DrawMap();
-            DrawTraction();
-            DrawSpeed();
+            mapPanel.Invalidate();
+            tractionCirclePanel.Invalidate();
+            stripChartPanel.Invalidate();
         }
         private void btnAutoAlign_Click(object sender, EventArgs e)
         {
@@ -736,7 +738,6 @@ namespace YamuraLog
             int runIdx = 0;
             #region update display info
             RunData curRun = dataLogger.runData[dataLogger.runData.Count - 1];
-            //foreach (RunData curRun in dataLogger.runData)
             {
                 runDisplay.Add(new RunDisplay_Data());
                 runIdx = runDisplay.Count - 1;
@@ -763,106 +764,32 @@ namespace YamuraLog
                     #endregion
                     #region axes create/update
                     String axisName = curChannel.Key;
-                    if((axisName == "gX") ||
-                       (axisName == "gY") ||
-                       (axisName == "gZ"))
+                    if (globalAxes.ContainsKey(axisName))
                     {
-                        axisName = "G";
-                    }
-                    #region strip chart
-                    if (stripChartAxes.ContainsKey(axisName))
-                    {
-                        stripChartAxes[axisName].AxisRange[0] = stripChartAxes[axisName].AxisRange[0] < curChannel.Value.DataRange[0] ? stripChartAxes[axisName].AxisRange[0] : curChannel.Value.DataRange[0];
-                        stripChartAxes[axisName].AxisRange[1] = stripChartAxes[axisName].AxisRange[1] > curChannel.Value.DataRange[1] ? stripChartAxes[axisName].AxisRange[1] : curChannel.Value.DataRange[1];
+                        globalAxes[axisName].AxisRange[0] = globalAxes[axisName].AxisRange[0] < curChannel.Value.DataRange[0] ? globalAxes[axisName].AxisRange[0] : curChannel.Value.DataRange[0];
+                        globalAxes[axisName].AxisRange[1] = globalAxes[axisName].AxisRange[1] > curChannel.Value.DataRange[1] ? globalAxes[axisName].AxisRange[1] : curChannel.Value.DataRange[1];
                     }
                     else
                     {
-                        stripChartAxes.Add(axisName, new Axis());
-                        stripChartAxes[axisName].AxisRange[0] = curChannel.Value.DataRange[0];
-                        stripChartAxes[axisName].AxisRange[1] = curChannel.Value.DataRange[1];
+                        globalAxes.Add(axisName, new Axis());
+                        globalAxes[axisName].AxisRange[0] = curChannel.Value.DataRange[0];
+                        globalAxes[axisName].AxisRange[1] = curChannel.Value.DataRange[1];
                     }
-                    stripChartAxes[axisName].AxisName = axisName;
-                    stripChartAxes[axisName].AxisRange[2] = stripChartAxes[axisName].AxisRange[1] - stripChartAxes[axisName].AxisRange[0];
-                    stripChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key),  new ChannelInfo(runIdx, curChannel.Key));
-                    stripChartAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / stripChartAxes[axisName].AxisRange[2];
-                    stripChartAxes[axisName].DisplayScale[1] =  (float)stripChartPanelBounds.Height / stripChartAxes[axisName].AxisRange[2];
-                    stripChartAxes[axisName].DisplayOffset = -1 * stripChartAxes[axisName].AxisRange[0];
-                    if (!cmbXAxis.Items.Contains(axisName))
-                    {
-                        cmbXAxis.Items.Add(axisName);
-                    }
-                    #endregion
-                    #region traction circle
-                    if (tractionCircleAxes.ContainsKey(axisName))
-                    {
-                        tractionCircleAxes[axisName].AxisRange[0] = tractionCircleAxes[axisName].AxisRange[0] < curChannel.Value.DataRange[0] ? tractionCircleAxes[axisName].AxisRange[0] : curChannel.Value.DataRange[0];
-                        tractionCircleAxes[axisName].AxisRange[1] = tractionCircleAxes[axisName].AxisRange[1] > curChannel.Value.DataRange[1] ? tractionCircleAxes[axisName].AxisRange[1] : curChannel.Value.DataRange[1];
-                    }
-                    else
-                    {
-                        tractionCircleAxes.Add(axisName, new Axis());
-                        tractionCircleAxes[axisName].AxisRange[0] = curChannel.Value.DataRange[0];
-                        tractionCircleAxes[axisName].AxisRange[1] = curChannel.Value.DataRange[1];
-                    }
-                    tractionCircleAxes[axisName].AxisName = axisName;
-                    tractionCircleAxes[axisName].AxisRange[2] = curChannel.Value.DataRange[1] - curChannel.Value.DataRange[0];
-                    tractionCircleAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, axisName));
-                    tractionCircleAxes[axisName].DisplayScale[0] = (float)tractionCircleBounds.Width / tractionCircleAxes[axisName].AxisRange[2];
-                    tractionCircleAxes[axisName].DisplayScale[1] = (float)tractionCircleBounds.Height / tractionCircleAxes[axisName].AxisRange[2];
-                    tractionCircleAxes[axisName].DisplayOffset = 0.0F;//tractionCircleAxes[axisName].DisplayScale[0];
-                    #endregion
-                    #region trackmap
-                    if (trackMapAxes.ContainsKey(axisName))
-                    {
-                        trackMapAxes[axisName].AxisRange[0] = trackMapAxes[axisName].AxisRange[0] < curChannel.Value.DataRange[0] ? trackMapAxes[axisName].AxisRange[0] : curChannel.Value.DataRange[0];
-                        trackMapAxes[axisName].AxisRange[1] = trackMapAxes[axisName].AxisRange[1] > curChannel.Value.DataRange[1] ? trackMapAxes[axisName].AxisRange[1] : curChannel.Value.DataRange[1];
-                    }
-                    else
-                    {
-                        trackMapAxes.Add(axisName, new Axis());
-                        trackMapAxes[axisName].AxisRange[0] = curChannel.Value.DataRange[0];
-                        trackMapAxes[axisName].AxisRange[1] = curChannel.Value.DataRange[1];
-                    }
-                    trackMapAxes[axisName].AxisName = axisName;
-                    trackMapAxes[axisName].AxisRange[2] = curChannel.Value.DataRange[1] - curChannel.Value.DataRange[0];
-                    trackMapAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, axisName));
-                    trackMapAxes[axisName].DisplayScale[0] = (float)trackMapBounds.Width / trackMapAxes[axisName].AxisRange[2];
-                    trackMapAxes[axisName].DisplayScale[1] = (float)trackMapBounds.Height / trackMapAxes[axisName].AxisRange[2];
-                    trackMapAxes[axisName].DisplayOffset =  0.0F;//trackMapAxes[axisName].DisplayScale[0];
-                    #endregion
+                    globalAxes[axisName].AxisName = axisName;
+                    globalAxes[axisName].AxisRange[2] = globalAxes[axisName].AxisRange[1] - globalAxes[axisName].AxisRange[0];
+                    globalAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key),  new ChannelInfo(runIdx, curChannel.Key));
+                    globalAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / globalAxes[axisName].AxisRange[2];
+                    globalAxes[axisName].DisplayScale[1] =  (float)stripChartPanelBounds.Height / globalAxes[axisName].AxisRange[2];
+                    globalAxes[axisName].DisplayOffset = -1 * globalAxes[axisName].AxisRange[0];
                     #endregion
                     channelIdx++;
                 }
             }
-
-            foreach (KeyValuePair<String, Axis> curAxis in stripChartAxes)
+            #endregion
+            #region axes to axis tree list
+            foreach (KeyValuePair<String, Axis> curAxis in globalAxes)
             {
-                System.Diagnostics.Debug.WriteLine("Strip Chart axis " + curAxis.Key +
-                                                  " Range " + curAxis.Value.AxisRange[0] + " to " + curAxis.Value.AxisRange[1] +
-                                                  " X scale " + curAxis.Value.DisplayScale[0] +
-                                                  " Y scale " + curAxis.Value.DisplayScale[1] +
-                                                  " Offset " + curAxis.Value.DisplayOffset);
-                #region old list
                 bool axisFound = false;
-                for (int rowIdx = 0; rowIdx < yAxisDataGrid.Rows.Count; rowIdx++)
-                {
-                    if (yAxisDataGrid.Rows[rowIdx].Cells["yAxisName"].Value.ToString() == curAxis.Value.AxisName)
-                    {
-                        axisFound = true;
-                        break;
-                    }
-                }
-                if (!axisFound)
-                {
-                    yAxisDataGrid.Rows.Add();
-                    yAxisDataGrid.Rows[yAxisDataGrid.Rows.Count - 1].Cells["yAxisUse"].Value = false;
-                    yAxisDataGrid.Rows[yAxisDataGrid.Rows.Count - 1].Cells["yAxisName"].Value = curAxis.Value.AxisName;
-                    yAxisDataGrid.Rows[yAxisDataGrid.Rows.Count - 1].Cells["axisMin"].Value = curAxis.Value.AxisRange[0];
-                    yAxisDataGrid.Rows[yAxisDataGrid.Rows.Count - 1].Cells["axisMax"].Value = curAxis.Value.AxisRange[1];
-                }
-                #endregion
-                #region tree list
-                axisFound = false;
                 foreach(TreeNode axisItem in axisChannelTree.Nodes)
                 {
                     axisFound = false;
@@ -884,51 +811,70 @@ namespace YamuraLog
                     }
                     axisChannelTree.Nodes[curAxis.Key].Nodes.Add(associatedChannel.Key, associatedChannel.Key, 1);
                 }
+            }
+            #endregion
+
+            #region copy global axes to local lists
+            foreach (KeyValuePair<String, Axis> globalAxis in globalAxes)
+            {
+                #region stripchart circle
+                if (!stripChartAxes.ContainsKey(globalAxis.Key))
+                {
+                    stripChartAxes.Add(globalAxis.Key, globalAxis.Value);
+                    if (!cmbXAxis.Items.Contains(globalAxis.Key))
+                    {
+                        cmbXAxis.Items.Add(globalAxis.Key);
+                    }
+                }
+                #endregion
+                #region traction circle
+                if (!tractionCircleAxes.ContainsKey(globalAxis.Key))
+                { 
+                    tractionCircleAxes.Add(globalAxis.Key, globalAxis.Value);
+                }
+                #endregion
+                #region trackmap
+                if (!trackMapAxes.ContainsKey(globalAxis.Key))
+                {
+                    trackMapAxes.Add(globalAxis.Key, globalAxis.Value);
+                    if (!comboBox1.Items.Contains(globalAxis.Key))
+                    {
+                        comboBox1.Items.Add(globalAxis.Key);
+                    }
+                    if (!comboBox2.Items.Contains(globalAxis.Key))
+                    {
+                        comboBox2.Items.Add(globalAxis.Key);
+                    }
+                }
                 #endregion
             }
-            foreach (KeyValuePair<String, Axis> curAxis in trackMapAxes)
-            {
-                System.Diagnostics.Debug.WriteLine("Track Map axis " + curAxis.Key +
-                                                  " Range " + curAxis.Value.AxisRange[0] + " to " + curAxis.Value.AxisRange[1] +
-                                                  " X scale " + curAxis.Value.DisplayScale[0] +
-                                                  " Y scale " + curAxis.Value.DisplayScale[1] +
-                                                  " Offset " + curAxis.Value.DisplayOffset);
-            }
-            foreach (KeyValuePair<String, Axis> curAxis in tractionCircleAxes)
-            {
-                System.Diagnostics.Debug.WriteLine("Traction Circle axis " + curAxis.Key +
-                                                  " Range " + curAxis.Value.AxisRange[0] + " to " + curAxis.Value.AxisRange[1] +
-                                                  " X scale " + curAxis.Value.DisplayScale[0] +
-                                                  " Y scale " + curAxis.Value.DisplayScale[1] +
-                                                  " Offset " + curAxis.Value.DisplayOffset);
-            }
-
-
-            xChannelName = stripChartAxes.ElementAt(0).Key;
-            cmbXAxis.SelectedIndex = 0;
+            xChannelName = globalAxes["Time"].AxisName;
+            comboBox1.Text = "Longitude";
+            comboBox2.Text = "Latitude";
             #endregion
 
             // auto align launches
             AutoAlign(0.10F);
 
-            channelDataGrid.Rows.Clear();
-            for (int runGridIdx = 0; runGridIdx < dataLogger.runData.Count; runGridIdx++)
-            {
-                foreach (KeyValuePair<String, DataChannel> kvp in dataLogger.runData[runGridIdx].channels)
-                {
-                    channelDataGrid.Rows.Add();
-                    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["displayChannel"].Value = runDisplay[runGridIdx].channelDisplay[kvp.Key];
-                    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelColor"].Style.BackColor = runDisplay[runGridIdx].channelColor[kvp.Key];
-                    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["runName"].Value = (runGridIdx + 1).ToString();
-                    channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelName"].Value = kvp.Key.ToString();
-                }
-            }
+            //channelDataGrid.Rows.Clear();
+            //for (int runGridIdx = 0; runGridIdx < dataLogger.runData.Count; runGridIdx++)
+            //{
+            //    foreach (KeyValuePair<String, DataChannel> kvp in dataLogger.runData[runGridIdx].channels)
+            //    {
+            //        channelDataGrid.Rows.Add();
+            //        channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["displayChannel"].Value = runDisplay[runGridIdx].channelDisplay[kvp.Key];
+            //        channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelColor"].Style.BackColor = runDisplay[runGridIdx].channelColor[kvp.Key];
+            //        channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["runName"].Value = (runGridIdx + 1).ToString();
+            //        channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelName"].Value = kvp.Key.ToString();
+            //    }
+            //}
             runDataGrid.Rows.Clear();
-            for (int runGridIdx = 0; runGridIdx < dataLogger.runData.Count(); runGridIdx++)
+            //for (int runGridIdx = 0; runGridIdx < dataLogger.runData.Count(); runGridIdx++)
+            for (int runGridIdx = 0; runGridIdx < runDisplay.Count(); runGridIdx++)
             {
                 runDataGrid.Rows.Add();
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runGridIdx + 1).ToString();
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = runDisplay[runGridIdx].showRun;
+                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = false; //runDisplay[runGridIdx].showRun;
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = dataLogger.runData[runGridIdx].dateStr + " " + dataLogger.runData[runGridIdx].timeStr;
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runGridIdx].channels["Time"].DataRange[0];
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runGridIdx].channels["Time"].DataRange[1];
@@ -937,8 +883,8 @@ namespace YamuraLog
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
             }
         }
-
         #endregion
+        #region Auto align
         /// <summary>
         /// estimate launch point offset from speed data
         /// find first speed > 30, walk back to first speed = 0
@@ -992,95 +938,91 @@ namespace YamuraLog
             //    runCount++;
             //}
         }
-        public void DrawMap()
-        {
-            mapPanel.Invalidate();
-        }
-        public void DrawTraction()
-        {
-            tractionCirclePanel.Invalidate();
-        }
-        public void DrawSpeed()
-        {
-            stripChartPanel.Invalidate();
-        }
+        #endregion
         #region track map events
         private void trackMap_Paint(object sender, PaintEventArgs e)
         {
-            for (int validIdx = 0; validIdx < trackMapLastCursorPosValid.Count(); validIdx++)
-            {
-                trackMapLastCursorPosValid[validIdx] = false;
-            }
-
-            // nothing to display yet, or not acceleration data
-            if ((globalDisplay.channelRanges.Count == 0) ||
-                (!globalDisplay.channelRanges.ContainsKey("Latitude")) ||
-                (!globalDisplay.channelRanges.ContainsKey("Longitude")))
+            // nothing to display yet
+            if (globalDisplay.channelRanges.Count == 0)
             {
                 return;
             }
+            stripChartStartPosValid = false;
+            stripChartLastCursorPosValid = false;
+
+            PointF startPt = new PointF();
+            PointF endPt = new PointF();
             Pen drawPen = new Pen(Color.Black, 1);
-            PointF startPt = new PointF(0.0F, 0.0F);
-            PointF endPt = new PointF(0.0F, 0.0F);
             bool initialValue = false;
-            float scaleX = (float)trackMapBounds.Width / (float)Math.Abs(globalDisplay.channelRanges["Longitude"][1] - globalDisplay.channelRanges["Longitude"][0]);
-            float scaleY = (float)trackMapBounds.Height / (float)Math.Abs(globalDisplay.channelRanges["Latitude"][1] - globalDisplay.channelRanges["Latitude"][0]);
-            trackMapScale = scaleX < scaleY ? scaleX : scaleY;
-            float longVal = 0.0F;
-            float startTime = 0.0F;
-            float endTime = 0.0F;
             int runCount = 0;
-
-            using (Graphics mapGraphics = mapPanel.CreateGraphics())
+            string localXChannelName = comboBox1.Text;
+            string localYChannelName = comboBox2.Text;
+            // get the graphics context
+            using (Graphics stripChartGraphics = mapPanel.CreateGraphics())
             {
+                runCount = 0;
 
-                foreach (RunData curRun in dataLogger.runData)
+                // check each Y axis
+                foreach (KeyValuePair<String, Axis> yAxis in stripChartAxes)
                 {
-                    if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
+                    // skip if axis is not displayed
+                    if (yAxis.Value.AxisName != localYChannelName)
                     {
-                        runCount++;
                         continue;
                     }
-                    drawPen = new Pen(runDisplay[runCount].runColor);
-                    initialValue = false;
-                    foreach (KeyValuePair<float, DataPoint> curData in curRun.channels["Longitude"].DataPoints)
+
+                    float[] DisplayScale = new float[] { 0.0F, 0.0F };
+                    DisplayScale[0] = (float)trackMapBounds.Width / globalAxes[localXChannelName].AxisRange[2];
+                    DisplayScale[1] = (float)trackMapBounds.Height / globalAxes[localYChannelName].AxisRange[2];
+                    float[] DisplayOffset = new float[] { 0.0F, 0.0F };
+
+                    DisplayOffset[0] = -1 * globalAxes[localXChannelName].AxisRange[0];
+                    DisplayOffset[1] = /*-1 * */globalAxes[localYChannelName].AxisRange[0];
+                    // check each associated axis
+                    foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
                     {
-                        endPt.X = curData.Value.PointValue - globalDisplay.channelRanges["Longitude"][0];
-                        longVal = curRun.channels["Latitude"].dataPoints[curData.Key].PointValue;
-                        endPt.Y = longVal - globalDisplay.channelRanges["Latitude"][0];
+                        // skip if channel is not displayed
+                        //if (!curChanInfo.Value.ShowChannel)
+                        //{
+                        //    continue;
+                        //}
+                        DataChannel curChannel = dataLogger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
+                        drawPen = new Pen(runDisplay[curChanInfo.Value.RunIndex].channelColor[curChanInfo.Value.ChannelName]);
 
-                        endPt = globalDisplay.ScaleDataToDisplay(endPt,
-                                                                 trackMapScale * trackMapScaleFactor,
-                                                                 trackMapScale * trackMapScaleFactor,
-                                                                 trackMapOffset[0],
-                                                                 trackMapOffset[1],
-                                                                 trackMapBounds);
-
-
-                        endTime = curData.Key;
-
-                        if (stripChartAxes[xChannelName].AxisRange[0] != stripChartAxes[xChannelName].AxisRange[1])
+                        initialValue = false;
+                        foreach (KeyValuePair<float, DataPoint> curData in curChannel.DataPoints)
                         {
-                            if (endTime < stripChartAxes[xChannelName].AxisRange[0])
+                            // x axis is time - direct lookup
+                            if (localXChannelName == "Time")
                             {
-                                startPt.X = endPt.X;
-                                startPt.Y = endPt.Y;
-                                startTime = endTime;
-                                continue;
+                                endPt.X = curData.Key;               // - (float)yAxis.Value.DisplayOffset + runDisplay[runCount].stipchart_Offset[0];
+                                endPt.Y = curData.Value.PointValue;  // - yAxis.Value.AxisRange[0];// - globalDisplay.channelRanges[curChanInfo.ChannelName][0];
                             }
-                            if (startTime > stripChartAxes[xChannelName].AxisRange[1])
+                            // x axis is not time - find nearest time in axis channel, 
+                            else
                             {
-                                break;
+                                DataPoint tst = dataLogger.runData[0].channels[localXChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+                                endPt.X = tst.PointValue;     // - globalDisplay.channelRanges[xChannelName][0] + runDisplay[runCount].stipchart_Offset[0];
+                                endPt.Y = curData.Value.PointValue;// curData.Value.PointValue;     // - globalDisplay.channelRanges[yChannelName][0];
                             }
+                            //
+                            // at this point, the value is already offset on the X axis by any user defined time shift
+                            // just need to offset by the stripchart panned position (H scrollbar)
+                            //
+                            endPt = globalDisplay.ScaleDataToDisplay(endPt,                // point
+                                                                     DisplayScale[0],      // scale X
+                                                                     DisplayScale[1],      // scale Y
+                                                                     DisplayOffset[0],     // offset X
+                                                                     DisplayOffset[1],     // offset Y
+                                                                     trackMapBounds);      // graphics area boundary
+                            if (initialValue)// && (startPt.X < trackMapBounds.Width) && (endPt.X > 0))
+                            {
+                                stripChartGraphics.DrawLine(drawPen, startPt, endPt);
+                            }
+                            startPt.X = endPt.X;
+                            startPt.Y = endPt.Y;
+                            initialValue = true;
                         }
-                        if (initialValue)
-                        {
-                            mapGraphics.DrawLine(drawPen, startPt, endPt);
-                        }
-                        startPt.X = endPt.X;
-                        startPt.Y = endPt.Y;
-                        startTime = endTime;
-                        initialValue = true;
                     }
                     runCount++;
                 }
@@ -1152,6 +1094,7 @@ namespace YamuraLog
         }
         private void TrackMapUpdateCursor(float xAxisValue)
         {
+            return;
             Pen drawPen = new Pen(Color.Black, 1);
             PointF locationPt = new PointF();
             Rectangle locationBox = new Rectangle();
@@ -1232,6 +1175,7 @@ namespace YamuraLog
         }
         private void TrackMapClearCursor()
         {
+            return;
             using (Graphics mapGraphics = mapPanel.CreateGraphics())
             {
                 int runCount = 0;
@@ -1276,6 +1220,7 @@ namespace YamuraLog
         #region traction circle events
         private void tractionCircle_Paint(object sender, PaintEventArgs e)
         {
+            return;
             tractionCircleStartPosValid = false;
             for (int validIdx = 0; validIdx < trackMapLastCursorPosValid.Count(); validIdx++)
             {
@@ -1410,6 +1355,7 @@ namespace YamuraLog
         }
         private void TractionCircleUpdateCursor(float xAxisValue)
         {
+            return;
             Pen drawPen = new Pen(Color.Black, 1);
             PointF locationPt = new PointF();
             Rectangle locationBox = new Rectangle();
@@ -1489,6 +1435,7 @@ namespace YamuraLog
         }
         private void TractionCircleClearCursor()
         {
+            return;
             using (Graphics mapGraphics = tractionCirclePanel.CreateGraphics())
             {
                 int runCount = 0;
@@ -1538,20 +1485,6 @@ namespace YamuraLog
             {
                 return;
             }
-            int channelCount = 0;
-            #region get count of displayed channels
-            //for (int rowIdx = 0; rowIdx < channelDataGrid.Rows.Count; rowIdx++)
-            //{
-            //    if ((bool)channelDataGrid.Rows[rowIdx].Cells["displayChannel"].Value == true)
-            //    {
-            //        channelCount++;
-            //    }
-            //}
-            //if (channelCount == 0)
-            //{
-            //    return;
-            //}
-            #endregion
             stripChartStartPosValid = false;
             stripChartLastCursorPosValid = false;
 
@@ -1560,21 +1493,27 @@ namespace YamuraLog
             Pen drawPen = new Pen(Color.Black, 1);
             bool initialValue = false;
             int runCount = 0;
-            xChannelName = cmbXAxis.Text;
-            using (Graphics mapGraphics = stripChartPanel.CreateGraphics())
+            if(cmbXAxis.Text.Length > 0)
+            { 
+                xChannelName = cmbXAxis.Text;
+            }
+            // get the graphics context
+            using (Graphics stripChartGraphics = stripChartPanel.CreateGraphics())
             {
                 runCount = 0;
 
-                //foreach (RunData curRun in dataLogger.runData)
-                foreach(KeyValuePair<String, Axis> yAxis in stripChartAxes)
+                // check each Y axis
+                foreach (KeyValuePair<String, Axis> yAxis in stripChartAxes)
                 {
-                    if(!yAxis.Value.ShowAxis)
+                    // skip if axis is not displayed
+                    if (!yAxis.Value.ShowAxis)
                     {
                         continue;
                     }
+                    // check each associated axis
                     foreach(KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
                     {
-                        // if not displayed, skip
+                        // skip if channel is not displayed
                         if (!curChanInfo.Value.ShowChannel)
                         {
                             continue;
@@ -1588,29 +1527,29 @@ namespace YamuraLog
                             // x axis is time - direct lookup
                             if (xChannelName == "Time")
                             {
-                                endPt.X = curData.Key;// - (float)yAxis.Value.DisplayOffset + runDisplay[runCount].stipchart_Offset[0];
-                                endPt.Y = curData.Value.PointValue;// - yAxis.Value.AxisRange[0];// - globalDisplay.channelRanges[curChanInfo.ChannelName][0];
+                                endPt.X = curData.Key;               // - (float)yAxis.Value.DisplayOffset + runDisplay[runCount].stipchart_Offset[0];
+                                endPt.Y = curData.Value.PointValue;  // - yAxis.Value.AxisRange[0];// - globalDisplay.channelRanges[curChanInfo.ChannelName][0];
                             }
                             // x axis is not time - find nearest time in axis channel, 
-                            //else
-                            //{
-                            //    DataPoint tst = curRun.channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
-                            //    endPt.X = tst.PointValue - globalDisplay.channelRanges[xChannelName][0] + runDisplay[runCount].stipchart_Offset[0];
-                            //    endPt.Y = curData.Value.PointValue - globalDisplay.channelRanges[yChannelName][0];
-                            //}
+                            else
+                            {
+                                DataPoint tst = dataLogger.runData[0].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+                                endPt.X = tst.PointValue;     // - globalDisplay.channelRanges[xChannelName][0] + runDisplay[runCount].stipchart_Offset[0];
+                                endPt.Y = curData.Value.PointValue;// curData.Value.PointValue;     // - globalDisplay.channelRanges[yChannelName][0];
+                            }
                             //
                             // at this point, the value is already offset on the X axis by any user defined time shift
                             // just need to offset by the stripchart panned position (H scrollbar)
                             //
-                            endPt = globalDisplay.ScaleDataToDisplay(endPt,                                                                // point
-                                                                     stripChartAxes[xChannelName].DisplayScale[0],// * stripChartScaleFactorX,                            // scale X
-                                                                     yAxis.Value.DisplayScale[1],// * stripChartScaleFactorY,              // scale Y
-                                                                     stripChartAxes[xChannelName].DisplayOffset,                                                                    // offset X
-                                                                     yAxis.Value.AxisRange[0],                                                                    // offset Y
-                                                                     stripChartPanelBounds);
+                            endPt = globalDisplay.ScaleDataToDisplay(endPt,                                             // point
+                                                                     stripChartAxes[xChannelName].DisplayScale[0],      // scale X
+                                                                     yAxis.Value.DisplayScale[1],                       // scale Y
+                                                                     stripChartAxes[xChannelName].DisplayOffset,        // offset X
+                                                                     yAxis.Value.AxisRange[0],                          // offset Y
+                                                                     stripChartPanelBounds);                            // graphics area boundary
                             if ((initialValue) && (startPt.X < stripChartPanelBounds.Width) && (endPt.X > 0))
                             {
-                                mapGraphics.DrawLine(drawPen, startPt, endPt);
+                                stripChartGraphics.DrawLine(drawPen, startPt, endPt);
                             }
                             startPt.X = endPt.X;
                             startPt.Y = endPt.Y;
@@ -1936,35 +1875,35 @@ namespace YamuraLog
         #region Y axis channel grid events
         private void YAxisChannelDataGrid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            if(e.RowIndex < 0)
-            {
-                return;
-            }
-            int runNum = Convert.ToInt32(channelDataGrid.Rows[e.RowIndex].Cells["runName"].Value.ToString()) - 1;
-            String channelName = channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString();
-            //// Ignore clicks that are not on button cells. 
-            if (e.ColumnIndex == channelDataGrid.Columns["displayChannel"].Index)
-            {
-                channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value = !(bool)channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value;
+            //if(e.RowIndex < 0)
+            //{
+            //    return;
+            //}
+            //int runNum = Convert.ToInt32(channelDataGrid.Rows[e.RowIndex].Cells["runName"].Value.ToString()) - 1;
+            //String channelName = channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString();
+            ////// Ignore clicks that are not on button cells. 
+            //if (e.ColumnIndex == channelDataGrid.Columns["displayChannel"].Index)
+            //{
+            //    channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value = !(bool)channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value;
 
-                runDisplay[runNum].channelDisplay[channelName] = (bool)channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value;
+            //    runDisplay[runNum].channelDisplay[channelName] = (bool)channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value;
 
-                stripChartPanel.Invalidate();
-            }
-            else if (e.ColumnIndex == channelDataGrid.Columns["channelColor"].Index)
-            {
-                if(colorDialog1.ShowDialog() == DialogResult.OK)
-                {
-                    Color resultColor = colorDialog1.Color;
-                    channelDataGrid.Rows[e.RowIndex].Cells["channelColor"].Style.BackColor = resultColor;
-                    channelDataGrid.Rows[e.RowIndex].Cells["channelColor"].Style.SelectionBackColor = resultColor;
-                    runDisplay[runNum].channelColor[channelName] = resultColor;
-                    channelDataGrid.Invalidate();
+            //    stripChartPanel.Invalidate();
+            //}
+            //else if (e.ColumnIndex == channelDataGrid.Columns["channelColor"].Index)
+            //{
+            //    if(colorDialog1.ShowDialog() == DialogResult.OK)
+            //    {
+            //        Color resultColor = colorDialog1.Color;
+            //        channelDataGrid.Rows[e.RowIndex].Cells["channelColor"].Style.BackColor = resultColor;
+            //        channelDataGrid.Rows[e.RowIndex].Cells["channelColor"].Style.SelectionBackColor = resultColor;
+            //        runDisplay[runNum].channelColor[channelName] = resultColor;
+            //        channelDataGrid.Invalidate();
 
-                }
-                stripChartPanel.Invalidate();
-            }
-            return;
+            //    }
+            //    stripChartPanel.Invalidate();
+            //}
+            //return;
         }
         #endregion
         #region GDI support
@@ -2015,22 +1954,11 @@ namespace YamuraLog
         }
         #endregion
 
-        private void yAxisDataGrid_RowValidated(object sender, DataGridViewCellEventArgs e)
-        {
-        }
-
-        private void yAxisDataGrid_RowValidating(object sender, DataGridViewCellCancelEventArgs e)
-        {
-        }
-
-        private void yAxisDataGrid_CellValidated(object sender, DataGridViewCellEventArgs e)
-        {
-        }
-
-        private void yAxisDataGrid_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
-        {
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void yAxisDataGrid_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             String axisName = yAxisDataGrid.Rows[e.RowIndex].Cells["yAxisName"].Value.ToString();
@@ -2058,28 +1986,40 @@ namespace YamuraLog
             }
             return;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void treeView1_AfterCheck(object sender, TreeViewEventArgs e)
         {
             // axis
             if(e.Node.Parent == null)
             {
-                stripChartAxes[e.Node.Name].ShowAxis = e.Node.Checked;
+                /*stripChartAxes*/globalAxes[e.Node.Name].ShowAxis = e.Node.Checked;
             }
             // channel
             else
             {
                 e.Node.Parent.Checked = e.Node.Checked;
-                stripChartAxes[e.Node.Parent.Name].AssociatedChannels[e.Node.Text].ShowChannel = e.Node.Checked;
-                stripChartAxes[e.Node.Parent.Name].ShowAxis = e.Node.Checked == true ? true : stripChartAxes[e.Node.Parent.Name].ShowAxis;
+                /*stripChartAxes*/globalAxes[e.Node.Parent.Name].AssociatedChannels[e.Node.Text].ShowChannel = e.Node.Checked;
+                /*stripChartAxes*/globalAxes[e.Node.Parent.Name].ShowAxis = e.Node.Checked == true ? true : /*stripChartAxes*/globalAxes[e.Node.Parent.Name].ShowAxis;
             }
             stripChartPanel.Invalidate();
         }
-
-
         #region channel context menu handlers
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void channelsContext_Opening(object sender, CancelEventArgs e)
         {
+            if(axisChannelTree.SelectedNode == null)
+            {
+                e.Cancel = true;
+                return;
+            }
             if (axisChannelTree.SelectedNode.Parent == null)
             {
                 channelsContext.Items["axisExtents"].Enabled = true;
@@ -2091,26 +2031,36 @@ namespace YamuraLog
                 channelsContext.Items["channelInfo"].Enabled = true;
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void axisInfo_Click(object sender, EventArgs e)
         {
             string axisName = axisChannelTree.SelectedNode.Text;
 
             AxisInfo axisDlg = new AxisInfo();
             axisDlg.Text = axisName + " Info";
-            axisDlg.RangeMinimum = stripChartAxes[axisName].AxisRange[0];
-            axisDlg.RangeMaximum = stripChartAxes[axisName].AxisRange[1];
+            axisDlg.RangeMinimum = globalAxes[axisName].AxisRange[0];
+            axisDlg.RangeMaximum = globalAxes[axisName].AxisRange[1];
             if (axisDlg.ShowDialog() == DialogResult.OK)
             {
-                stripChartAxes[axisName].AxisRange[0] = axisDlg.RangeMinimum;
-                stripChartAxes[axisName].AxisRange[1] = axisDlg.RangeMaximum;
-                stripChartAxes[axisName].AxisRange[2] = stripChartAxes[axisName].AxisRange[1] - stripChartAxes[axisName].AxisRange[0];
-                stripChartAxes[axisName].DisplayOffset = -1 * stripChartAxes[axisName].AxisRange[0];
-                stripChartAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / stripChartAxes[axisName].AxisRange[2];
-                stripChartAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / stripChartAxes[axisName].AxisRange[2];
+                globalAxes[axisName].AxisRange[0] = axisDlg.RangeMinimum;
+                globalAxes[axisName].AxisRange[1] = axisDlg.RangeMaximum;
+                globalAxes[axisName].AxisRange[2] = globalAxes[axisName].AxisRange[1] - globalAxes[axisName].AxisRange[0];
+                globalAxes[axisName].DisplayOffset = -1 * globalAxes[axisName].AxisRange[0];
+                globalAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / globalAxes[axisName].AxisRange[2];
+                globalAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / globalAxes[axisName].AxisRange[2];
 
                 stripChartPanel.Invalidate();
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void channelInfo_Click(object sender, EventArgs e)
         {
             string channelFullName = axisChannelTree.SelectedNode.Text;

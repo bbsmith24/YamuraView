@@ -71,6 +71,10 @@
             this.axisMax = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.axisChannelTree = new System.Windows.Forms.TreeView();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.comboBox2 = new System.Windows.Forms.ComboBox();
+            this.label5 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.channelDataGrid)).BeginInit();
             this.channelsContext.SuspendLayout();
@@ -153,9 +157,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(796, 64);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(125, 13);
+            this.label3.Size = new System.Drawing.Size(30, 13);
             this.label3.TabIndex = 15;
-            this.label3.Text = "Stripchart Channels (any)";
+            this.label3.Text = "Axes";
             // 
             // runDataGrid
             // 
@@ -333,20 +337,20 @@
             this.axisExtents,
             this.channelInfo});
             this.channelsContext.Name = "channelsContext";
-            this.channelsContext.Size = new System.Drawing.Size(153, 70);
+            this.channelsContext.Size = new System.Drawing.Size(143, 48);
             this.channelsContext.Opening += new System.ComponentModel.CancelEventHandler(this.channelsContext_Opening);
             // 
             // axisExtents
             // 
             this.axisExtents.Name = "axisExtents";
-            this.axisExtents.Size = new System.Drawing.Size(152, 22);
+            this.axisExtents.Size = new System.Drawing.Size(142, 22);
             this.axisExtents.Text = "Axis Info";
             this.axisExtents.Click += new System.EventHandler(this.axisInfo_Click);
             // 
             // channelInfo
             // 
             this.channelInfo.Name = "channelInfo";
-            this.channelInfo.Size = new System.Drawing.Size(152, 22);
+            this.channelInfo.Size = new System.Drawing.Size(142, 22);
             this.channelInfo.Text = "Channel Info";
             this.channelInfo.Click += new System.EventHandler(this.channelInfo_Click);
             // 
@@ -408,10 +412,6 @@
             this.yAxisDataGrid.Size = new System.Drawing.Size(111, 99);
             this.yAxisDataGrid.TabIndex = 27;
             this.yAxisDataGrid.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.yAxisDataGrid_CellEndEdit);
-            this.yAxisDataGrid.CellValidated += new System.Windows.Forms.DataGridViewCellEventHandler(this.yAxisDataGrid_CellValidated);
-            this.yAxisDataGrid.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.yAxisDataGrid_CellValidating);
-            this.yAxisDataGrid.RowValidated += new System.Windows.Forms.DataGridViewCellEventHandler(this.yAxisDataGrid_RowValidated);
-            this.yAxisDataGrid.RowValidating += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.yAxisDataGrid_RowValidating);
             // 
             // yAxisUse
             // 
@@ -444,6 +444,7 @@
             // 
             // axisChannelTree
             // 
+            this.axisChannelTree.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.axisChannelTree.CheckBoxes = true;
             this.axisChannelTree.ContextMenuStrip = this.channelsContext;
             this.axisChannelTree.Location = new System.Drawing.Point(795, 86);
@@ -457,11 +458,53 @@
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
+            // comboBox1
+            // 
+            this.comboBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(640, 127);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(111, 21);
+            this.comboBox1.TabIndex = 31;
+            // 
+            // label4
+            // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(567, 134);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(67, 13);
+            this.label4.TabIndex = 30;
+            this.label4.Text = "Track X Axis";
+            // 
+            // comboBox2
+            // 
+            this.comboBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox2.FormattingEnabled = true;
+            this.comboBox2.Location = new System.Drawing.Point(640, 153);
+            this.comboBox2.Name = "comboBox2";
+            this.comboBox2.Size = new System.Drawing.Size(111, 21);
+            this.comboBox2.TabIndex = 33;
+            // 
+            // label5
+            // 
+            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(567, 156);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(67, 13);
+            this.label5.TabIndex = 32;
+            this.label5.Text = "Track Y Axis";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1115, 925);
+            this.Controls.Add(this.comboBox2);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.channelDataGrid);
             this.Controls.Add(this.axisChannelTree);
             this.Controls.Add(this.yAxisDataGrid);
@@ -532,6 +575,10 @@
         private System.Windows.Forms.TreeView axisChannelTree;
         private System.Windows.Forms.ToolStripMenuItem channelInfo;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ComboBox comboBox2;
+        private System.Windows.Forms.Label label5;
     }
 }
 
