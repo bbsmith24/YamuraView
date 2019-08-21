@@ -4,4 +4,6 @@ Release
 # Visual Studio files that don't need to be included
 *.vspx
 *.press
+.suo
+*.suo
 
