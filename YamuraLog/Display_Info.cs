@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace YamuraLog
 {
-    class Axis
+    public class Axis
     {
         String axisName = "unnamed";
         public String AxisName
@@ -50,7 +50,7 @@ namespace YamuraLog
             set { showAxis = value; }
         }
     }
-    class ChannelInfo
+    public class ChannelInfo
     {
         int runIndex = 0;
         public int RunIndex
@@ -59,7 +59,7 @@ namespace YamuraLog
             set { runIndex = value; }
         }
 
-        string channelName = "unnamed";
+        String channelName = "unnamed";
         public String ChannelName
         {
             get { return channelName; }
@@ -72,7 +72,7 @@ namespace YamuraLog
             get { return showChannel; }
             set { showChannel = value; }
         }
-        public ChannelInfo(int idx, string name)
+        public ChannelInfo(int idx, String name)
         {
             runIndex = idx;
             channelName = name;

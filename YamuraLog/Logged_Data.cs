@@ -10,7 +10,7 @@ namespace YamuraLog
     /// <summary>
     /// run header - one per run, contains global data for run
     /// </summary>
-    class DataLogger
+    public class DataLogger
     {
         public float[] minMaxTimestamp = new float[] { float.MaxValue, float.MinValue };
         public float[]   minMaxLong = new float[] { float.MaxValue, float.MinValue };
@@ -22,7 +22,7 @@ namespace YamuraLog
                                                       new float[] {float.MaxValue, float.MinValue}};
 
         public List<RunData> runData = new List<RunData>();
-        public Dictionary<String, float[]> channelRanges = new Dictionary<string, float[]>();
+        public Dictionary<String, float[]> channelRanges = new Dictionary<String, float[]>();
         public void UpdateChannelRange(String channelName, float curVal)
         {
             channelRanges[channelName][0] = curVal < channelRanges[channelName][0] ? curVal : channelRanges[channelName][0];
@@ -42,10 +42,10 @@ namespace YamuraLog
                                                           new float[] {float.MaxValue, float.MinValue}};
     }
 }
-    class RunData
+    public class RunData
     {
-        public Dictionary<String, float[]> channelRanges = new Dictionary<string, float[]>();
-        public Dictionary<String, DataChannel> channels = new Dictionary<string, DataChannel>();
+        public Dictionary<String, float[]> channelRanges = new Dictionary<String, float[]>();
+        public Dictionary<String, DataChannel> channels = new Dictionary<String, DataChannel>();
         public String dateStr = "";
         public String timeStr = "";
         public String fileName = "";
@@ -160,7 +160,7 @@ namespace YamuraLog
         float[] timeRange = new float[] { float.MaxValue, float.MinValue };
         float[] dataRange = new float[] { float.MaxValue, float.MinValue };
         public SortedList<float, DataPoint> dataPoints = new SortedList<float, DataPoint>();
-        public string ChannelName
+        public String ChannelName
         {
             get
             {
@@ -172,7 +172,7 @@ namespace YamuraLog
                 channelName = value;
             }
         }
-        public string ChannelDescription
+        public String ChannelDescription
         {
             get
             {
@@ -184,7 +184,7 @@ namespace YamuraLog
                 channelDescription = value;
             }
         }
-        public string ChannelSource
+        public String ChannelSource
         {
             get
             {

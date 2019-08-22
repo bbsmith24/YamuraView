@@ -118,8 +118,8 @@ namespace YamuraLog
         //float[] stripChartOffset = new float[] { 0.0F, 0.0F };
         //float[] stripChartExtentsX = new float[] { 0.0F, 0.0F };
         #endregion
-        string xChannelName = "Time";
-        string yChannelName = "none";
+        String xChannelName = "Time";
+        String yChannelName = "none";
         #endregion
 
         int dragZoomPenWidth = 1;
@@ -446,13 +446,13 @@ namespace YamuraLog
                         inFile.ReadUInt32();
 
                         float lat = 0.0F;
-                        string ns = "";
+                        String ns = "";
                         float lng = 0.0F;
-                        string ew = "";
+                        String ew = "";
                         float hd = 0.0F;
                         float speed = 0.0F;
                         int sat = 0;
-                        string date = "";
+                        String date = "";
                         int utcHr = 0;
                         int utcMin = 0;
                         Single utcSec = 0.0F;
@@ -565,7 +565,7 @@ namespace YamuraLog
         /// 
         /// </summary>
         /// <param name="inFile"></param>
-        public bool ParseGPS_NMEA(BinaryReader inFile, out string date, out int hr, out int min, out float sec, out float lat, out string ns, out float lng, out string ew, out float hd, out float speed, out int sat)
+        public bool ParseGPS_NMEA(BinaryReader inFile, out String date, out int hr, out int min, out float sec, out float lat, out String ns, out float lng, out String ew, out float hd, out float speed, out int sat)
         {
             bool rVal = false;
             int utcHour = -1;
@@ -807,7 +807,7 @@ namespace YamuraLog
                 {
                     axisChannelTree.Nodes.Add(curAxis.Key, curAxis.Key, 0);
                 }
-                foreach (KeyValuePair<string, ChannelInfo> associatedChannel in curAxis.Value.AssociatedChannels)
+                foreach (KeyValuePair<String, ChannelInfo> associatedChannel in curAxis.Value.AssociatedChannels)
                 {
                     if(axisChannelTree.Nodes[curAxis.Key].Nodes.ContainsKey(associatedChannel.Key))
                     {
@@ -959,8 +959,8 @@ namespace YamuraLog
             Pen drawPen = new Pen(Color.Black, 1);
             bool initialValue = false;
             int runCount = 0;
-            string localXChannelName = comboBox1.Text;
-            string localYChannelName = comboBox2.Text;
+            String localXChannelName = comboBox1.Text;
+            String localYChannelName = comboBox2.Text;
             // get the graphics context
             using (Graphics stripChartGraphics = mapPanel.CreateGraphics())
             {
@@ -1082,7 +1082,7 @@ namespace YamuraLog
             trackMapBounds.Width = mapPanel.Width - 10;
             trackMapBounds.Height = mapPanel.Height - 10;
 
-            foreach (KeyValuePair<string, Axis> axisInfo in trackMapAxes)
+            foreach (KeyValuePair<String, Axis> axisInfo in trackMapAxes)
             {
                 axisInfo.Value.DisplayScale[0] = (float)trackMapBounds.Width / axisInfo.Value.AxisRange[2];
                 axisInfo.Value.DisplayScale[1] = (float)trackMapBounds.Height / axisInfo.Value.AxisRange[2];
@@ -1343,7 +1343,7 @@ namespace YamuraLog
             tractionCircleBounds.Width = tractionCirclePanel.Width - (2 * tractionCircleBorder);
             tractionCircleBounds.Height = tractionCirclePanel.Height - (2 * tractionCircleBorder);
 
-            foreach (KeyValuePair<string, Axis> axisInfo in tractionCircleAxes)
+            foreach (KeyValuePair<String, Axis> axisInfo in tractionCircleAxes)
             {
                 axisInfo.Value.DisplayScale[0] = (float)tractionCircleBounds.Width / axisInfo.Value.AxisRange[2];
                 axisInfo.Value.DisplayScale[1] = (float)tractionCircleBounds.Height / axisInfo.Value.AxisRange[2];
@@ -1802,7 +1802,7 @@ namespace YamuraLog
             stripChartPanelBounds.Width = stripChartPanel.Width - (2 * stripChartPanelBorder);
             stripChartPanelBounds.Height = stripChartPanel.Height - (2 * stripChartPanelBorder);
 
-            foreach (KeyValuePair<string, Axis> axisInfo in stripChartAxes)
+            foreach (KeyValuePair<String, Axis> axisInfo in stripChartAxes)
             {
                 axisInfo.Value.DisplayScale[0] = (float)stripChartPanel.Width / axisInfo.Value.AxisRange[2];
                 axisInfo.Value.DisplayScale[1] = (float)stripChartPanel.Height / axisInfo.Value.AxisRange[2];
@@ -2042,7 +2042,7 @@ namespace YamuraLog
         /// <param name="e"></param>
         private void axisInfo_Click(object sender, EventArgs e)
         {
-            string axisName = axisChannelTree.SelectedNode.Text;
+            String axisName = axisChannelTree.SelectedNode.Text;
 
             AxisInfo axisDlg = new AxisInfo();
             axisDlg.Text = axisName + " Info";
@@ -2067,9 +2067,9 @@ namespace YamuraLog
         /// <param name="e"></param>
         private void channelInfo_Click(object sender, EventArgs e)
         {
-            string channelFullName = axisChannelTree.SelectedNode.Text;
+            String channelFullName = axisChannelTree.SelectedNode.Text;
             int runIdx = Convert.ToInt32(channelFullName.Substring(0, channelFullName.IndexOf('-')));
-            string channelName = channelFullName.Substring(channelFullName.IndexOf('-') + 1);
+            String channelName = channelFullName.Substring(channelFullName.IndexOf('-') + 1);
 
             ChannelInfoForm channelDlg = new ChannelInfoForm();
             channelDlg.Text = channelFullName + " Info";
@@ -2093,7 +2093,7 @@ namespace YamuraLog
     {
         // ranges for all data in a channel for all runs
         // for example, if 'Time' in run 1 is 0-120 and 'Time' in run 2 is 0-360, channelRange["Time"] will be 0-360
-        public Dictionary<String, float[]> channelRanges = new Dictionary<string, float[]>();
+        public Dictionary<String, float[]> channelRanges = new Dictionary<String, float[]>();
 
         public void AddChannel(String channelName)
         {
@@ -2154,8 +2154,8 @@ namespace YamuraLog
         public Color runColor = Color.Black;
         public float[] stipchart_Offset = new float[] { 0.0F, 0.0F };
         public bool showRun = true;
-        public Dictionary<String, bool> channelDisplay = new Dictionary<string, bool>();
-        public Dictionary<String, Color> channelColor = new Dictionary<string, Color>();
+        public Dictionary<String, bool> channelDisplay = new Dictionary<String, bool>();
+        public Dictionary<String, Color> channelColor = new Dictionary<String, Color>();
         public void Reset()
         {
             stipchart_Offset = new float[] { 0.0F, 0.0F };
