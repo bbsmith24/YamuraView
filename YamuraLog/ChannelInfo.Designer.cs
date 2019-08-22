@@ -1,6 +1,6 @@
 ﻿namespace YamuraLog
 {
-    partial class ChannelInfoForm
+    public partial class ChannelInfoForm
     {
         /// <summary>
         /// Required designer variable.

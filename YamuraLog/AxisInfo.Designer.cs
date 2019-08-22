@@ -1,6 +1,6 @@
 ﻿namespace YamuraLog
 {
-    partial class AxisInfo
+    public partial class AxisInfo
     {
         /// <summary>
         /// Required designer variable.

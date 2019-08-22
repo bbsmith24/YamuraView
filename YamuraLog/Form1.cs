@@ -153,15 +153,7 @@ namespace YamuraLog
             runDataGrid.CellValueChanged += new DataGridViewCellEventHandler(RunDataGrid_CellValueChanged);
             runDataGrid.CellMouseUp += new DataGridViewCellMouseEventHandler(RunDataGrid_CellMouseUp);
 
-
-            ImageList imageListSmall = new ImageList();
-            imageListSmall.Images.Add(imageList1.Images[0]);
-            imageListSmall.Images.Add(imageList1.Images[1]);
-            //imageListSmall.Images.Add(Bitmap.FromResource("Resources\\MySmallImage1.bmp"));
-            //imageListSmall.Images.Add(Bitmap.FromFile("Resources\\MySmallImage2.bmp"));
-            //imageListSmall.Images.Add(Bitmap.FromFile("C:\\Users\\bsmith\\Documents\\GitHub\\YamuraView\\YamuraLog\\MySmallImage1.bmp"));
-            //imageListSmall.Images.Add(Bitmap.FromFile("C:\\Users\\bsmith\\Documents\\GitHub\\YamuraView\\YamuraLog\\MySmallImage2.bmp"));
-            axisChannelTree.ImageList = imageListSmall;
+            chartControl1.Logger = dataLogger;
         }
 
         private void btnClearAll_Click(object sender, EventArgs e)
@@ -390,6 +382,8 @@ namespace YamuraLog
             int logRunsIdx = 0;
             char[] b = new char[3];
             uint timeStamp = 0;
+            uint timeStampOffset = 0;
+            bool timeStampOffsetSet = false;
             float timestampSeconds = 0;
             float priorLatVal = 0.0F;
             float priorLongVal = 0.0F;
@@ -422,6 +416,12 @@ namespace YamuraLog
                     if ((char)b[0] == 'T')
                     {
                         timeStamp = inFile.ReadUInt32();
+                        if(!timeStampOffsetSet)
+                        {
+                            timeStampOffset = timeStamp;
+                            timeStampOffsetSet = true;
+                        }
+                        timeStamp -= timeStampOffset;
                         timestampSeconds = (float)timeStamp / 1000000.0F;
                         dataLogger.runData[logRunsIdx].channels["Time"].AddPoint(timestampSeconds, timestampSeconds);
                         continue;
@@ -782,6 +782,7 @@ namespace YamuraLog
                     globalAxes[axisName].AxisName = axisName;
                     globalAxes[axisName].AxisRange[2] = globalAxes[axisName].AxisRange[1] - globalAxes[axisName].AxisRange[0];
                     globalAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key),  new ChannelInfo(runIdx, curChannel.Key));
+                    globalAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
                     globalAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / globalAxes[axisName].AxisRange[2];
                     globalAxes[axisName].DisplayScale[1] =  (float)stripChartPanelBounds.Height / globalAxes[axisName].AxisRange[2];
                     globalAxes[axisName].DisplayOffset = -1 * globalAxes[axisName].AxisRange[0];
@@ -849,6 +850,12 @@ namespace YamuraLog
                     {
                         comboBox2.Items.Add(globalAxis.Key);
                     }
+                }
+                #endregion
+                #region strip chart (control)
+                if (!chartControl1.ChartAxes.ContainsKey(globalAxis.Key))
+                {
+                    chartControl1.ChartAxes.Add(globalAxis.Key, globalAxis.Value);
                 }
                 #endregion
             }
@@ -1817,11 +1824,6 @@ namespace YamuraLog
             stripChartPanelBounds.Width = stripChartPanel.Width - (2 * stripChartPanelBorder);
             stripChartPanelBounds.Height = stripChartPanel.Height - (2 * stripChartPanelBorder);
         }
-        private void stripchartHScroll_Scroll(object sender, ScrollEventArgs e)
-        {
-            stripChartAxes[xChannelName].DisplayOffset -= ((float)(e.NewValue - e.OldValue)/(float)stripchartHScroll.Width) * (stripChartAxes[xChannelName].AxisRange[2]);
-            stripChartPanel.Invalidate();
-        }
         #endregion
         #region data grid events
         private void RunDataGrid_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -2081,7 +2083,11 @@ namespace YamuraLog
             if (channelDlg.ShowDialog() == DialogResult.OK)
             {
                 runDisplay[runIdx].channelColor[channelName] = channelDlg.ChannelColor;
+
+                globalAxes[channelName].AssociatedChannels[(runIdx.ToString() + "-" + channelName)].ChannelColor = channelDlg.ChannelColor;
+
                 stripChartPanel.Invalidate();
+                chartControl1.Invalidate();
             }
         }
         #endregion

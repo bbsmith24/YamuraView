@@ -1,6 +1,6 @@
 ﻿namespace YamuraLog
 {
-    partial class Form1
+    public partial class Form1
     {
         /// <summary>
         /// Required designer variable.
@@ -63,7 +63,6 @@
             this.channelInfo = new System.Windows.Forms.ToolStripMenuItem();
             this.cmbXAxis = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.stripchartHScroll = new System.Windows.Forms.HScrollBar();
             this.btnClearAll = new System.Windows.Forms.Button();
             this.yAxisDataGrid = new System.Windows.Forms.DataGridView();
             this.yAxisUse = new System.Windows.Forms.DataGridViewCheckBoxColumn();
@@ -76,7 +75,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.chartControl1 = new YamuraLog.ChartControl();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.channelDataGrid)).BeginInit();
             this.channelsContext.SuspendLayout();
@@ -112,7 +111,7 @@
             // 
             // tractionCirclePanel
             // 
-            this.tractionCirclePanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.tractionCirclePanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.tractionCirclePanel.BackColor = System.Drawing.Color.White;
             this.tractionCirclePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tractionCirclePanel.Location = new System.Drawing.Point(795, 409);
@@ -127,14 +126,12 @@
             // 
             // stripChartPanel
             // 
-            this.stripChartPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.stripChartPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.stripChartPanel.BackColor = System.Drawing.Color.White;
             this.stripChartPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.stripChartPanel.Location = new System.Drawing.Point(11, 198);
+            this.stripChartPanel.Location = new System.Drawing.Point(795, 243);
             this.stripChartPanel.Name = "stripChartPanel";
-            this.stripChartPanel.Size = new System.Drawing.Size(778, 677);
+            this.stripChartPanel.Size = new System.Drawing.Size(314, 160);
             this.stripChartPanel.TabIndex = 6;
             this.stripChartPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.stripChart_Paint);
             this.stripChartPanel.Layout += new System.Windows.Forms.LayoutEventHandler(this.stripChartPanel_Layout);
@@ -376,16 +373,6 @@
             this.label1.TabIndex = 24;
             this.label1.Text = "Cursor position:";
             // 
-            // stripchartHScroll
-            // 
-            this.stripchartHScroll.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.stripchartHScroll.Location = new System.Drawing.Point(12, 878);
-            this.stripchartHScroll.Name = "stripchartHScroll";
-            this.stripchartHScroll.Size = new System.Drawing.Size(777, 17);
-            this.stripchartHScroll.TabIndex = 25;
-            this.stripchartHScroll.Scroll += new System.Windows.Forms.ScrollEventHandler(this.stripchartHScroll_Scroll);
-            // 
             // btnClearAll
             // 
             this.btnClearAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -446,12 +433,12 @@
             // 
             // axisChannelTree
             // 
-            this.axisChannelTree.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.axisChannelTree.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.axisChannelTree.CheckBoxes = true;
             this.axisChannelTree.ContextMenuStrip = this.channelsContext;
             this.axisChannelTree.Location = new System.Drawing.Point(795, 86);
             this.axisChannelTree.Name = "axisChannelTree";
-            this.axisChannelTree.Size = new System.Drawing.Size(314, 317);
+            this.axisChannelTree.Size = new System.Drawing.Size(314, 151);
             this.axisChannelTree.TabIndex = 29;
             this.axisChannelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCheck);
             // 
@@ -498,18 +485,23 @@
             this.label5.TabIndex = 32;
             this.label5.Text = "Track Y Axis";
             // 
-            // imageList1
+            // chartControl1
             // 
-            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
-            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageList1.Images.SetKeyName(0, "MySmallImage1.bmp");
-            this.imageList1.Images.SetKeyName(1, "MySmallImage2.bmp");
+            this.chartControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.chartControl1.Location = new System.Drawing.Point(11, 198);
+            this.chartControl1.Logger = null;
+            this.chartControl1.Name = "chartControl1";
+            this.chartControl1.Size = new System.Drawing.Size(778, 697);
+            this.chartControl1.TabIndex = 34;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1115, 925);
+            this.Controls.Add(this.chartControl1);
             this.Controls.Add(this.comboBox2);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.comboBox1);
@@ -518,7 +510,6 @@
             this.Controls.Add(this.axisChannelTree);
             this.Controls.Add(this.yAxisDataGrid);
             this.Controls.Add(this.btnClearAll);
-            this.Controls.Add(this.stripchartHScroll);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cmbXAxis);
             this.Controls.Add(this.txtAutoAlignThreshold);
@@ -559,7 +550,6 @@
         private System.Windows.Forms.DataGridView channelDataGrid;
         private System.Windows.Forms.ComboBox cmbXAxis;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.HScrollBar stripchartHScroll;
         private System.Windows.Forms.Button btnClearAll;
         private System.Windows.Forms.DataGridViewTextBoxColumn colRunNumber;
         private System.Windows.Forms.DataGridViewCheckBoxColumn colShowRun;
@@ -588,7 +578,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.ImageList imageList1;
+        private ChartControl chartControl1;
     }
 }
 

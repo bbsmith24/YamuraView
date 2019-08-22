@@ -19,8 +19,8 @@ namespace YamuraLog
             set { logger = value; }
         }
 
-        Dictionary<String, Axis> chartAxes = new Dictionary<String, Axis>();
-        public Dictionary<String, Axis> ChartAxes
+        Dictionary<string, Axis> chartAxes = new Dictionary<string, Axis>();
+        public Dictionary<string, Axis> ChartAxes
         {
             get { return chartAxes; }
             set { chartAxes = value; }
@@ -30,7 +30,7 @@ namespace YamuraLog
         Rectangle chartBounds = new Rectangle(0, 0, 0, 0);
         bool chartStartPosValid = false;
         bool chartLastCursorPosValid = false;
-        String xChannelName;
+        string xChannelName;
 
         /// <summary>
         /// 
@@ -66,7 +66,7 @@ namespace YamuraLog
             using (Graphics chartGraphics = chartPanel.CreateGraphics())
             {
                 // check each Y axis
-                foreach (KeyValuePair<String, Axis> yAxis in chartAxes)
+                foreach (KeyValuePair<string, Axis> yAxis in chartAxes)
                 {
                     // skip if axis is not displayed
                     if (!yAxis.Value.ShowAxis)
@@ -84,7 +84,7 @@ namespace YamuraLog
                             continue;
                         }
                         DataChannel curChannel = logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
-                        drawPen = new Pen(Color.Black);// (runDisplay[curChanInfo.Value.RunIndex].channelColor[curChanInfo.Value.ChannelName]);
+                        drawPen = new Pen(curChanInfo.Value.ChannelColor);
 
                         initialValue = false;
                         foreach (KeyValuePair<float, DataPoint> curData in curChannel.DataPoints)
@@ -171,5 +171,21 @@ namespace YamuraLog
             return rPt;
         }
 
+        private void ChartControl_Resize(object sender, EventArgs e)
+        {
+            // update the paintable area
+            chartBounds.X = chartBorder;
+            chartBounds.Y = chartBorder;
+            chartBounds.Width = chartPanel.Width - (2 * chartBorder);
+            chartBounds.Height = chartPanel.Height - (2 * chartBorder);
+            // redraw
+            chartPanel.Invalidate();
+
+        }
+
+        private void ChartControl_Paint(object sender, PaintEventArgs e)
+        {
+            chartPanel.Invalidate();
+        }
     }
 }

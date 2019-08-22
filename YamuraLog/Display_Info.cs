@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,8 +9,8 @@ namespace YamuraLog
 {
     public class Axis
     {
-        String axisName = "unnamed";
-        public String AxisName
+        string axisName = "unnamed";
+        public string AxisName
         {
             get { return axisName; }
             set { axisName = value; }
@@ -22,8 +23,8 @@ namespace YamuraLog
             set { axisRange = value; }
         }
 
-        Dictionary<String, ChannelInfo> associatedChannels = new Dictionary<String, ChannelInfo>();
-        public Dictionary<String, ChannelInfo> AssociatedChannels
+        Dictionary<string, ChannelInfo> associatedChannels = new Dictionary<string, ChannelInfo>();
+        public Dictionary<string, ChannelInfo> AssociatedChannels
         {
             get { return associatedChannels; }
             set { associatedChannels = value; }
@@ -76,6 +77,13 @@ namespace YamuraLog
         {
             runIndex = idx;
             channelName = name;
+        }
+
+        Color channelColor = Color.Black;
+        public Color ChannelColor
+        {
+            get { return channelColor; }
+            set { channelColor = value; }
         }
     }
 }

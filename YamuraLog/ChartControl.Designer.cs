@@ -1,6 +1,6 @@
 ﻿namespace YamuraLog
 {
-    partial class ChartControl
+    public partial class ChartControl
     {
         /// <summary> 
         /// Required designer variable.
@@ -35,6 +35,9 @@
             // 
             // chartPanel
             // 
+            this.chartPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.chartPanel.BackColor = System.Drawing.Color.White;
             this.chartPanel.Location = new System.Drawing.Point(17, 0);
             this.chartPanel.Name = "chartPanel";
@@ -70,6 +73,8 @@
             this.Controls.Add(this.chartPanel);
             this.Name = "ChartControl";
             this.Size = new System.Drawing.Size(487, 391);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.ChartControl_Paint);
+            this.Resize += new System.EventHandler(this.ChartControl_Resize);
             this.ResumeLayout(false);
 
         }
