@@ -155,8 +155,12 @@ namespace YamuraLog
 
 
             ImageList imageListSmall = new ImageList();
-            imageListSmall.Images.Add(Bitmap.FromFile("C:\\Users\\bsmith\\Documents\\GitHub\\YamuraView\\YamuraLog\\MySmallImage1.bmp"));
-            imageListSmall.Images.Add(Bitmap.FromFile("C:\\Users\\bsmith\\Documents\\GitHub\\YamuraView\\YamuraLog\\MySmallImage2.bmp"));
+            imageListSmall.Images.Add(imageList1.Images[0]);
+            imageListSmall.Images.Add(imageList1.Images[1]);
+            //imageListSmall.Images.Add(Bitmap.FromResource("Resources\\MySmallImage1.bmp"));
+            //imageListSmall.Images.Add(Bitmap.FromFile("Resources\\MySmallImage2.bmp"));
+            //imageListSmall.Images.Add(Bitmap.FromFile("C:\\Users\\bsmith\\Documents\\GitHub\\YamuraView\\YamuraLog\\MySmallImage1.bmp"));
+            //imageListSmall.Images.Add(Bitmap.FromFile("C:\\Users\\bsmith\\Documents\\GitHub\\YamuraView\\YamuraLog\\MySmallImage2.bmp"));
             axisChannelTree.ImageList = imageListSmall;
         }
 
