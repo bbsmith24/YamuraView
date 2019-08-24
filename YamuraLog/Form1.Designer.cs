@@ -45,16 +45,16 @@
             this.txtAutoAlignThreshold = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.btnClearAll = new System.Windows.Forms.Button();
-            this.stripChart = new YamuraLog.ChartControl();
-            this.tractionCircle = new YamuraLog.ChartControl();
             this.trackMap = new YamuraLog.ChartControl();
+            this.tractionCircle = new YamuraLog.ChartControl();
+            this.stripChart = new YamuraLog.ChartControl();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             this.SuspendLayout();
             // 
             // btnOpenFile
             // 
             this.btnOpenFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenFile.Location = new System.Drawing.Point(1019, 7);
+            this.btnOpenFile.Location = new System.Drawing.Point(699, 12);
             this.btnOpenFile.Name = "btnOpenFile";
             this.btnOpenFile.Size = new System.Drawing.Size(90, 23);
             this.btnOpenFile.TabIndex = 0;
@@ -81,7 +81,7 @@
             this.runDataGrid.Location = new System.Drawing.Point(11, 12);
             this.runDataGrid.Name = "runDataGrid";
             this.runDataGrid.RowHeadersVisible = false;
-            this.runDataGrid.Size = new System.Drawing.Size(453, 180);
+            this.runDataGrid.Size = new System.Drawing.Size(682, 180);
             this.runDataGrid.TabIndex = 18;
             // 
             // colRunNumber
@@ -159,7 +159,7 @@
             // 
             this.btnAutoAlign.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAutoAlign.Enabled = false;
-            this.btnAutoAlign.Location = new System.Drawing.Point(1019, 57);
+            this.btnAutoAlign.Location = new System.Drawing.Point(699, 70);
             this.btnAutoAlign.Name = "btnAutoAlign";
             this.btnAutoAlign.Size = new System.Drawing.Size(90, 23);
             this.btnAutoAlign.TabIndex = 20;
@@ -171,7 +171,7 @@
             // 
             this.txtAutoAlignThreshold.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.txtAutoAlignThreshold.Enabled = false;
-            this.txtAutoAlignThreshold.Location = new System.Drawing.Point(957, 57);
+            this.txtAutoAlignThreshold.Location = new System.Drawing.Point(699, 99);
             this.txtAutoAlignThreshold.Name = "txtAutoAlignThreshold";
             this.txtAutoAlignThreshold.Size = new System.Drawing.Size(58, 20);
             this.txtAutoAlignThreshold.TabIndex = 21;
@@ -190,7 +190,7 @@
             // btnClearAll
             // 
             this.btnClearAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClearAll.Location = new System.Drawing.Point(1019, 31);
+            this.btnClearAll.Location = new System.Drawing.Point(699, 41);
             this.btnClearAll.Name = "btnClearAll";
             this.btnClearAll.Size = new System.Drawing.Size(90, 23);
             this.btnClearAll.TabIndex = 26;
@@ -198,12 +198,49 @@
             this.btnClearAll.UseVisualStyleBackColor = true;
             this.btnClearAll.Click += new System.EventHandler(this.btnClearAll_Click);
             // 
+            // trackMap
+            // 
+            this.trackMap.AllowDrag = true;
+            this.trackMap.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.trackMap.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.trackMap.ChartAxes = null;
+            this.trackMap.CursorBoxSize = 10;
+            this.trackMap.CursorMode = YamuraLog.ChartControl.CursorStyle.CROSSHAIRS;
+            this.trackMap.CursorUpdateSource = true;
+            this.trackMap.Location = new System.Drawing.Point(795, 198);
+            this.trackMap.Logger = null;
+            this.trackMap.Name = "trackMap";
+            this.trackMap.ShowHScroll = true;
+            this.trackMap.ShowVScroll = true;
+            this.trackMap.Size = new System.Drawing.Size(314, 697);
+            this.trackMap.TabIndex = 36;
+            // 
+            // tractionCircle
+            // 
+            this.tractionCircle.AllowDrag = true;
+            this.tractionCircle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tractionCircle.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tractionCircle.ChartAxes = null;
+            this.tractionCircle.CursorBoxSize = 10;
+            this.tractionCircle.CursorMode = YamuraLog.ChartControl.CursorStyle.CROSSHAIRS;
+            this.tractionCircle.CursorUpdateSource = true;
+            this.tractionCircle.Location = new System.Drawing.Point(795, 12);
+            this.tractionCircle.Logger = null;
+            this.tractionCircle.Name = "tractionCircle";
+            this.tractionCircle.ShowHScroll = true;
+            this.tractionCircle.ShowVScroll = true;
+            this.tractionCircle.Size = new System.Drawing.Size(314, 180);
+            this.tractionCircle.TabIndex = 35;
+            // 
             // stripChart
             // 
             this.stripChart.AllowDrag = true;
             this.stripChart.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.stripChart.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.stripChart.ChartAxes = null;
             this.stripChart.CursorBoxSize = 10;
             this.stripChart.CursorMode = YamuraLog.ChartControl.CursorStyle.CROSSHAIRS;
@@ -211,38 +248,10 @@
             this.stripChart.Location = new System.Drawing.Point(11, 198);
             this.stripChart.Logger = null;
             this.stripChart.Name = "stripChart";
+            this.stripChart.ShowHScroll = true;
+            this.stripChart.ShowVScroll = true;
             this.stripChart.Size = new System.Drawing.Size(778, 697);
             this.stripChart.TabIndex = 34;
-            // 
-            // tractionCircle
-            // 
-            this.tractionCircle.AllowDrag = true;
-            this.tractionCircle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tractionCircle.ChartAxes = null;
-            this.tractionCircle.CursorBoxSize = 10;
-            this.tractionCircle.CursorMode = YamuraLog.ChartControl.CursorStyle.CROSSHAIRS;
-            this.tractionCircle.CursorUpdateSource = true;
-            this.tractionCircle.Location = new System.Drawing.Point(470, 12);
-            this.tractionCircle.Logger = null;
-            this.tractionCircle.Name = "tractionCircle";
-            this.tractionCircle.Size = new System.Drawing.Size(319, 180);
-            this.tractionCircle.TabIndex = 35;
-            // 
-            // trackMap
-            // 
-            this.trackMap.AllowDrag = true;
-            this.trackMap.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.trackMap.ChartAxes = null;
-            this.trackMap.CursorBoxSize = 10;
-            this.trackMap.CursorMode = YamuraLog.ChartControl.CursorStyle.CROSSHAIRS;
-            this.trackMap.CursorUpdateSource = true;
-            this.trackMap.Location = new System.Drawing.Point(795, 86);
-            this.trackMap.Logger = null;
-            this.trackMap.Name = "trackMap";
-            this.trackMap.Size = new System.Drawing.Size(314, 809);
-            this.trackMap.TabIndex = 36;
             // 
             // Form1
             // 

@@ -15,28 +15,6 @@ namespace YamuraLog
 {
     public partial class Form1 : Form
     {
-        // GDI draw modes for eraseable cursors
-        public enum DrawMode
-        {
-            R2_BLACK = 1,  // Pixel is always black.
-            R2_NOTMERGEPEN = 2,  // Pixel is the inverse of the R2_MERGEPEN color (final pixel = NOT(pen OR screen pixel)).
-            R2_MASKNOTPEN = 3,  // Pixel is a combination of the colors common to both the screen and the inverse of the pen (final pixel = (NOT pen) AND screen pixel).
-            R2_NOTCOPYPEN = 4,  // Pixel is the inverse of the pen color.
-            R2_MASKPENNOT = 5,  // Pixel is a combination of the colors common to both the pen and the inverse of the screen (final pixel = (NOT screen pixel) AND pen).
-            R2_NOT = 6,  // Pixel is the inverse of the screen color.
-            R2_XORPEN = 7,  // Pixel is a combination of the colors that are in the pen or in the screen, but not in both (final pixel = pen XOR screen pixel).
-            R2_NOTMASKPEN = 8,  // Pixel is the inverse of the R2_MASKPEN color (final pixel = NOT(pen AND screen pixel)).
-            R2_MASKPEN = 9,  // Pixel is a combination of the colors common to both the pen and the screen (final pixel = pen AND screen pixel).
-            R2_NOTXORPEN = 10,  // Pixel is the inverse of the R2_XORPEN color (final pixel = NOT(pen XOR screen pixel)).
-            R2_NOP = 11,  // Pixel remains unchanged.
-            R2_MERGENOTPEN = 12,  // Pixel is a combination of the screen color and the inverse of the pen color (final pixel = (NOT pen) OR screen pixel).
-            R2_COPYPEN = 13,  // Pixel is the pen color.
-            R2_MERGEPENNOT = 14,  // Pixel is a combination of the pen color and the inverse of the screen color (final pixel = (NOT screen pixel) OR pen).
-            R2_MERGEPEN = 15,  // Pixel is a combination of the pen color and the screen color (final pixel = pen OR screen pixel).
-            R2_WHITE = 16,  // Pixel is always white.
-            R2_LAST = 16
-        }
-
         private Button colorButton = new Button();
         List<Color> penColors = new List<Color>();
         private List<Task> tasks = new List<Task>();
@@ -74,18 +52,28 @@ namespace YamuraLog
             runDataGrid.CellEndEdit += new DataGridViewCellEventHandler(RunDataGrid_CellEndEdit);
             runDataGrid.CellValueChanged += new DataGridViewCellEventHandler(RunDataGrid_CellValueChanged);
             runDataGrid.CellMouseUp += new DataGridViewCellMouseEventHandler(RunDataGrid_CellMouseUp);
-
+            
+            // initialize the chart controls
             stripChart.Logger = dataLogger;
+            stripChart.CursorMode = ChartControl.CursorStyle.CROSSHAIRS;
             stripChart.CursorUpdateSource = true;
             stripChart.ChartAxes = new Dictionary<string, Axis>();
+            stripChart.ShowHScroll = true;
+            stripChart.ShowVScroll = true;
 
             tractionCircle.Logger = dataLogger;
+            tractionCircle.CursorMode = ChartControl.CursorStyle.BOX;
             tractionCircle.CursorUpdateSource = false;
             tractionCircle.ChartAxes = new Dictionary<string, Axis>();
+            tractionCircle.ShowHScroll = false;
+            tractionCircle.ShowVScroll = false;
 
             trackMap.Logger = dataLogger;
+            trackMap.CursorMode = ChartControl.CursorStyle.BOX;
             trackMap.CursorUpdateSource = false;
             trackMap.ChartAxes = new Dictionary<string, Axis>();
+            trackMap.ShowHScroll = false;
+            trackMap.ShowVScroll = false;
         }
 
         private void btnClearAll_Click(object sender, EventArgs e)

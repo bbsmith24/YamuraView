@@ -36,6 +36,7 @@ namespace YamuraLog
         }
         public enum CursorStyle
         {
+            NONE,
             CROSSHAIRS,
             VERTICAL,
             HORIZONTAL,
@@ -56,7 +57,6 @@ namespace YamuraLog
             get { return chartAxes; }
             set { chartAxes = value; }
         }
-
 
         int dragZoomPenWidth = 1;
         int chartBorder = 10;
@@ -123,7 +123,62 @@ namespace YamuraLog
                 cursorUpdateSource = value;
             }
         }
-        
+
+        bool showHScroll = true;
+        /// <summary>
+        /// show the H scrollbar
+        /// </summary>
+        public bool ShowHScroll
+        {
+            get { return showHScroll; }
+            set
+            {
+                showHScroll = value;
+                hScrollBar.Visible = showHScroll;
+                if (showHScroll)
+                {
+                    hScrollBar.Height = 17;
+                    hScrollBar.Width = Width - 17;
+                    hScrollBar.Location = new Point(17, Height - 17);
+                    chartPanel.Location = new Point(17, 0);
+                    chartPanel.Width = Width - 17;
+                }
+                else
+                {
+                    hScrollBar.Location = new Point(0, 0);
+                    chartPanel.Location = new Point(0, 0);
+                    chartPanel.Width = Width;
+                }
+            }
+        }
+
+        bool showVScroll = true;
+        /// <summary>
+        /// show the V scrollbar
+        /// </summary>
+        public bool ShowVScroll
+        {
+            get { return showVScroll; }
+            set
+            {
+                showVScroll = value;
+                vScrollBar.Visible = showVScroll;
+                if (showVScroll)
+                {
+                    vScrollBar.Height = Height - 17;
+                    vScrollBar.Width = 17;
+                    chartPanel.Height = Height - 17;
+                    vScrollBar.Location = new Point(0, 0);
+                }
+                else
+                {
+                    chartPanel.Height = Height;
+                    vScrollBar.Location = new Point(0, 0);
+                }
+
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -280,31 +335,34 @@ namespace YamuraLog
             #region just moving the mouse with no buttons
             else
             {
-                startMouseDrag = false;
-                #region erase if something was drawn
-                if (!startMouseMove)
+                if (CursorMode != CursorStyle.NONE)
                 {
-                    chartLastCursorPos = e.Location;
+                    startMouseDrag = false;
+                    #region erase if something was drawn
+                    if (!startMouseMove)
+                    {
+                        chartLastCursorPos = e.Location;
+                    }
+                    else
+                    {
+                        DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
+                    }
+                    #endregion
+                    #region draw new cursor if in chart area
+                    if (((e.Location.X >= chartBorder) && (e.Location.X <= (chartPanel.Width - chartBorder))) &&
+                        ((e.Location.Y >= chartBorder) && (e.Location.Y <= (chartPanel.Height - chartBorder))))
+                    {
+                        startMouseMove = true;
+                        chartLastCursorPos = e.Location;
+                        DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
+                    }
+                    // outside of chart, don't draw and not started
+                    else
+                    {
+                        startMouseMove = false;
+                    }
+                    #endregion
                 }
-                else
-                {
-                    DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
-                }
-                #endregion
-                #region draw new cursor if in chart area
-                if (((e.Location.X >= chartBorder) && (e.Location.X <= (chartPanel.Width - chartBorder))) &&
-                    ((e.Location.Y >= chartBorder) && (e.Location.Y <= (chartPanel.Height - chartBorder))))
-                {
-                    startMouseMove = true;
-                    chartLastCursorPos = e.Location;
-                    DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
-                }
-                // outside of chart, don't draw and not started
-                else
-                {
-                    startMouseMove = false;
-                }
-                #endregion
             }
             #endregion
             // up to now, dealing in screen units. convert current position to X axis value and active Y axis values and raise message
