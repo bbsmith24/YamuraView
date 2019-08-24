@@ -28,9 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.chartPanel = new System.Windows.Forms.Panel();
             this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
             this.hScrollBar1 = new System.Windows.Forms.HScrollBar();
+            this.chartControlContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.selectAxesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.chartControlContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // chartPanel
@@ -39,11 +43,14 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chartPanel.BackColor = System.Drawing.Color.White;
+            this.chartPanel.ContextMenuStrip = this.chartControlContextMenu;
             this.chartPanel.Location = new System.Drawing.Point(17, 0);
             this.chartPanel.Name = "chartPanel";
             this.chartPanel.Size = new System.Drawing.Size(470, 367);
             this.chartPanel.TabIndex = 0;
             this.chartPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.chartPanel_Paint);
+            this.chartPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chartPanel_MouseMove);
+            this.chartPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.chartPanel_MouseUp);
             this.chartPanel.Resize += new System.EventHandler(this.chartPanel_Resize);
             // 
             // vScrollBar1
@@ -64,6 +71,20 @@
             this.hScrollBar1.Size = new System.Drawing.Size(470, 17);
             this.hScrollBar1.TabIndex = 2;
             // 
+            // chartControlContextMenu
+            // 
+            this.chartControlContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectAxesMenuItem});
+            this.chartControlContextMenu.Name = "chartControlContextMenu";
+            this.chartControlContextMenu.Size = new System.Drawing.Size(134, 26);
+            // 
+            // selectAxesMenuItem
+            // 
+            this.selectAxesMenuItem.Name = "selectAxesMenuItem";
+            this.selectAxesMenuItem.Size = new System.Drawing.Size(133, 22);
+            this.selectAxesMenuItem.Text = "Select Axes";
+            this.selectAxesMenuItem.Click += new System.EventHandler(this.selectAxesMenuItem_Click);
+            // 
             // ChartControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -73,8 +94,7 @@
             this.Controls.Add(this.chartPanel);
             this.Name = "ChartControl";
             this.Size = new System.Drawing.Size(487, 391);
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.ChartControl_Paint);
-            this.Resize += new System.EventHandler(this.ChartControl_Resize);
+            this.chartControlContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -84,5 +104,7 @@
         private System.Windows.Forms.Panel chartPanel;
         private System.Windows.Forms.VScrollBar vScrollBar1;
         private System.Windows.Forms.HScrollBar hScrollBar1;
+        private System.Windows.Forms.ContextMenuStrip chartControlContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem selectAxesMenuItem;
     }
 }

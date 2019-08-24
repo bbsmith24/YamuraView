@@ -7,11 +7,42 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GDI;
+using Win32Interop.Methods;
 
 namespace YamuraLog
 {
     public partial class ChartControl : UserControl
     {
+        public enum DrawMode
+        {
+            R2_BLACK = 1,  // Pixel is always black.
+            R2_NOTMERGEPEN = 2,  // Pixel is the inverse of the R2_MERGEPEN color (final pixel = NOT(pen OR screen pixel)).
+            R2_MASKNOTPEN = 3,  // Pixel is a combination of the colors common to both the screen and the inverse of the pen (final pixel = (NOT pen) AND screen pixel).
+            R2_NOTCOPYPEN = 4,  // Pixel is the inverse of the pen color.
+            R2_MASKPENNOT = 5,  // Pixel is a combination of the colors common to both the pen and the inverse of the screen (final pixel = (NOT screen pixel) AND pen).
+            R2_NOT = 6,  // Pixel is the inverse of the screen color.
+            R2_XORPEN = 7,  // Pixel is a combination of the colors that are in the pen or in the screen, but not in both (final pixel = pen XOR screen pixel).
+            R2_NOTMASKPEN = 8,  // Pixel is the inverse of the R2_MASKPEN color (final pixel = NOT(pen AND screen pixel)).
+            R2_MASKPEN = 9,  // Pixel is a combination of the colors common to both the pen and the screen (final pixel = pen AND screen pixel).
+            R2_NOTXORPEN = 10,  // Pixel is the inverse of the R2_XORPEN color (final pixel = NOT(pen XOR screen pixel)).
+            R2_NOP = 11,  // Pixel remains unchanged.
+            R2_MERGENOTPEN = 12,  // Pixel is a combination of the screen color and the inverse of the pen color (final pixel = (NOT pen) OR screen pixel).
+            R2_COPYPEN = 13,  // Pixel is the pen color.
+            R2_MERGEPENNOT = 14,  // Pixel is a combination of the pen color and the inverse of the screen color (final pixel = (NOT screen pixel) OR pen).
+            R2_MERGEPEN = 15,  // Pixel is a combination of the pen color and the screen color (final pixel = pen OR screen pixel).
+            R2_WHITE = 16,  // Pixel is always white.
+            R2_LAST = 16
+        }
+        public enum CursorStyle
+        {
+            CROSSHAIRS,
+            VERTICAL,
+            HORIZONTAL,
+            BOX,
+            CIRCLE
+        }
+
         DataLogger logger;
         public DataLogger Logger
         {
@@ -26,12 +57,73 @@ namespace YamuraLog
             set { chartAxes = value; }
         }
 
+
+        int dragZoomPenWidth = 1;
         int chartBorder = 10;
         Rectangle chartBounds = new Rectangle(0, 0, 0, 0);
-        bool chartStartPosValid = false;
-        bool chartLastCursorPosValid = false;
+        bool startMouseDrag = false;
+        bool startMouseMove = false;
+        Point chartLastCursorPos = new Point(0, 0);
+        Point chartStartCursorPos = new Point(0, 0);
         string xChannelName;
+        //
+        // chart display properties 
+        //
+        bool allowDrag = true;
+        /// <summary>
+        /// chart allows drag area with left mouse button
+        /// </summary>
+        public bool AllowDrag
+        {
+            get
+            {
+                return allowDrag;
+            }
 
+            set
+            {
+                allowDrag = value;
+            }
+        }
+        
+        // crosshairs, box, circle work
+        // horizontal and vertical look weird
+        CursorStyle cursorMode = CursorStyle.CROSSHAIRS;
+        /// <summary>
+        /// type of mouse move cursor - CROSSHAIRS, HORIZONTAL, VERTICAL, BOX, CIRCLE
+        /// </summary>
+        public CursorStyle CursorMode
+        {
+            get { return cursorMode; }
+            set { cursorMode = value; }
+        }
+
+        int cursorBoxSize = 10;
+        /// <summary>
+        /// size of box and circle cursor
+        /// </summary>
+        public int CursorBoxSize
+        {
+            get { return cursorBoxSize; }
+            set { cursorBoxSize = value; }
+        }
+
+        bool cursorUpdateSource = true;
+        /// <summary>
+        /// chart accepts mouse moves and raises cursor update events for listeners
+        /// </summary>
+        public bool CursorUpdateSource
+        {
+            get
+            {
+                return cursorUpdateSource;
+            }
+            set
+            {
+                cursorUpdateSource = value;
+            }
+        }
+        
         /// <summary>
         /// 
         /// </summary>
@@ -39,7 +131,10 @@ namespace YamuraLog
         {
             InitializeComponent();
             xChannelName = "Time";
+            CursorUpdateSource = true;
         }
+
+        #region chart message handlers
         /// <summary>
         /// 
         /// </summary>
@@ -47,13 +142,14 @@ namespace YamuraLog
         /// <param name="e"></param>
         private void chartPanel_Paint(object sender, PaintEventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine("cursors invalid");
+            startMouseDrag = false;
+            startMouseMove = false;
             // nothing to display yet
             if ((chartAxes == null) || (chartAxes.Count == 0))
             {
                 return;
             }
-            chartStartPosValid = false;
-            chartLastCursorPosValid = false;
             PointF startPt = new PointF();
             PointF endPt = new PointF();
             Pen drawPen = new Pen(Color.Black, 1);
@@ -124,7 +220,11 @@ namespace YamuraLog
                 }
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void chartPanel_Resize(object sender, EventArgs e)
         {
             // update the paintable area
@@ -135,7 +235,254 @@ namespace YamuraLog
             // redraw
             chartPanel.Invalidate();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void chartPanel_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (CursorUpdateSource == false)
+            {
+                return;
+            }
+            chartPanel.Focus();
+            #region left mouse button down - dragging zoom region 
+            if ((e.Button == MouseButtons.Left) && AllowDrag)
+            {
+                // starting mouse drag - erase old cursor if needed, save initial start and end locations
+                if (!startMouseDrag)
+                {
+                    // was moving mouse with left button up, erase cursor
+                    if (startMouseMove)
+                    {
+                        DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
+                    }
+                    // save location
+                    chartStartCursorPos.X = e.Location.X;
+                    chartStartCursorPos.Y = 0;
+                    chartLastCursorPos.X = e.Location.X;
+                    chartLastCursorPos.Y = chartPanel.Height;
+                }
+                // continue mouse drag - erase last box
+                else
+                {
+                    DrawSelectArea(chartStartCursorPos.X, chartStartCursorPos.Y, chartLastCursorPos.X, chartLastCursorPos.Y);
+                }
+                // continue mouse drag, save current end location and draw new box
+                chartLastCursorPos.X = e.Location.X;
+                DrawSelectArea(chartStartCursorPos.X, chartStartCursorPos.Y, chartLastCursorPos.X, chartLastCursorPos.Y);
+                // mouse drag has started, mouse move has stopped
+                startMouseDrag = true;
+                startMouseMove = false;
+            }
+            #endregion
+            #region just moving the mouse with no buttons
+            else
+            {
+                startMouseDrag = false;
+                #region erase if something was drawn
+                if (!startMouseMove)
+                {
+                    chartLastCursorPos = e.Location;
+                }
+                else
+                {
+                    DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
+                }
+                #endregion
+                #region draw new cursor if in chart area
+                if (((e.Location.X >= chartBorder) && (e.Location.X <= (chartPanel.Width - chartBorder))) &&
+                    ((e.Location.Y >= chartBorder) && (e.Location.Y <= (chartPanel.Height - chartBorder))))
+                {
+                    startMouseMove = true;
+                    chartLastCursorPos = e.Location;
+                    DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
+                }
+                // outside of chart, don't draw and not started
+                else
+                {
+                    startMouseMove = false;
+                }
+                #endregion
+            }
+            #endregion
+            // up to now, dealing in screen units. convert current position to X axis value and active Y axis values and raise message
 
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void chartPanel_MouseUp(object sender, MouseEventArgs e)
+        {
+            if ((startMouseDrag) && AllowDrag)
+            {
+                startMouseDrag = false;
+                chartPanel.Invalidate();
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void selectAxesMenuItem_Click(object sender, EventArgs e)
+        {
+            ChartControlAxesSelect axesDialog = new ChartControlAxesSelect();
+            axesDialog.ChartAxes = chartAxes;
+            axesDialog.XAxisName = xChannelName;
+
+            if(axesDialog.ShowDialog() == DialogResult.OK)
+            {
+                xChannelName = axesDialog.XAxisName;
+                chartPanel.Invalidate();
+            }
+        }
+        //
+        // from old form - this reset the zoom and offset...
+        //
+        //private void stripChart_KeyDown(object sender, KeyPressEventArgs e)
+        //{
+        //    if ((e.KeyChar == '1') || (e.KeyChar == 'R') || (e.KeyChar == 'r'))
+        //    {
+        //        //stripChartScaleFactorX = 1.0F;
+        //        stripChartPanel.Invalidate();
+        //        tractionCirclePanel.Invalidate();
+        //        mapPanel.Invalidate();
+        //    }
+        //}
+        #endregion
+
+        #region GDI support
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static uint RGB(Color color)
+        {
+            uint rgb = (uint)(color.R + (color.G << 8) + (color.B << 16));
+            return rgb;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static uint NotRGB(Color color)
+        {
+            uint rgb = (uint)(color.R + (color.G << 8) + (color.B << 16));
+            rgb = ~rgb & 0xFFFFFF;
+            return rgb;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        void DrawCursorAt(int x, int y)
+        {
+            Rectangle locationBox = new Rectangle(0, 0, 0, 0);
+            IntPtr lpPoint = new IntPtr();
+            lpPoint = IntPtr.Zero;
+            using (Graphics drawGraphics = chartPanel.CreateGraphics())
+            {
+                #region create GDI objects
+                IntPtr hDC = drawGraphics.GetHdc();
+                IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
+                                                dragZoomPenWidth,
+                                                NotRGB(Color.Black));
+                IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.BLACK_BRUSH);
+                IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
+                IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
+                Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
+                #endregion
+                #region crosshairs
+                if (cursorMode == CursorStyle.CROSSHAIRS)
+                {
+                    // horizontal line
+                    Gdi32.MoveToEx(hDC, 0, y, lpPoint);
+                    Gdi32.LineTo(hDC, chartPanel.Width, y);
+                    // vertical line
+                    Gdi32.MoveToEx(hDC, x, chartPanel.Height, lpPoint);
+                    Gdi32.LineTo(hDC, x, 0);
+                }
+                #endregion
+                #region box
+                else if (cursorMode == CursorStyle.BOX)
+                {
+                    locationBox = new Rectangle(x - (cursorBoxSize / 2), y - (cursorBoxSize / 2), cursorBoxSize, cursorBoxSize);
+                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + cursorBoxSize, locationBox.Top + cursorBoxSize);
+                }
+                #endregion
+                #region circle
+                else if (cursorMode == CursorStyle.CIRCLE)
+                {
+                    locationBox = new Rectangle(x - (cursorBoxSize / 2), y - (cursorBoxSize / 2), cursorBoxSize, cursorBoxSize);
+                    Gdi32.Ellipse(hDC, locationBox.Left, locationBox.Top, locationBox.Left + cursorBoxSize, locationBox.Top + cursorBoxSize);
+                }
+                #endregion
+                #region horizontal line
+                else if (cursorMode == CursorStyle.HORIZONTAL)
+                {
+                    // horizontal line
+                    Gdi32.MoveToEx(hDC, 0, y, lpPoint);
+                    Gdi32.LineTo(hDC, chartPanel.Width, y);
+                }
+                #endregion
+                #region vertical line
+                else if (cursorMode == CursorStyle.VERTICAL)
+                {
+                    // vertical line
+                    Gdi32.MoveToEx(hDC, x, 0, lpPoint);
+                    Gdi32.LineTo(hDC, x, chartPanel.Height);
+                }
+                #endregion
+                #region clean up GDI, reset context
+                Gdi32.SelectObject(hDC, oldPen);
+                Gdi32.SelectObject(hDC, oldBrush);
+                Gdi32.DeleteObject(newPen);
+                Gdi32.DeleteObject(newBrush);
+                drawGraphics.ReleaseHdc();
+                #endregion
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fromX"></param>
+        /// <param name="fromY"></param>
+        /// <param name="toX"></param>
+        /// <param name="toY"></param>
+        void DrawSelectArea(int fromX, int fromY, int toX, int toY)
+        {
+            using (Graphics drawGraphics = chartPanel.CreateGraphics())
+            {
+                #region create GDI objects
+                IntPtr hDC = drawGraphics.GetHdc();
+                IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
+                                                dragZoomPenWidth,
+                                                NotRGB(Color.Gray));
+                IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.GRAY_BRUSH);
+                IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
+                IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
+                Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
+                #endregion
+                Gdi32.Rectangle(hDC, fromX, fromY, toX, toY);
+                #region clean up GDI restore context
+                Gdi32.SelectObject(hDC, oldPen);
+                Gdi32.SelectObject(hDC, oldBrush);
+                Gdi32.DeleteObject(newPen);
+                Gdi32.DeleteObject(newBrush);
+                drawGraphics.ReleaseHdc();
+                #endregion
+            }
+        }
+        #endregion
+        
+        #region scaling support
         /// <summary>
         /// convert sourcePt from data units to display units
         /// </summary>
@@ -170,22 +517,8 @@ namespace YamuraLog
             rPt.Y = -1.0F * ((rPt.Y - (float)bounds.Height) / scaleY) - offsetY;
             return rPt;
         }
+        #endregion
 
-        private void ChartControl_Resize(object sender, EventArgs e)
-        {
-            // update the paintable area
-            chartBounds.X = chartBorder;
-            chartBounds.Y = chartBorder;
-            chartBounds.Width = chartPanel.Width - (2 * chartBorder);
-            chartBounds.Height = chartPanel.Height - (2 * chartBorder);
-            // redraw
-            chartPanel.Invalidate();
-
-        }
-
-        private void ChartControl_Paint(object sender, PaintEventArgs e)
-        {
-            chartPanel.Invalidate();
-        }
     }
+
 }

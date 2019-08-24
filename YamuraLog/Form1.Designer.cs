@@ -28,17 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnOpenFile = new System.Windows.Forms.Button();
             this.openLogFile = new System.Windows.Forms.OpenFileDialog();
-            this.mapPanel = new System.Windows.Forms.Panel();
-            this.tractionCirclePanel = new System.Windows.Forms.Panel();
-            this.stripChartPanel = new System.Windows.Forms.Panel();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             this.runDataGrid = new System.Windows.Forms.DataGridView();
             this.colRunNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colShowRun = new System.Windows.Forms.DataGridViewCheckBoxColumn();
@@ -52,34 +43,12 @@
             this.txtCursorPos = new System.Windows.Forms.TextBox();
             this.btnAutoAlign = new System.Windows.Forms.Button();
             this.txtAutoAlignThreshold = new System.Windows.Forms.TextBox();
-            this.channelDataGrid = new System.Windows.Forms.DataGridView();
-            this.displayChannel = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.channelColor = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.runName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.channelName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.channelDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.channelsContext = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.axisExtents = new System.Windows.Forms.ToolStripMenuItem();
-            this.channelInfo = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmbXAxis = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.btnClearAll = new System.Windows.Forms.Button();
-            this.yAxisDataGrid = new System.Windows.Forms.DataGridView();
-            this.yAxisUse = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.yAxisName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.axisMin = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.axisMax = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.axisChannelTree = new System.Windows.Forms.TreeView();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.chartControl1 = new YamuraLog.ChartControl();
+            this.stripChart = new YamuraLog.ChartControl();
+            this.tractionCircle = new YamuraLog.ChartControl();
+            this.trackMap = new YamuraLog.ChartControl();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.channelDataGrid)).BeginInit();
-            this.channelsContext.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.yAxisDataGrid)).BeginInit();
             this.SuspendLayout();
             // 
             // btnOpenFile
@@ -92,73 +61,6 @@
             this.btnOpenFile.Text = "Add Runs";
             this.btnOpenFile.UseVisualStyleBackColor = true;
             this.btnOpenFile.Click += new System.EventHandler(this.btnOpenFile_Click);
-            // 
-            // mapPanel
-            // 
-            this.mapPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.mapPanel.BackColor = System.Drawing.Color.White;
-            this.mapPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.mapPanel.Location = new System.Drawing.Point(795, 574);
-            this.mapPanel.Name = "mapPanel";
-            this.mapPanel.Size = new System.Drawing.Size(314, 321);
-            this.mapPanel.TabIndex = 4;
-            this.mapPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.trackMap_Paint);
-            this.mapPanel.Layout += new System.Windows.Forms.LayoutEventHandler(this.trackMap_Layout);
-            this.mapPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.trackMap_MouseMove);
-            this.mapPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.trackMap_MouseUp);
-            this.mapPanel.Resize += new System.EventHandler(this.trackMap_Resize);
-            // 
-            // tractionCirclePanel
-            // 
-            this.tractionCirclePanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.tractionCirclePanel.BackColor = System.Drawing.Color.White;
-            this.tractionCirclePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tractionCirclePanel.Location = new System.Drawing.Point(795, 409);
-            this.tractionCirclePanel.Name = "tractionCirclePanel";
-            this.tractionCirclePanel.Size = new System.Drawing.Size(314, 159);
-            this.tractionCirclePanel.TabIndex = 5;
-            this.tractionCirclePanel.Paint += new System.Windows.Forms.PaintEventHandler(this.tractionCircle_Paint);
-            this.tractionCirclePanel.Layout += new System.Windows.Forms.LayoutEventHandler(this.tractionCircle_Layout);
-            this.tractionCirclePanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.tractionCircle_MouseMove);
-            this.tractionCirclePanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.tractionCircle_MouseUp);
-            this.tractionCirclePanel.Resize += new System.EventHandler(this.tractionCircle_Resize);
-            // 
-            // stripChartPanel
-            // 
-            this.stripChartPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.stripChartPanel.BackColor = System.Drawing.Color.White;
-            this.stripChartPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.stripChartPanel.Location = new System.Drawing.Point(795, 243);
-            this.stripChartPanel.Name = "stripChartPanel";
-            this.stripChartPanel.Size = new System.Drawing.Size(314, 160);
-            this.stripChartPanel.TabIndex = 6;
-            this.stripChartPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.stripChart_Paint);
-            this.stripChartPanel.Layout += new System.Windows.Forms.LayoutEventHandler(this.stripChartPanel_Layout);
-            this.stripChartPanel.MouseLeave += new System.EventHandler(this.stripChart_MouseLeave);
-            this.stripChartPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.stripChart_MouseMove);
-            this.stripChartPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.stripChart_MouseUp);
-            this.stripChartPanel.Resize += new System.EventHandler(this.stripChart_Resize);
-            // 
-            // label2
-            // 
-            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(795, 17);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(111, 13);
-            this.label2.TabIndex = 14;
-            this.label2.Text = "Stripchart X Axis (one)";
-            // 
-            // label3
-            // 
-            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(796, 64);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(30, 13);
-            this.label3.TabIndex = 15;
-            this.label3.Text = "Axes";
             // 
             // runDataGrid
             // 
@@ -275,94 +177,6 @@
             this.txtAutoAlignThreshold.TabIndex = 21;
             this.txtAutoAlignThreshold.Text = "0.10";
             // 
-            // channelDataGrid
-            // 
-            this.channelDataGrid.AllowUserToAddRows = false;
-            this.channelDataGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.channelDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.channelDataGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.displayChannel,
-            this.channelColor,
-            this.runName,
-            this.channelName,
-            this.channelDescription});
-            this.channelDataGrid.ContextMenuStrip = this.channelsContext;
-            this.channelDataGrid.Location = new System.Drawing.Point(588, 12);
-            this.channelDataGrid.Name = "channelDataGrid";
-            this.channelDataGrid.RowHeadersVisible = false;
-            this.channelDataGrid.Size = new System.Drawing.Size(100, 68);
-            this.channelDataGrid.TabIndex = 22;
-            // 
-            // displayChannel
-            // 
-            this.displayChannel.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.displayChannel.HeaderText = "Show";
-            this.displayChannel.Name = "displayChannel";
-            this.displayChannel.Width = 40;
-            // 
-            // channelColor
-            // 
-            this.channelColor.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
-            this.channelColor.HeaderText = "Color";
-            this.channelColor.Name = "channelColor";
-            this.channelColor.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.channelColor.Width = 37;
-            // 
-            // runName
-            // 
-            this.runName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.runName.HeaderText = "Run";
-            this.runName.Name = "runName";
-            this.runName.Width = 52;
-            // 
-            // channelName
-            // 
-            this.channelName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
-            this.channelName.DefaultCellStyle = dataGridViewCellStyle1;
-            this.channelName.HeaderText = "Channel";
-            this.channelName.Name = "channelName";
-            this.channelName.Width = 71;
-            // 
-            // channelDescription
-            // 
-            this.channelDescription.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.channelDescription.HeaderText = "Description";
-            this.channelDescription.Name = "channelDescription";
-            // 
-            // channelsContext
-            // 
-            this.channelsContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.axisExtents,
-            this.channelInfo});
-            this.channelsContext.Name = "channelsContext";
-            this.channelsContext.Size = new System.Drawing.Size(143, 48);
-            this.channelsContext.Opening += new System.ComponentModel.CancelEventHandler(this.channelsContext_Opening);
-            // 
-            // axisExtents
-            // 
-            this.axisExtents.Name = "axisExtents";
-            this.axisExtents.Size = new System.Drawing.Size(142, 22);
-            this.axisExtents.Text = "Axis Info";
-            this.axisExtents.Click += new System.EventHandler(this.axisInfo_Click);
-            // 
-            // channelInfo
-            // 
-            this.channelInfo.Name = "channelInfo";
-            this.channelInfo.Size = new System.Drawing.Size(142, 22);
-            this.channelInfo.Text = "Channel Info";
-            this.channelInfo.Click += new System.EventHandler(this.channelInfo_Click);
-            // 
-            // cmbXAxis
-            // 
-            this.cmbXAxis.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmbXAxis.FormattingEnabled = true;
-            this.cmbXAxis.Location = new System.Drawing.Point(795, 33);
-            this.cmbXAxis.Name = "cmbXAxis";
-            this.cmbXAxis.Size = new System.Drawing.Size(220, 21);
-            this.cmbXAxis.TabIndex = 23;
-            this.cmbXAxis.SelectedIndexChanged += new System.EventHandler(this.cmbXAxis_SelectedIndexChanged);
-            // 
             // label1
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -384,150 +198,70 @@
             this.btnClearAll.UseVisualStyleBackColor = true;
             this.btnClearAll.Click += new System.EventHandler(this.btnClearAll_Click);
             // 
-            // yAxisDataGrid
+            // stripChart
             // 
-            this.yAxisDataGrid.AllowUserToAddRows = false;
-            this.yAxisDataGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.yAxisDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.yAxisDataGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.yAxisUse,
-            this.yAxisName,
-            this.axisMin,
-            this.axisMax});
-            this.yAxisDataGrid.ContextMenuStrip = this.channelsContext;
-            this.yAxisDataGrid.Location = new System.Drawing.Point(471, 12);
-            this.yAxisDataGrid.Name = "yAxisDataGrid";
-            this.yAxisDataGrid.RowHeadersVisible = false;
-            this.yAxisDataGrid.Size = new System.Drawing.Size(111, 99);
-            this.yAxisDataGrid.TabIndex = 27;
-            this.yAxisDataGrid.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.yAxisDataGrid_CellEndEdit);
-            // 
-            // yAxisUse
-            // 
-            this.yAxisUse.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.yAxisUse.HeaderText = "Use";
-            this.yAxisUse.Name = "yAxisUse";
-            this.yAxisUse.Width = 32;
-            // 
-            // yAxisName
-            // 
-            this.yAxisName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomLeft;
-            this.yAxisName.DefaultCellStyle = dataGridViewCellStyle2;
-            this.yAxisName.HeaderText = "Axis Name";
-            this.yAxisName.Name = "yAxisName";
-            // 
-            // axisMin
-            // 
-            this.axisMin.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.axisMin.HeaderText = "Min";
-            this.axisMin.Name = "axisMin";
-            this.axisMin.Width = 49;
-            // 
-            // axisMax
-            // 
-            this.axisMax.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.axisMax.HeaderText = "Max";
-            this.axisMax.Name = "axisMax";
-            this.axisMax.Width = 52;
-            // 
-            // axisChannelTree
-            // 
-            this.axisChannelTree.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.axisChannelTree.CheckBoxes = true;
-            this.axisChannelTree.ContextMenuStrip = this.channelsContext;
-            this.axisChannelTree.Location = new System.Drawing.Point(795, 86);
-            this.axisChannelTree.Name = "axisChannelTree";
-            this.axisChannelTree.Size = new System.Drawing.Size(314, 151);
-            this.axisChannelTree.TabIndex = 29;
-            this.axisChannelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCheck);
-            // 
-            // contextMenuStrip1
-            // 
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(640, 127);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(111, 21);
-            this.comboBox1.TabIndex = 31;
-            // 
-            // label4
-            // 
-            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(567, 134);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(67, 13);
-            this.label4.TabIndex = 30;
-            this.label4.Text = "Track X Axis";
-            // 
-            // comboBox2
-            // 
-            this.comboBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(640, 153);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(111, 21);
-            this.comboBox2.TabIndex = 33;
-            // 
-            // label5
-            // 
-            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(567, 156);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(67, 13);
-            this.label5.TabIndex = 32;
-            this.label5.Text = "Track Y Axis";
-            // 
-            // chartControl1
-            // 
-            this.chartControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.stripChart.AllowDrag = true;
+            this.stripChart.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.chartControl1.Location = new System.Drawing.Point(11, 198);
-            this.chartControl1.Logger = null;
-            this.chartControl1.Name = "chartControl1";
-            this.chartControl1.Size = new System.Drawing.Size(778, 697);
-            this.chartControl1.TabIndex = 34;
+            this.stripChart.ChartAxes = null;
+            this.stripChart.CursorBoxSize = 10;
+            this.stripChart.CursorMode = YamuraLog.ChartControl.CursorStyle.CROSSHAIRS;
+            this.stripChart.CursorUpdateSource = false;
+            this.stripChart.Location = new System.Drawing.Point(11, 198);
+            this.stripChart.Logger = null;
+            this.stripChart.Name = "stripChart";
+            this.stripChart.Size = new System.Drawing.Size(778, 697);
+            this.stripChart.TabIndex = 34;
+            // 
+            // tractionCircle
+            // 
+            this.tractionCircle.AllowDrag = true;
+            this.tractionCircle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tractionCircle.ChartAxes = null;
+            this.tractionCircle.CursorBoxSize = 10;
+            this.tractionCircle.CursorMode = YamuraLog.ChartControl.CursorStyle.CROSSHAIRS;
+            this.tractionCircle.CursorUpdateSource = true;
+            this.tractionCircle.Location = new System.Drawing.Point(470, 12);
+            this.tractionCircle.Logger = null;
+            this.tractionCircle.Name = "tractionCircle";
+            this.tractionCircle.Size = new System.Drawing.Size(319, 180);
+            this.tractionCircle.TabIndex = 35;
+            // 
+            // trackMap
+            // 
+            this.trackMap.AllowDrag = true;
+            this.trackMap.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.trackMap.ChartAxes = null;
+            this.trackMap.CursorBoxSize = 10;
+            this.trackMap.CursorMode = YamuraLog.ChartControl.CursorStyle.CROSSHAIRS;
+            this.trackMap.CursorUpdateSource = true;
+            this.trackMap.Location = new System.Drawing.Point(795, 86);
+            this.trackMap.Logger = null;
+            this.trackMap.Name = "trackMap";
+            this.trackMap.Size = new System.Drawing.Size(314, 809);
+            this.trackMap.TabIndex = 36;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1115, 925);
-            this.Controls.Add(this.chartControl1);
-            this.Controls.Add(this.comboBox2);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.comboBox1);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.channelDataGrid);
-            this.Controls.Add(this.axisChannelTree);
-            this.Controls.Add(this.yAxisDataGrid);
+            this.Controls.Add(this.trackMap);
+            this.Controls.Add(this.tractionCircle);
+            this.Controls.Add(this.stripChart);
             this.Controls.Add(this.btnClearAll);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.cmbXAxis);
             this.Controls.Add(this.txtAutoAlignThreshold);
             this.Controls.Add(this.btnAutoAlign);
             this.Controls.Add(this.txtCursorPos);
             this.Controls.Add(this.runDataGrid);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.stripChartPanel);
-            this.Controls.Add(this.tractionCirclePanel);
-            this.Controls.Add(this.mapPanel);
             this.Controls.Add(this.btnOpenFile);
             this.Name = "Form1";
             this.Text = "Team Yamura data logger viewer";
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.channelDataGrid)).EndInit();
-            this.channelsContext.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.yAxisDataGrid)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -537,18 +271,11 @@
 
         private System.Windows.Forms.Button btnOpenFile;
         private System.Windows.Forms.OpenFileDialog openLogFile;
-        private System.Windows.Forms.Panel mapPanel;
-        private System.Windows.Forms.Panel tractionCirclePanel;
-        private System.Windows.Forms.Panel stripChartPanel;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.DataGridView runDataGrid;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.TextBox txtCursorPos;
         private System.Windows.Forms.Button btnAutoAlign;
         private System.Windows.Forms.TextBox txtAutoAlignThreshold;
-        private System.Windows.Forms.DataGridView channelDataGrid;
-        private System.Windows.Forms.ComboBox cmbXAxis;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnClearAll;
         private System.Windows.Forms.DataGridViewTextBoxColumn colRunNumber;
@@ -559,26 +286,9 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colMaxTime;
         private System.Windows.Forms.DataGridViewTextBoxColumn colOffsetTime;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSourceFile;
-        private System.Windows.Forms.ContextMenuStrip channelsContext;
-        private System.Windows.Forms.ToolStripMenuItem axisExtents;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn displayChannel;
-        private System.Windows.Forms.DataGridViewTextBoxColumn channelColor;
-        private System.Windows.Forms.DataGridViewTextBoxColumn runName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn channelName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn channelDescription;
-        private System.Windows.Forms.DataGridView yAxisDataGrid;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn yAxisUse;
-        private System.Windows.Forms.DataGridViewTextBoxColumn yAxisName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn axisMin;
-        private System.Windows.Forms.DataGridViewTextBoxColumn axisMax;
-        private System.Windows.Forms.TreeView axisChannelTree;
-        private System.Windows.Forms.ToolStripMenuItem channelInfo;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.ComboBox comboBox2;
-        private System.Windows.Forms.Label label5;
-        private ChartControl chartControl1;
+        private ChartControl stripChart;
+        private ChartControl tractionCircle;
+        private ChartControl trackMap;
     }
 }
 

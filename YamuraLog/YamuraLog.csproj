@@ -94,6 +94,12 @@
     <Compile Include="ChannelInfo.Designer.cs">
       <DependentUpon>ChannelInfo.cs</DependentUpon>
     </Compile>
+    <Compile Include="ChartControlAxesSelect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChartControlAxesSelect.Designer.cs">
+      <DependentUpon>ChartControlAxesSelect.cs</DependentUpon>
+    </Compile>
     <Compile Include="Display_Info.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -117,6 +123,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ChannelInfo.resx">
       <DependentUpon>ChannelInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ChartControlAxesSelect.resx">
+      <DependentUpon>ChartControlAxesSelect.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

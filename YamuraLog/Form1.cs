@@ -43,92 +43,15 @@ namespace YamuraLog
 
         // DataLogger contains runs, which contain channels which contain data points
         DataLogger dataLogger = new DataLogger();
-        // global display data
-        GlobalDisplay_Data globalDisplay = new GlobalDisplay_Data();
-        Dictionary<String, Axis> globalAxes = new Dictionary<String, Axis>();
 
-        Dictionary<String, Axis> stripChartAxes = new Dictionary<String, Axis>();
-        Dictionary<String, Axis> trackMapAxes = new Dictionary<String, Axis>();
-        Dictionary<String, Axis> tractionCircleAxes = new Dictionary<String, Axis>();
         // run for display data
         List<RunDisplay_Data> runDisplay = new List<RunDisplay_Data>();
 
         float gpsDist = 0.0F;
 
-        #region track map
-        #region mouse move points
-        Point trackMapStartPos = new Point(0, 0);
-        bool trackMapStartPosValid = false;
-        Point trackMapLastPos = new Point(0, 0);
-        #endregion
-        #region cursor
-        List<Point> trackMapLastCursorPos = new List<Point>();
-        List<bool> trackMapLastCursorPosValid = new List<bool>();
-        float trackMapCursorSize = 10.0F;
-        #endregion
-        #region scaling
-        float trackMapScale = 1.0F;
-        float trackMapScaleFactor = 1.0F;
-        float[] trackMapOffset = new float[] { 0.0F, 0.0F };
-        #endregion
-        #region window
-        Rectangle trackMapBounds = new Rectangle(0, 0, 0, 0);
-        int trackMapBorder = 10;
-        #endregion
-        #endregion
-        #region traction circle
-        #region mouse move points
-        Point tractionCircleStartPos = new Point(0, 0);
-        bool tractionCircleStartPosValid = false;
-        Point tractionCircleLastPos = new Point(0, 0);
-        #endregion
-        #region cursor
-        List<Point> tractionCircleLastCursorPos = new List<Point>();
-        List<bool> tractionCircleLastCursorPosValid = new List<bool>();
-        float tractionCircleCursorSize = 10.0F;
-        #endregion
-        #region scaling
-        float tractionCircleScale = 1.0F;
-        float tractionCircleScaleFactor = 1.0F;
-        float[] tractionCircleOffset = new float[] { 0.0F, 0.0F };
-        #endregion
-        #region window
-        int tractionCircleBorder = 10;
-        Rectangle tractionCircleBounds = new Rectangle(0, 0, 0, 0);
-        #endregion
-        #endregion
-        #region strip chart
-        #region mouse move points
-        Point stripChartStartPos = new Point(0, 0);
-        bool stripChartStartPosValid = false;
-        Point stripChartLastPos = new Point(0, 0);
-        #endregion
-        #region cursor
-        PointF stripChartStartCursorPos = new Point(0, 0);
-        PointF stripChartLastCursorPos = new Point(0, 0);
-        Point stripChartStartCursorPosInt = new Point(0, 0);
-        Point stripChartLastCursorPosInt = new Point(0, 0);
-        bool stripChartLastCursorPosValid = false;
-        #endregion
-        #region window
-        int stripChartPanelBorder = 10;
-        Rectangle stripChartPanelBounds = new Rectangle(0, 0, 0, 0);
-        #endregion
-        #region X axis range
-        //float[] stripChartOffset = new float[] { 0.0F, 0.0F };
-        //float[] stripChartExtentsX = new float[] { 0.0F, 0.0F };
-        #endregion
-        String xChannelName = "Time";
-        String yChannelName = "none";
-        #endregion
-
-        int dragZoomPenWidth = 1;
         public Form1()
         {
             InitializeComponent();
-            (mapPanel as Control).KeyPress += new KeyPressEventHandler(trackMap_KeyDown);
-            (tractionCirclePanel as Control).KeyPress += new KeyPressEventHandler(tractionCircle_KeyDown);
-            (stripChartPanel as Control).KeyPress += new KeyPressEventHandler(stripChart_KeyDown);
             penColors.Add(Color.Red);
             penColors.Add(Color.Green);
             penColors.Add(Color.Blue);
@@ -148,12 +71,21 @@ namespace YamuraLog
 
             // Add a CellClick handler to handle clicks in the button column.
             runDataGrid.CellClick += new DataGridViewCellEventHandler(RunDataGrid_CellClick);
-            //channelDataGrid.CellClick += new DataGridViewCellEventHandler(YAxisChannelDataGrid_CellValueChanged);
             runDataGrid.CellEndEdit += new DataGridViewCellEventHandler(RunDataGrid_CellEndEdit);
             runDataGrid.CellValueChanged += new DataGridViewCellEventHandler(RunDataGrid_CellValueChanged);
             runDataGrid.CellMouseUp += new DataGridViewCellMouseEventHandler(RunDataGrid_CellMouseUp);
 
-            chartControl1.Logger = dataLogger;
+            stripChart.Logger = dataLogger;
+            stripChart.CursorUpdateSource = true;
+            stripChart.ChartAxes = new Dictionary<string, Axis>();
+
+            tractionCircle.Logger = dataLogger;
+            tractionCircle.CursorUpdateSource = false;
+            tractionCircle.ChartAxes = new Dictionary<string, Axis>();
+
+            trackMap.Logger = dataLogger;
+            trackMap.CursorUpdateSource = false;
+            trackMap.ChartAxes = new Dictionary<string, Axis>();
         }
 
         private void btnClearAll_Click(object sender, EventArgs e)
@@ -161,12 +93,12 @@ namespace YamuraLog
             runDataGrid.Rows.Clear();
             //channelDataGrid.Rows.Clear();
             dataLogger.Reset();
-            globalDisplay.Reset();
             runDisplay.Clear();
 
-            stripChartPanel.Invalidate();
-            mapPanel.Invalidate();
-            tractionCirclePanel.Invalidate();
+
+            stripChart.Invalidate();
+            tractionCircle.Invalidate();
+            trackMap.Invalidate();
         }
         private void btnOpenFile_Click(object sender, EventArgs e)
         {
@@ -182,9 +114,9 @@ namespace YamuraLog
             {
                 ReadYLGFile(openLogFile.FileName);
             }
-            mapPanel.Invalidate();
-            tractionCirclePanel.Invalidate();
-            stripChartPanel.Invalidate();
+            stripChart.Invalidate();
+            tractionCircle.Invalidate();
+            trackMap.Invalidate();
         }
         private void btnAutoAlign_Click(object sender, EventArgs e)
         {
@@ -199,11 +131,6 @@ namespace YamuraLog
                 return;
             }
             AutoAlign(autoThreshold);
-        }
-        private void cmbXAxis_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            xChannelName = cmbXAxis.Text;
-            stripChartPanel.Invalidate();
         }
         #region read log file
         private void ReadTXTFile(String fileName)
@@ -749,138 +676,83 @@ namespace YamuraLog
                 runDisplay[runIdx].stipchart_Offset[0] = 0.0F;
                 runDisplay[runIdx].stipchart_Offset[1] = 0.0F;
 
-                trackMapLastCursorPos.Add(new Point(0, 0));
-                trackMapLastCursorPosValid.Add(false);
-                tractionCircleLastCursorPos.Add(new Point(0, 0));
-                tractionCircleLastCursorPosValid.Add(false);
-
                 channelIdx = 0;
                 foreach (KeyValuePair<String, DataChannel> curChannel in curRun.channels)
                 {
-                    #region global display
-                    globalDisplay.AddChannel(curChannel.Key);
-                    globalDisplay.channelRanges[curChannel.Key][0] = curChannel.Value.DataRange[0]<globalDisplay.channelRanges[curChannel.Key][0] ? curChannel.Value.DataRange[0] : globalDisplay.channelRanges[curChannel.Key][0];
-                    globalDisplay.channelRanges[curChannel.Key][1] = curChannel.Value.DataRange[1] > globalDisplay.channelRanges[curChannel.Key][1] ? curChannel.Value.DataRange[1] : globalDisplay.channelRanges[curChannel.Key][1];
-                    #endregion
                     #region channel display
                     runDisplay[runIdx].channelDisplay.Add(curChannel.Key, false);
                     runDisplay[runIdx].channelColor.Add(curChannel.Key, penColors[channelIdx % penColors.Count()]);
                     #endregion
-                    #region axes create/update
                     String axisName = curChannel.Key;
-                    if (globalAxes.ContainsKey(axisName))
+                    #region strip chart control axes create/update
+                    if (stripChart.ChartAxes.ContainsKey(axisName))
                     {
-                        globalAxes[axisName].AxisRange[0] = globalAxes[axisName].AxisRange[0] < curChannel.Value.DataRange[0] ? globalAxes[axisName].AxisRange[0] : curChannel.Value.DataRange[0];
-                        globalAxes[axisName].AxisRange[1] = globalAxes[axisName].AxisRange[1] > curChannel.Value.DataRange[1] ? globalAxes[axisName].AxisRange[1] : curChannel.Value.DataRange[1];
+                        stripChart.ChartAxes[axisName].AxisRange[0] = stripChart.ChartAxes[axisName].AxisRange[0] < curChannel.Value.DataRange[0] ? stripChart.ChartAxes[axisName].AxisRange[0] : curChannel.Value.DataRange[0];
+                        stripChart.ChartAxes[axisName].AxisRange[1] = stripChart.ChartAxes[axisName].AxisRange[1] > curChannel.Value.DataRange[1] ? stripChart.ChartAxes[axisName].AxisRange[1] : curChannel.Value.DataRange[1];
                     }
                     else
                     {
-                        globalAxes.Add(axisName, new Axis());
-                        globalAxes[axisName].AxisRange[0] = curChannel.Value.DataRange[0];
-                        globalAxes[axisName].AxisRange[1] = curChannel.Value.DataRange[1];
+                        stripChart.ChartAxes.Add(axisName, new Axis());
+                        stripChart.ChartAxes[axisName].AxisRange[0] = curChannel.Value.DataRange[0];
+                        stripChart.ChartAxes[axisName].AxisRange[1] = curChannel.Value.DataRange[1];
                     }
-                    globalAxes[axisName].AxisName = axisName;
-                    globalAxes[axisName].AxisRange[2] = globalAxes[axisName].AxisRange[1] - globalAxes[axisName].AxisRange[0];
-                    globalAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key),  new ChannelInfo(runIdx, curChannel.Key));
-                    globalAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
-                    globalAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / globalAxes[axisName].AxisRange[2];
-                    globalAxes[axisName].DisplayScale[1] =  (float)stripChartPanelBounds.Height / globalAxes[axisName].AxisRange[2];
-                    globalAxes[axisName].DisplayOffset = -1 * globalAxes[axisName].AxisRange[0];
+                    stripChart.ChartAxes[axisName].AxisName = axisName;
+                    stripChart.ChartAxes[axisName].AxisRange[2] = stripChart.ChartAxes[axisName].AxisRange[1] - stripChart.ChartAxes[axisName].AxisRange[0];
+                    stripChart.ChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, curChannel.Key));
+                    stripChart.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
+                    //stripChart.ChartAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / stripChart.ChartAxes[axisName].AxisRange[2];
+                    //stripChart.ChartAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / stripChart.ChartAxes[axisName].AxisRange[2];
+                    stripChart.ChartAxes[axisName].DisplayOffset = -1 * stripChart.ChartAxes[axisName].AxisRange[0];
+                    #endregion
+                    #region traction circle control axes create/update
+                    if (tractionCircle.ChartAxes.ContainsKey(axisName))
+                    {
+                        tractionCircle.ChartAxes[axisName].AxisRange[0] = tractionCircle.ChartAxes[axisName].AxisRange[0] < curChannel.Value.DataRange[0] ? tractionCircle.ChartAxes[axisName].AxisRange[0] : curChannel.Value.DataRange[0];
+                        tractionCircle.ChartAxes[axisName].AxisRange[1] = tractionCircle.ChartAxes[axisName].AxisRange[1] > curChannel.Value.DataRange[1] ? tractionCircle.ChartAxes[axisName].AxisRange[1] : curChannel.Value.DataRange[1];
+                    }
+                    else
+                    {
+                        tractionCircle.ChartAxes.Add(axisName, new Axis());
+                        tractionCircle.ChartAxes[axisName].AxisRange[0] = curChannel.Value.DataRange[0];
+                        tractionCircle.ChartAxes[axisName].AxisRange[1] = curChannel.Value.DataRange[1];
+                    }
+                    tractionCircle.ChartAxes[axisName].AxisName = axisName;
+                    tractionCircle.ChartAxes[axisName].AxisRange[2] = tractionCircle.ChartAxes[axisName].AxisRange[1] - tractionCircle.ChartAxes[axisName].AxisRange[0];
+                    tractionCircle.ChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, curChannel.Key));
+                    tractionCircle.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
+                    //tractionCircle.ChartAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / tractionCircle.ChartAxes[axisName].AxisRange[2];
+                    //tractionCircle.ChartAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / tractionCircle.ChartAxes[axisName].AxisRange[2];
+                    tractionCircle.ChartAxes[axisName].DisplayOffset = -1 * tractionCircle.ChartAxes[axisName].AxisRange[0];
+                    #endregion
+                    #region traction circle control axes create/update
+                    if (trackMap.ChartAxes.ContainsKey(axisName))
+                    {
+                        trackMap.ChartAxes[axisName].AxisRange[0] = trackMap.ChartAxes[axisName].AxisRange[0] < curChannel.Value.DataRange[0] ? trackMap.ChartAxes[axisName].AxisRange[0] : curChannel.Value.DataRange[0];
+                        trackMap.ChartAxes[axisName].AxisRange[1] = trackMap.ChartAxes[axisName].AxisRange[1] > curChannel.Value.DataRange[1] ? trackMap.ChartAxes[axisName].AxisRange[1] : curChannel.Value.DataRange[1];
+                    }
+                    else
+                    {
+                        trackMap.ChartAxes.Add(axisName, new Axis());
+                        trackMap.ChartAxes[axisName].AxisRange[0] = curChannel.Value.DataRange[0];
+                        trackMap.ChartAxes[axisName].AxisRange[1] = curChannel.Value.DataRange[1];
+                    }
+                    trackMap.ChartAxes[axisName].AxisName = axisName;
+                    trackMap.ChartAxes[axisName].AxisRange[2] = trackMap.ChartAxes[axisName].AxisRange[1] - trackMap.ChartAxes[axisName].AxisRange[0];
+                    trackMap.ChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, curChannel.Key));
+                    trackMap.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
+                    //trackMap.ChartAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / trackMap.ChartAxes[axisName].AxisRange[2];
+                    //trackMap.ChartAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / trackMap.ChartAxes[axisName].AxisRange[2];
+                    trackMap.ChartAxes[axisName].DisplayOffset = -1 * trackMap.ChartAxes[axisName].AxisRange[0];
                     #endregion
                     channelIdx++;
                 }
             }
             #endregion
-            #region axes to axis tree list
-            foreach (KeyValuePair<String, Axis> curAxis in globalAxes)
-            {
-                bool axisFound = false;
-                foreach(TreeNode axisItem in axisChannelTree.Nodes)
-                {
-                    axisFound = false;
-                    if (axisItem.Name == curAxis.Key)
-                    {
-                        axisFound = true;
-                        break;
-                    }
-                }
-                if (!axisFound)
-                {
-                    axisChannelTree.Nodes.Add(curAxis.Key, curAxis.Key, 0);
-                }
-                foreach (KeyValuePair<String, ChannelInfo> associatedChannel in curAxis.Value.AssociatedChannels)
-                {
-                    if(axisChannelTree.Nodes[curAxis.Key].Nodes.ContainsKey(associatedChannel.Key))
-                    {
-                        continue;
-                    }
-                    axisChannelTree.Nodes[curAxis.Key].Nodes.Add(associatedChannel.Key, associatedChannel.Key, 1);
-                }
-            }
-            #endregion
-
-            #region copy global axes to local lists
-            foreach (KeyValuePair<String, Axis> globalAxis in globalAxes)
-            {
-                #region stripchart circle
-                if (!stripChartAxes.ContainsKey(globalAxis.Key))
-                {
-                    stripChartAxes.Add(globalAxis.Key, globalAxis.Value);
-                    if (!cmbXAxis.Items.Contains(globalAxis.Key))
-                    {
-                        cmbXAxis.Items.Add(globalAxis.Key);
-                    }
-                }
-                #endregion
-                #region traction circle
-                if (!tractionCircleAxes.ContainsKey(globalAxis.Key))
-                { 
-                    tractionCircleAxes.Add(globalAxis.Key, globalAxis.Value);
-                }
-                #endregion
-                #region trackmap
-                if (!trackMapAxes.ContainsKey(globalAxis.Key))
-                {
-                    trackMapAxes.Add(globalAxis.Key, globalAxis.Value);
-                    if (!comboBox1.Items.Contains(globalAxis.Key))
-                    {
-                        comboBox1.Items.Add(globalAxis.Key);
-                    }
-                    if (!comboBox2.Items.Contains(globalAxis.Key))
-                    {
-                        comboBox2.Items.Add(globalAxis.Key);
-                    }
-                }
-                #endregion
-                #region strip chart (control)
-                if (!chartControl1.ChartAxes.ContainsKey(globalAxis.Key))
-                {
-                    chartControl1.ChartAxes.Add(globalAxis.Key, globalAxis.Value);
-                }
-                #endregion
-            }
-            xChannelName = globalAxes["Time"].AxisName;
-            comboBox1.Text = "Longitude";
-            comboBox2.Text = "Latitude";
-            #endregion
 
             // auto align launches
             AutoAlign(0.10F);
 
-            //channelDataGrid.Rows.Clear();
-            //for (int runGridIdx = 0; runGridIdx < dataLogger.runData.Count; runGridIdx++)
-            //{
-            //    foreach (KeyValuePair<String, DataChannel> kvp in dataLogger.runData[runGridIdx].channels)
-            //    {
-            //        channelDataGrid.Rows.Add();
-            //        channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["displayChannel"].Value = runDisplay[runGridIdx].channelDisplay[kvp.Key];
-            //        channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelColor"].Style.BackColor = runDisplay[runGridIdx].channelColor[kvp.Key];
-            //        channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["runName"].Value = (runGridIdx + 1).ToString();
-            //        channelDataGrid.Rows[channelDataGrid.Rows.Count - 1].Cells["channelName"].Value = kvp.Key.ToString();
-            //    }
-            //}
             runDataGrid.Rows.Clear();
-            //for (int runGridIdx = 0; runGridIdx < dataLogger.runData.Count(); runGridIdx++)
             for (int runGridIdx = 0; runGridIdx < runDisplay.Count(); runGridIdx++)
             {
                 runDataGrid.Rows.Add();
@@ -950,881 +822,6 @@ namespace YamuraLog
             //}
         }
         #endregion
-        #region track map events
-        private void trackMap_Paint(object sender, PaintEventArgs e)
-        {
-            // nothing to display yet
-            if (globalDisplay.channelRanges.Count == 0)
-            {
-                return;
-            }
-            stripChartStartPosValid = false;
-            stripChartLastCursorPosValid = false;
-
-            PointF startPt = new PointF();
-            PointF endPt = new PointF();
-            Pen drawPen = new Pen(Color.Black, 1);
-            bool initialValue = false;
-            int runCount = 0;
-            String localXChannelName = comboBox1.Text;
-            String localYChannelName = comboBox2.Text;
-            // get the graphics context
-            using (Graphics stripChartGraphics = mapPanel.CreateGraphics())
-            {
-                runCount = 0;
-
-                // check each Y axis
-                foreach (KeyValuePair<String, Axis> yAxis in stripChartAxes)
-                {
-                    // skip if axis is not displayed
-                    if (yAxis.Value.AxisName != localYChannelName)
-                    {
-                        continue;
-                    }
-
-                    float[] DisplayScale = new float[] { 0.0F, 0.0F };
-                    DisplayScale[0] = (float)trackMapBounds.Width / globalAxes[localXChannelName].AxisRange[2];
-                    DisplayScale[1] = (float)trackMapBounds.Height / globalAxes[localYChannelName].AxisRange[2];
-                    float[] DisplayOffset = new float[] { 0.0F, 0.0F };
-
-                    DisplayOffset[0] = -1 * globalAxes[localXChannelName].AxisRange[0];
-                    DisplayOffset[1] = /*-1 * */globalAxes[localYChannelName].AxisRange[0];
-                    // check each associated axis
-                    foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
-                    {
-                        // skip if channel is not displayed
-                        //if (!curChanInfo.Value.ShowChannel)
-                        //{
-                        //    continue;
-                        //}
-                        DataChannel curChannel = dataLogger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
-                        drawPen = new Pen(runDisplay[curChanInfo.Value.RunIndex].channelColor[curChanInfo.Value.ChannelName]);
-
-                        initialValue = false;
-                        foreach (KeyValuePair<float, DataPoint> curData in curChannel.DataPoints)
-                        {
-                            // x axis is time - direct lookup
-                            if (localXChannelName == "Time")
-                            {
-                                endPt.X = curData.Key;               // - (float)yAxis.Value.DisplayOffset + runDisplay[runCount].stipchart_Offset[0];
-                                endPt.Y = curData.Value.PointValue;  // - yAxis.Value.AxisRange[0];// - globalDisplay.channelRanges[curChanInfo.ChannelName][0];
-                            }
-                            // x axis is not time - find nearest time in axis channel, 
-                            else
-                            {
-                                DataPoint tst = dataLogger.runData[0].channels[localXChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
-                                endPt.X = tst.PointValue;     // - globalDisplay.channelRanges[xChannelName][0] + runDisplay[runCount].stipchart_Offset[0];
-                                endPt.Y = curData.Value.PointValue;// curData.Value.PointValue;     // - globalDisplay.channelRanges[yChannelName][0];
-                            }
-                            //
-                            // at this point, the value is already offset on the X axis by any user defined time shift
-                            // just need to offset by the stripchart panned position (H scrollbar)
-                            //
-                            endPt = globalDisplay.ScaleDataToDisplay(endPt,                // point
-                                                                     DisplayScale[0],      // scale X
-                                                                     DisplayScale[1],      // scale Y
-                                                                     DisplayOffset[0],     // offset X
-                                                                     DisplayOffset[1],     // offset Y
-                                                                     trackMapBounds);      // graphics area boundary
-                            if (initialValue)// && (startPt.X < trackMapBounds.Width) && (endPt.X > 0))
-                            {
-                                stripChartGraphics.DrawLine(drawPen, startPt, endPt);
-                            }
-                            startPt.X = endPt.X;
-                            startPt.Y = endPt.Y;
-                            initialValue = true;
-                        }
-                    }
-                    runCount++;
-                }
-            }
-        }
-        private void trackMap_MouseMove(object sender, MouseEventArgs e)
-        {
-            mapPanel.Focus();
-            if (e.Button == MouseButtons.Left)
-            {
-                if (!trackMapStartPosValid)
-                {
-                    trackMapStartPosValid = true;
-                    trackMapStartPos = e.Location;
-                }
-            }
-            trackMapLastPos = e.Location;
-        }
-        private void trackMap_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (trackMapStartPosValid)
-            {
-                trackMapOffset[0] += ((float)(e.Location.X - trackMapStartPos.X) / trackMapScale);
-                trackMapOffset[1] += ((float)(e.Location.Y - trackMapStartPos.Y) / trackMapScale);
-            }
-            trackMapStartPosValid = false;
-            mapPanel.Invalidate();
-        }
-        private void trackMap_KeyDown(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == '+')
-            {
-                trackMapScaleFactor *= 1.05F;
-                mapPanel.Invalidate();
-            }
-            else if (e.KeyChar == '-')
-            {
-                trackMapScaleFactor *= 0.95F;
-                mapPanel.Invalidate();
-            }
-            else if ((e.KeyChar == '1') || (e.KeyChar == 'R') || (e.KeyChar == 'r'))
-            {
-                trackMapScaleFactor = 1.0F;
-                trackMapOffset[0] = 0;
-                trackMapOffset[1] = 0;
-                mapPanel.Invalidate();
-            }
-        }
-        private void trackMap_Resize(object sender, EventArgs e)
-        {
-            trackMapBounds.X = 5;
-            trackMapBounds.Y = 5;
-            trackMapBounds.Width = mapPanel.Width - 10;
-            trackMapBounds.Height = mapPanel.Height - 10;
-
-            foreach (KeyValuePair<String, Axis> axisInfo in trackMapAxes)
-            {
-                axisInfo.Value.DisplayScale[0] = (float)trackMapBounds.Width / axisInfo.Value.AxisRange[2];
-                axisInfo.Value.DisplayScale[1] = (float)trackMapBounds.Height / axisInfo.Value.AxisRange[2];
-            }
-            mapPanel.Invalidate();
-        }
-        private void trackMap_Layout(object sender, LayoutEventArgs e)
-        {
-            trackMapBounds.X = trackMapBorder;
-            trackMapBounds.Y = trackMapBorder;
-            trackMapBounds.Width = mapPanel.Width - (2 * trackMapBorder);
-            trackMapBounds.Height = mapPanel.Height - (2 * trackMapBorder);
-        }
-        private void TrackMapUpdateCursor(float xAxisValue)
-        {
-            return;
-            Pen drawPen = new Pen(Color.Black, 1);
-            PointF locationPt = new PointF();
-            Rectangle locationBox = new Rectangle();
-            int runCount = 0;
-            float runTimeStamp = 0.0F;
-            using (Graphics mapGraphics = mapPanel.CreateGraphics())
-            {
-                foreach (RunData curRun in dataLogger.runData)
-                {
-                    if(!curRun.channels.ContainsKey("Longitude"))
-                    {
-                        continue;
-                    }
-                    if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
-                    {
-                        runCount++;
-                        continue;
-                    }
-                    drawPen = new Pen(runDisplay[runCount].runColor);
-                    runTimeStamp = xAxisValue - runDisplay[runCount].stipchart_Offset[0];
-
-                    KeyValuePair<float, DataPoint> kvp = curRun.channels["Longitude"].DataPoints.FirstOrDefault(i => i.Key > runTimeStamp);
-                    DataPoint curPoint = kvp.Value;
-                    runTimeStamp = kvp.Key;
-                    if (curPoint == null)
-                    {
-                        continue;
-                    }
-                    locationPt.X = curPoint.PointValue - globalDisplay.channelRanges["Longitude"][0];
-                    locationPt.Y = curRun.channels["Latitude"].DataPoints[runTimeStamp].PointValue - globalDisplay.channelRanges["Latitude"][0];
-
-                    locationPt = globalDisplay.ScaleDataToDisplay(locationPt,
-                                                                  trackMapScale * trackMapScaleFactor,
-                                                                  trackMapScale * trackMapScaleFactor,
-                                                                  trackMapOffset[0],
-                                                                  trackMapOffset[1],
-                                                                  trackMapBounds);
-
-                    #region position cursor
-                    IntPtr hDC = mapGraphics.GetHdc();
-
-                    IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-                                                    dragZoomPenWidth,
-                                                    NotRGB(runDataGrid.Rows[runCount].Cells["colTraceColor"].Style.BackColor));
-                    IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
-                    IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-                    IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-                    Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
-
-                    IntPtr lpPoint = new IntPtr();
-                    lpPoint = IntPtr.Zero;
-
-                    if (trackMapLastCursorPosValid[runCount])
-                    {
-                        locationBox = new Rectangle(trackMapLastCursorPos[runCount].X, trackMapLastCursorPos[runCount].Y, (int)trackMapCursorSize, (int)trackMapCursorSize);
-                        Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)trackMapCursorSize, locationBox.Top + (int)trackMapCursorSize);
-                    }
-
-                    locationBox = new Rectangle((int)(locationPt.X),
-                                                (int)(locationPt.Y),
-                                                (int)(trackMapCursorSize),
-                                                (int)(trackMapCursorSize));
-
-
-                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)trackMapCursorSize, locationBox.Top + (int)trackMapCursorSize);
-                    trackMapLastCursorPos[runCount] = new Point(locationBox.Left, locationBox.Top);
-                    trackMapLastCursorPosValid[runCount] = true;
-
-                    Gdi32.SelectObject(hDC, oldPen);
-                    Gdi32.SelectObject(hDC, oldBrush);
-                    Gdi32.DeleteObject(newPen);
-                    Gdi32.DeleteObject(newBrush);
-                    mapGraphics.ReleaseHdc();
-                    #endregion
-                    runCount++;
-                }
-            }
-        }
-        private void TrackMapClearCursor()
-        {
-            return;
-            using (Graphics mapGraphics = mapPanel.CreateGraphics())
-            {
-                int runCount = 0;
-                Rectangle locationBox = new Rectangle(0, 0, 0, 0);
-                foreach (RunData curRun in dataLogger.runData)
-                {
-                    if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
-                    {
-                        runCount++;
-                        continue;
-                    }
-                    #region position cursor
-                    IntPtr hDC = mapGraphics.GetHdc();
-
-                    IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-                                                    dragZoomPenWidth,
-                                                    NotRGB(runDataGrid.Rows[runCount].Cells["colTraceColor"].Style.BackColor));
-                    IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
-                    IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-                    IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-                    Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
-
-                    IntPtr lpPoint = new IntPtr();
-                    lpPoint = IntPtr.Zero;
-
-                    locationBox = new Rectangle(trackMapLastCursorPos[runCount].X, trackMapLastCursorPos[runCount].Y, (int)trackMapCursorSize, (int)trackMapCursorSize);
-                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)trackMapCursorSize, locationBox.Top + (int)trackMapCursorSize);
-
-                    trackMapLastCursorPosValid[runCount] = false;
-                    Gdi32.SelectObject(hDC, oldPen);
-                    Gdi32.SelectObject(hDC, oldBrush);
-                    Gdi32.DeleteObject(newPen);
-                    Gdi32.DeleteObject(newBrush);
-                    mapGraphics.ReleaseHdc();
-                    #endregion
-
-                    runCount++;
-                }
-            }
-        }
-        #endregion
-        #region traction circle events
-        private void tractionCircle_Paint(object sender, PaintEventArgs e)
-        {
-            return;
-            tractionCircleStartPosValid = false;
-            for (int validIdx = 0; validIdx < trackMapLastCursorPosValid.Count(); validIdx++)
-            {
-                trackMapLastCursorPosValid[validIdx] = false;
-            }
-            // nothing to display yet, or not acceleration data
-            if ((globalDisplay.channelRanges.Count == 0) ||
-                (!globalDisplay.channelRanges.ContainsKey("gX")) ||
-                (!globalDisplay.channelRanges.ContainsKey("gY")))
-            {
-                return;
-            }
-            Pen drawPen = new Pen(Color.Black, 1);
-            PointF startPt = new PointF();
-            PointF endPt = new PointF();
-            bool initialValue = false;
-            float scaleX = (float)tractionCircleBounds.Width / (float)Math.Abs(globalDisplay.channelRanges["gX"][1] - globalDisplay.channelRanges["gX"][0]);
-            float scaleY = (float)tractionCircleBounds.Height / (float)Math.Abs(globalDisplay.channelRanges["gY"][1] - globalDisplay.channelRanges["gY"][0]);
-            tractionCircleScale = scaleX < scaleY ? scaleX : scaleY;
-            float startTime = 0.0F;
-            float endTime = 0.0F;
-            int runCount = 0;
-
-            using (Graphics tractionCircleGraphics = tractionCirclePanel.CreateGraphics())
-            {
-                foreach (RunData curRun in dataLogger.runData)
-                {
-                    if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
-                    {
-                        runCount++;
-                        continue;
-                    }
-                    drawPen = new Pen(runDisplay[runCount].runColor);
-                    initialValue = false;
-                    foreach (KeyValuePair<float, DataPoint> curData in curRun.channels["gX"].DataPoints)
-                    {
-                        endPt.X = curData.Value.PointValue - globalDisplay.channelRanges["gX"][0];
-                        endPt.Y = curRun.channels["gY"].dataPoints[curData.Key].PointValue - globalDisplay.channelRanges["gY"][0];
-                        endPt = globalDisplay.ScaleDataToDisplay(endPt,
-                                                                 tractionCircleScale * tractionCircleScaleFactor,
-                                                                 tractionCircleScale * tractionCircleScaleFactor,
-                                                                 tractionCircleOffset[0],
-                                                                 tractionCircleOffset[1],
-                                                                 tractionCircleBounds);
-                        endTime = (float)curData.Key;
-                        if (stripChartAxes[xChannelName].AxisRange[0] != stripChartAxes[xChannelName].AxisRange[1])
-                        {
-                            if (endTime < stripChartAxes[xChannelName].AxisRange[0])
-                            {
-                                continue;
-                            }
-                            if (startTime > stripChartAxes[xChannelName].AxisRange[1])
-                            {
-                                break;
-                            }
-                        }
-                        if (initialValue)
-                        {
-                            tractionCircleGraphics.DrawLine(drawPen, startPt, endPt);
-                        }
-                        startPt = endPt;
-                        startTime = endTime;
-                        initialValue = true;
-                    }
-                    runCount++;
-                }
-            }
-        }
-        private void tractionCircle_MouseMove(object sender, MouseEventArgs e)
-        {
-            tractionCirclePanel.Focus();
-            if (e.Button == MouseButtons.Left)
-            {
-                if (!tractionCircleStartPosValid)
-                {
-                    tractionCircleStartPosValid = true;
-                    tractionCircleStartPos = e.Location;
-                }
-            }
-            tractionCircleLastPos = e.Location;
-        }
-        private void tractionCircle_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (tractionCircleStartPosValid)
-            {
-                tractionCircleOffset[0] += ((float)(e.Location.X - tractionCircleStartPos.X) / tractionCircleScale);
-                tractionCircleOffset[1] += ((float)(e.Location.Y - tractionCircleStartPos.Y) / tractionCircleScale);
-            }
-            tractionCircleStartPosValid = false;
-            tractionCirclePanel.Invalidate();
-        }
-        private void tractionCircle_KeyDown(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == '+')
-            {
-                tractionCircleScaleFactor *= 1.05F;
-                tractionCirclePanel.Invalidate();
-            }
-            else if (e.KeyChar == '-')
-            {
-                tractionCircleScaleFactor *= 0.95F;
-                tractionCirclePanel.Invalidate();
-            }
-            else if ((e.KeyChar == '1') || (e.KeyChar == 'R') || (e.KeyChar == 'r'))
-            {
-                tractionCircleScaleFactor = 1.0F;
-                tractionCircleOffset[0] = 0;
-                tractionCircleOffset[1] = 0;
-                tractionCirclePanel.Invalidate();
-            }
-        }
-        private void tractionCircle_Resize(object sender, EventArgs e)
-        {
-            tractionCircleBounds.X = tractionCircleBorder;
-            tractionCircleBounds.Y = tractionCircleBorder;
-            tractionCircleBounds.Width = tractionCirclePanel.Width - (2 * tractionCircleBorder);
-            tractionCircleBounds.Height = tractionCirclePanel.Height - (2 * tractionCircleBorder);
-
-            foreach (KeyValuePair<String, Axis> axisInfo in tractionCircleAxes)
-            {
-                axisInfo.Value.DisplayScale[0] = (float)tractionCircleBounds.Width / axisInfo.Value.AxisRange[2];
-                axisInfo.Value.DisplayScale[1] = (float)tractionCircleBounds.Height / axisInfo.Value.AxisRange[2];
-            }
-            tractionCirclePanel.Invalidate();
-        }
-        private void tractionCircle_Layout(object sender, LayoutEventArgs e)
-        {
-            tractionCircleBounds.X = tractionCircleBorder;
-            tractionCircleBounds.Y = tractionCircleBorder;
-            tractionCircleBounds.Width = tractionCirclePanel.Width - (2 * tractionCircleBorder);
-            tractionCircleBounds.Height = tractionCirclePanel.Height - (2 * tractionCircleBorder);
-        }
-        private void TractionCircleUpdateCursor(float xAxisValue)
-        {
-            return;
-            Pen drawPen = new Pen(Color.Black, 1);
-            PointF locationPt = new PointF();
-            Rectangle locationBox = new Rectangle();
-            int runCount = 0;
-            float runTimeStamp = 0.0F;
-            using (Graphics mapGraphics = tractionCirclePanel.CreateGraphics())
-            {
-                foreach (RunData curRun in dataLogger.runData)
-                {
-                    if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
-                    {
-                        runCount++;
-                        continue;
-                    }
-                    drawPen = new Pen(runDisplay[runCount].runColor);
-
-                    runTimeStamp = xAxisValue - runDisplay[runCount].stipchart_Offset[0];
-
-
-                    KeyValuePair<float, DataPoint> kvp = curRun.channels["gX"].DataPoints.FirstOrDefault(i => i.Key > runTimeStamp);
-                    DataPoint curPoint = kvp.Value;
-                    runTimeStamp = kvp.Key;
-                    if (curPoint == null)
-                    {
-                        continue;
-                    }
-                    locationPt.X = curPoint.PointValue - globalDisplay.channelRanges["gX"][0];
-                    locationPt.Y = curRun.channels["gY"].DataPoints[runTimeStamp].PointValue - globalDisplay.channelRanges["gY"][0];
-
-                    locationPt = globalDisplay.ScaleDataToDisplay(locationPt,
-                                                                  tractionCircleScale * tractionCircleScaleFactor,
-                                                                  tractionCircleScale * tractionCircleScaleFactor,
-                                                                  tractionCircleOffset[0],
-                                                                  tractionCircleOffset[1],
-                                                                  tractionCircleBounds);
-
-                    #region position cursor
-                    IntPtr hDC = mapGraphics.GetHdc();
-
-                    IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-                                                    dragZoomPenWidth,
-                                                    NotRGB(runDataGrid.Rows[runCount].Cells["colTraceColor"].Style.BackColor));
-                    IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
-                    IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-                    IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-                    Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
-
-                    IntPtr lpPoint = new IntPtr();
-                    lpPoint = IntPtr.Zero;
-
-                    if (tractionCircleLastCursorPosValid[runCount])
-                    {
-                        locationBox = new Rectangle(tractionCircleLastCursorPos[runCount].X, tractionCircleLastCursorPos[runCount].Y, (int)tractionCircleCursorSize, (int)tractionCircleCursorSize);
-                        Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)tractionCircleCursorSize, locationBox.Top + (int)tractionCircleCursorSize);
-                    }
-
-                    locationBox = new Rectangle((int)(locationPt.X),
-                                                (int)(locationPt.Y),
-                                                (int)(tractionCircleCursorSize),
-                                                (int)(tractionCircleCursorSize));
-
-
-                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)tractionCircleCursorSize, locationBox.Top + (int)tractionCircleCursorSize);
-                    tractionCircleLastCursorPos[runCount] = new Point(locationBox.Left, locationBox.Top);
-                    tractionCircleLastCursorPosValid[runCount] = true;
-
-                    Gdi32.SelectObject(hDC, oldPen);
-                    Gdi32.SelectObject(hDC, oldBrush);
-                    Gdi32.DeleteObject(newPen);
-                    Gdi32.DeleteObject(newBrush);
-                    mapGraphics.ReleaseHdc();
-                    #endregion
-
-                    runCount++;
-                }
-            }
-        }
-        private void TractionCircleClearCursor()
-        {
-            return;
-            using (Graphics mapGraphics = tractionCirclePanel.CreateGraphics())
-            {
-                int runCount = 0;
-                Rectangle locationBox = new Rectangle(0, 0, 0, 0);
-                foreach (RunData curRun in dataLogger.runData)
-                {
-                    if ((bool)runDataGrid.Rows[runCount].Cells["colShowRun"].Value == false)
-                    {
-                        runCount++;
-                        continue;
-                    }
-                    #region position cursor
-                    IntPtr hDC = mapGraphics.GetHdc();
-
-                    IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-                                                    dragZoomPenWidth,
-                                                    NotRGB(runDataGrid.Rows[runCount].Cells["colTraceColor"].Style.BackColor));
-                    IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
-                    IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-                    IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-                    Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
-
-                    IntPtr lpPoint = new IntPtr();
-                    lpPoint = IntPtr.Zero;
-
-                    locationBox = new Rectangle(tractionCircleLastCursorPos[runCount].X, tractionCircleLastCursorPos[runCount].Y, (int)tractionCircleCursorSize, (int)tractionCircleCursorSize);
-                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + (int)tractionCircleCursorSize, locationBox.Top + (int)tractionCircleCursorSize);
-
-                    tractionCircleLastCursorPosValid[runCount] = false;
-                    Gdi32.SelectObject(hDC, oldPen);
-                    Gdi32.SelectObject(hDC, oldBrush);
-                    Gdi32.DeleteObject(newPen);
-                    Gdi32.DeleteObject(newBrush);
-                    mapGraphics.ReleaseHdc();
-                    #endregion
-
-                    runCount++;
-                }
-            }
-        }
-        #endregion
-        #region stripchart events
-        private void stripChart_Paint(object sender, PaintEventArgs e)
-        {
-            // nothing to display yet
-            if (globalDisplay.channelRanges.Count == 0)
-            {
-                return;
-            }
-            stripChartStartPosValid = false;
-            stripChartLastCursorPosValid = false;
-
-            PointF startPt = new PointF();
-            PointF endPt = new PointF();
-            Pen drawPen = new Pen(Color.Black, 1);
-            bool initialValue = false;
-            int runCount = 0;
-            if(cmbXAxis.Text.Length > 0)
-            { 
-                xChannelName = cmbXAxis.Text;
-            }
-            // get the graphics context
-            using (Graphics stripChartGraphics = stripChartPanel.CreateGraphics())
-            {
-                runCount = 0;
-
-                // check each Y axis
-                foreach (KeyValuePair<String, Axis> yAxis in stripChartAxes)
-                {
-                    // skip if axis is not displayed
-                    if (!yAxis.Value.ShowAxis)
-                    {
-                        continue;
-                    }
-                    // check each associated axis
-                    foreach(KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
-                    {
-                        // skip if channel is not displayed
-                        if (!curChanInfo.Value.ShowChannel)
-                        {
-                            continue;
-                        }
-                        DataChannel curChannel = dataLogger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
-                        drawPen = new Pen(runDisplay[curChanInfo.Value.RunIndex].channelColor[curChanInfo.Value.ChannelName]);
-
-                        initialValue = false;
-                        foreach (KeyValuePair<float, DataPoint> curData in curChannel.DataPoints)
-                        {
-                            // x axis is time - direct lookup
-                            if (xChannelName == "Time")
-                            {
-                                endPt.X = curData.Key;               // - (float)yAxis.Value.DisplayOffset + runDisplay[runCount].stipchart_Offset[0];
-                                endPt.Y = curData.Value.PointValue;  // - yAxis.Value.AxisRange[0];// - globalDisplay.channelRanges[curChanInfo.ChannelName][0];
-                            }
-                            // x axis is not time - find nearest time in axis channel, 
-                            else
-                            {
-                                DataPoint tst = dataLogger.runData[0].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
-                                endPt.X = tst.PointValue;     // - globalDisplay.channelRanges[xChannelName][0] + runDisplay[runCount].stipchart_Offset[0];
-                                endPt.Y = curData.Value.PointValue;// curData.Value.PointValue;     // - globalDisplay.channelRanges[yChannelName][0];
-                            }
-                            //
-                            // at this point, the value is already offset on the X axis by any user defined time shift
-                            // just need to offset by the stripchart panned position (H scrollbar)
-                            //
-                            endPt = globalDisplay.ScaleDataToDisplay(endPt,                                             // point
-                                                                     stripChartAxes[xChannelName].DisplayScale[0],      // scale X
-                                                                     yAxis.Value.DisplayScale[1],                       // scale Y
-                                                                     stripChartAxes[xChannelName].DisplayOffset,        // offset X
-                                                                     yAxis.Value.AxisRange[0],                          // offset Y
-                                                                     stripChartPanelBounds);                            // graphics area boundary
-                            if ((initialValue) && (startPt.X < stripChartPanelBounds.Width) && (endPt.X > 0))
-                            {
-                                stripChartGraphics.DrawLine(drawPen, startPt, endPt);
-                            }
-                            startPt.X = endPt.X;
-                            startPt.Y = endPt.Y;
-                            initialValue = true;
-                        }
-                    }
-                    runCount++;
-                }
-            }
-        }
-        private void stripChart_MouseMove(object sender, MouseEventArgs e)
-        {
-            if(stripChartAxes.Count == 0)
-            {
-                return;
-            }
-            stripChartPanel.Focus();
-            PointF floatPosition = new PointF(e.X, e.Y);
-            // floatPosition should be offset by the stripchart hScroll position....
-            floatPosition = globalDisplay.ScaleDisplayToData(floatPosition,
-                                             stripChartAxes[xChannelName].DisplayScale[0],// * stripChartScaleFactorX,   // X scale
-                                             1,                                           // Y scale
-                                             stripChartAxes[xChannelName].DisplayOffset,                         // X offset
-                                             0,                         // Y offset
-                                             stripChartPanelBounds);
-
-            #region left mouse button down - dragging zoom region 
-            IntPtr lpPoint = new IntPtr();
-            if (e.Button == MouseButtons.Left)
-            {
-                if (!stripChartStartPosValid)
-                {
-                    #region erase existing cursor lines
-                    using (Graphics drawGraphics = stripChartPanel.CreateGraphics())
-                    {
-                        IntPtr hDC = drawGraphics.GetHdc();
-                        IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-                                                        dragZoomPenWidth,
-                                                        NotRGB(Color.Gray));
-                        IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
-                        IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-                        IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-                        Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
-
-                        Gdi32.MoveToEx(hDC, stripChartLastCursorPosInt.X, 0, lpPoint);
-                        Gdi32.LineTo(hDC, stripChartLastCursorPosInt.X, stripChartPanel.Height);
-
-                        Gdi32.MoveToEx(hDC, 0, stripChartLastCursorPosInt.Y, lpPoint);
-                        Gdi32.LineTo(hDC, stripChartPanel.Width, stripChartLastCursorPosInt.Y);
-
-                        Gdi32.SelectObject(hDC, oldPen);
-                        Gdi32.SelectObject(hDC, oldBrush);
-                        Gdi32.DeleteObject(newPen);
-                        Gdi32.DeleteObject(newBrush);
-                        drawGraphics.ReleaseHdc();
-                    }
-                    #endregion
-                    stripChartStartPosValid = true;
-                    stripChartStartPos = e.Location;
-                    stripChartStartCursorPos = floatPosition;
-                    stripChartStartCursorPosInt = e.Location;
-                }
-                #region zoom box - light gray filled
-                using (Graphics drawGraphics = stripChartPanel.CreateGraphics())
-                {
-                    IntPtr hDC = drawGraphics.GetHdc();
-
-                    IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-                                                    dragZoomPenWidth,
-                                                    NotRGB(Color.Gray));
-                    IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.LTGRAY_BRUSH);
-                    IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-                    IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-                    Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
-
-                    lpPoint = IntPtr.Zero;
-                    // only erase if something was drawn and cursor was moved
-                    if ((stripChartLastCursorPosValid) &&
-                        ((e.Location.X != stripChartLastCursorPosInt.X) || (e.Location.Y != stripChartLastCursorPosInt.Y)))
-                    {
-                        //Gdi32.MoveToEx(hDC, stripChartLastCursorPosInt.X, 0, lpPoint);
-                        //Gdi32.LineTo(hDC, stripChartLastCursorPosInt.X, stripChartPanel.Height);
-
-                        //Gdi32.MoveToEx(hDC, 0, stripChartLastCursorPosInt.Y, lpPoint);
-                        Gdi32.Rectangle(hDC, stripChartStartCursorPosInt.X, 0, stripChartLastCursorPosInt.X, stripChartPanel.Height);
-                        //Gdi32.LineTo(hDC, stripChartPanel.Width, stripChartLastCursorPosInt.Y);
-                    }
-                    // only draw if nothing has been drawn or cursor was moved
-                    if ((!stripChartLastCursorPosValid) ||
-                        ((e.Location.X != stripChartLastCursorPosInt.X) || (e.Location.Y != stripChartLastCursorPosInt.Y)))
-                    {
-                        //Gdi32.MoveToEx(hDC, e.Location.X, 0, lpPoint);
-                        //Gdi32.LineTo(hDC, e.Location.X, stripChartPanel.Height);
-
-                        //Gdi32.MoveToEx(hDC, 0, e.Location.Y, lpPoint);
-                        //Gdi32.LineTo(hDC, stripChartPanel.Width, e.Location.Y);
-                        Gdi32.Rectangle(hDC, stripChartStartCursorPosInt.X, 0, e.X, stripChartPanel.Height);
-
-                    }
-
-                    Gdi32.SelectObject(hDC, oldPen);
-                    Gdi32.SelectObject(hDC, oldBrush);
-                    Gdi32.DeleteObject(newPen);
-                    Gdi32.DeleteObject(newBrush);
-                    drawGraphics.ReleaseHdc();
-                }
-                #endregion
-            }
-            #endregion
-            #region just moving the mouse
-            else
-            {
-                #region vertical cursor
-                using (Graphics drawGraphics = stripChartPanel.CreateGraphics())
-                {
-                    IntPtr hDC = drawGraphics.GetHdc();
-
-                    IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-                                                    dragZoomPenWidth,
-                                                    NotRGB(Color.Gray));
-                    IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
-                    IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-                    IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-                    Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
-
-                    lpPoint = IntPtr.Zero;
-                    // only erase if something was drawn and cursor was moved
-                    if ((stripChartLastCursorPosValid) && 
-                        ((e.Location.X != stripChartLastCursorPosInt.X) || (e.Location.Y != stripChartLastCursorPosInt.Y)))
-                    {
-                        Gdi32.MoveToEx(hDC, stripChartLastCursorPosInt.X, 0, lpPoint);
-                        Gdi32.LineTo(hDC, stripChartLastCursorPosInt.X, stripChartPanel.Height);
-
-                        Gdi32.MoveToEx(hDC, 0, stripChartLastCursorPosInt.Y, lpPoint);
-                        Gdi32.LineTo(hDC, stripChartPanel.Width, stripChartLastCursorPosInt.Y);
-                    }
-                    // only draw if nothing has been drawn or cursor was moved
-                    if ((!stripChartLastCursorPosValid) || 
-                        ((e.Location.X != stripChartLastCursorPosInt.X) || (e.Location.Y != stripChartLastCursorPosInt.Y)))
-                    {
-                        Gdi32.MoveToEx(hDC, e.Location.X, 0, lpPoint);
-                        Gdi32.LineTo(hDC, e.Location.X, stripChartPanel.Height);
-
-                        Gdi32.MoveToEx(hDC, 0, e.Location.Y, lpPoint);
-                        Gdi32.LineTo(hDC, stripChartPanel.Width, e.Location.Y);
-                    }
-
-                    Gdi32.SelectObject(hDC, oldPen);
-                    Gdi32.SelectObject(hDC, oldBrush);
-                    Gdi32.DeleteObject(newPen);
-                    Gdi32.DeleteObject(newBrush);
-                    drawGraphics.ReleaseHdc();
-                }
-                #endregion
-            }
-            #endregion
-            #region update position info text
-            StringBuilder positionStr = new StringBuilder();
-            positionStr.AppendFormat("{0}={1}", xChannelName, floatPosition.X.ToString());
-
-            txtCursorPos.Text = positionStr.ToString();
-            #endregion
-            #region update cursor positions
-            stripChartLastCursorPos = floatPosition;
-            TrackMapUpdateCursor(floatPosition.X);
-            TractionCircleUpdateCursor(floatPosition.X);
-            stripChartLastCursorPosInt = e.Location;
-            stripChartLastCursorPosValid = true;
-            #endregion
-        }
-        private void stripChart_MouseUp(object sender, MouseEventArgs e)
-        {
-            if(stripChartStartPosValid)
-            {
-                // dragged zoom rectangle
-                PointF scaledStart = new PointF(stripChartStartCursorPos.X, stripChartStartCursorPos.Y);
-                PointF scaledEnd = new PointF(stripChartLastCursorPos.X, stripChartLastCursorPos.Y);
-
-                stripChartAxes[xChannelName].DisplayOffset = -1.0F *( scaledStart.X < scaledEnd.X ? scaledStart.X : scaledEnd.X);
-                stripChartAxes[xChannelName].AxisRange[0] = scaledStart.X < scaledEnd.X ? scaledStart.X : scaledEnd.X;
-                stripChartAxes[xChannelName].AxisRange[1] = scaledStart.X < scaledEnd.X ? scaledEnd.X : scaledStart.X;
-                stripChartAxes[xChannelName].AxisRange[2] = stripChartAxes[xChannelName].AxisRange[1] - stripChartAxes[xChannelName].AxisRange[0];
-
-//                stripChartScaleX = (float)stripChartPanelBounds.Width / Math.Abs(scaledEnd.X - scaledStart.X);
-
-                //stripChartScaleFactorX = 1.0F;
-
-                // update associated views to show only current zoomed area
-                stripChartStartPosValid = false;
-                stripChartPanel.Invalidate();
-                mapPanel.Invalidate();
-                tractionCirclePanel.Invalidate();
-            }
-        }
-        private void stripChart_MouseLeave(object sender, EventArgs e)
-        {
-            // if there was a cursor, erase it prior to leaving
-            // also clear cursor marks in map and traction circle
-            if(stripChartLastCursorPosValid)
-            {
-                #region vertical cursor
-                using (Graphics drawGraphics = stripChartPanel.CreateGraphics())
-                {
-                    IntPtr hDC = drawGraphics.GetHdc();
-
-                    IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-                                                    dragZoomPenWidth,// ScalePenWidth(dragZoomPenWidth, subSystems[currentSubsystem].scale),
-                                                    NotRGB(Color.Gray));
-                    IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.NULL_BRUSH);
-                    IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-                    IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-                    Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
-
-                    IntPtr lpPoint = new IntPtr();
-                    lpPoint = IntPtr.Zero;
-
-                    Gdi32.MoveToEx(hDC, stripChartLastCursorPosInt.X, 0, lpPoint);
-                    Gdi32.LineTo(hDC, stripChartLastCursorPosInt.X, stripChartPanel.Height);
-
-                    Gdi32.SelectObject(hDC, oldPen);
-                    Gdi32.SelectObject(hDC, oldBrush);
-                    Gdi32.DeleteObject(newPen);
-                    Gdi32.DeleteObject(newBrush);
-                    drawGraphics.ReleaseHdc();
-                }
-                #endregion
-                TrackMapClearCursor();
-                TractionCircleClearCursor();
-            }
-            stripChartLastCursorPosValid = false;
-        }
-        private void stripChart_KeyDown(object sender, KeyPressEventArgs e)
-        {
-            if ((e.KeyChar == '1') || (e.KeyChar == 'R') || (e.KeyChar == 'r'))
-            {
-                //stripChartScaleFactorX = 1.0F;
-                stripChartPanel.Invalidate();
-                tractionCirclePanel.Invalidate();
-                mapPanel.Invalidate();
-            }
-        }
-        private void stripChart_Resize(object sender, EventArgs e)
-        {
-            stripChartPanelBounds.X = stripChartPanelBorder;
-            stripChartPanelBounds.Y = stripChartPanelBorder;
-            stripChartPanelBounds.Width = stripChartPanel.Width - (2 * stripChartPanelBorder);
-            stripChartPanelBounds.Height = stripChartPanel.Height - (2 * stripChartPanelBorder);
-
-            foreach (KeyValuePair<String, Axis> axisInfo in stripChartAxes)
-            {
-                axisInfo.Value.DisplayScale[0] = (float)stripChartPanel.Width / axisInfo.Value.AxisRange[2];
-                axisInfo.Value.DisplayScale[1] = (float)stripChartPanel.Height / axisInfo.Value.AxisRange[2];
-            }
-
-            stripChartPanel.Invalidate();
-        }
-        private void stripChartPanel_Layout(object sender, LayoutEventArgs e)
-        {
-            stripChartPanelBounds.X = stripChartPanelBorder;
-            stripChartPanelBounds.Y = stripChartPanelBorder;
-            stripChartPanelBounds.Width = stripChartPanel.Width - (2 * stripChartPanelBorder);
-            stripChartPanelBounds.Height = stripChartPanel.Height - (2 * stripChartPanelBorder);
-        }
-        #endregion
         #region data grid events
         private void RunDataGrid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -1838,9 +835,9 @@ namespace YamuraLog
                 runDisplay[e.RowIndex].runColor = resultColor;
 
                 runDataGrid.Invalidate();
-                mapPanel.Invalidate();
-                tractionCirclePanel.Invalidate();
-                stripChartPanel.Invalidate();
+                trackMap.Invalidate();
+                tractionCircle.Invalidate();
+                stripChart.Invalidate();
             }
             return;
         }
@@ -1850,9 +847,9 @@ namespace YamuraLog
             if (e.RowIndex >= 0 && ((e.ColumnIndex == runDataGrid.Columns["colTraceColor"].Index) ||
                                     (e.ColumnIndex == runDataGrid.Columns["colShowRun"].Index)))
             {
-                mapPanel.Invalidate();
-                tractionCirclePanel.Invalidate();
-                stripChartPanel.Invalidate();
+                stripChart.Invalidate();
+                trackMap.Invalidate();
+                tractionCircle.Invalidate();
             }
             return;
         }
@@ -1862,9 +859,9 @@ namespace YamuraLog
             {
                 runDisplay[e.RowIndex].stipchart_Offset[0] = Convert.ToSingle(runDataGrid.Rows[e.RowIndex].Cells["colOffsetTime"].Value);
                 runDataGrid.Invalidate();
-                mapPanel.Invalidate();
-                tractionCirclePanel.Invalidate();
-                stripChartPanel.Invalidate();
+                trackMap.Invalidate();
+                tractionCircle.Invalidate();
+                stripChart.Invalidate();
             }
             return;
         }
@@ -1876,40 +873,6 @@ namespace YamuraLog
                 runDataGrid.EndEdit();
             }
 
-        }
-        #endregion
-        #region Y axis channel grid events
-        private void YAxisChannelDataGrid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            //if(e.RowIndex < 0)
-            //{
-            //    return;
-            //}
-            //int runNum = Convert.ToInt32(channelDataGrid.Rows[e.RowIndex].Cells["runName"].Value.ToString()) - 1;
-            //String channelName = channelDataGrid.Rows[e.RowIndex].Cells["channelName"].Value.ToString();
-            ////// Ignore clicks that are not on button cells. 
-            //if (e.ColumnIndex == channelDataGrid.Columns["displayChannel"].Index)
-            //{
-            //    channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value = !(bool)channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value;
-
-            //    runDisplay[runNum].channelDisplay[channelName] = (bool)channelDataGrid.Rows[e.RowIndex].Cells["displayChannel"].Value;
-
-            //    stripChartPanel.Invalidate();
-            //}
-            //else if (e.ColumnIndex == channelDataGrid.Columns["channelColor"].Index)
-            //{
-            //    if(colorDialog1.ShowDialog() == DialogResult.OK)
-            //    {
-            //        Color resultColor = colorDialog1.Color;
-            //        channelDataGrid.Rows[e.RowIndex].Cells["channelColor"].Style.BackColor = resultColor;
-            //        channelDataGrid.Rows[e.RowIndex].Cells["channelColor"].Style.SelectionBackColor = resultColor;
-            //        runDisplay[runNum].channelColor[channelName] = resultColor;
-            //        channelDataGrid.Invalidate();
-
-            //    }
-            //    stripChartPanel.Invalidate();
-            //}
-            //return;
         }
         #endregion
         #region GDI support
@@ -1959,198 +922,6 @@ namespace YamuraLog
             return (float)rad;
         }
         #endregion
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void yAxisDataGrid_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            String axisName = yAxisDataGrid.Rows[e.RowIndex].Cells["yAxisName"].Value.ToString();
-            if (e.ColumnIndex == yAxisDataGrid.Columns["yAxisUse"].Index)
-            {
-                stripChartAxes[axisName].ShowAxis = (bool)(yAxisDataGrid.Rows[e.RowIndex].Cells["yAxisUse"].Value);
-                stripChartPanel.Invalidate();
-            }
-            else if (e.ColumnIndex == yAxisDataGrid.Columns["axisMin"].Index)
-            {
-                stripChartAxes[axisName].AxisRange[0] = Convert.ToSingle(yAxisDataGrid.Rows[e.RowIndex].Cells["axisMin"].Value);
-                stripChartAxes[axisName].AxisRange[2] = stripChartAxes[axisName].AxisRange[1] - stripChartAxes[axisName].AxisRange[0];
-                stripChartAxes[axisName].DisplayOffset = stripChartAxes[axisName].AxisRange[0];
-
-                stripChartAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / stripChartAxes[axisName].AxisRange[2];
-                stripChartAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / stripChartAxes[axisName].AxisRange[2];
-            }
-            else if (e.ColumnIndex == yAxisDataGrid.Columns["axisMax"].Index)
-            {
-                stripChartAxes[axisName].AxisRange[1] = Convert.ToSingle(yAxisDataGrid.Rows[e.RowIndex].Cells["axisMax"].Value);
-                stripChartAxes[axisName].AxisRange[2] = stripChartAxes[axisName].AxisRange[1] - stripChartAxes[axisName].AxisRange[0];
-
-                stripChartAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / stripChartAxes[axisName].AxisRange[2];
-                stripChartAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / stripChartAxes[axisName].AxisRange[2];
-            }
-            return;
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void treeView1_AfterCheck(object sender, TreeViewEventArgs e)
-        {
-            // axis
-            if(e.Node.Parent == null)
-            {
-                /*stripChartAxes*/globalAxes[e.Node.Name].ShowAxis = e.Node.Checked;
-            }
-            // channel
-            else
-            {
-                e.Node.Parent.Checked = e.Node.Checked;
-                /*stripChartAxes*/globalAxes[e.Node.Parent.Name].AssociatedChannels[e.Node.Text].ShowChannel = e.Node.Checked;
-                /*stripChartAxes*/globalAxes[e.Node.Parent.Name].ShowAxis = e.Node.Checked == true ? true : /*stripChartAxes*/globalAxes[e.Node.Parent.Name].ShowAxis;
-            }
-            stripChartPanel.Invalidate();
-        }
-        #region channel context menu handlers
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void channelsContext_Opening(object sender, CancelEventArgs e)
-        {
-            if(axisChannelTree.SelectedNode == null)
-            {
-                e.Cancel = true;
-                return;
-            }
-            if (axisChannelTree.SelectedNode.Parent == null)
-            {
-                channelsContext.Items["axisExtents"].Enabled = true;
-                channelsContext.Items["channelInfo"].Enabled = false;
-            }
-            else
-            {
-                channelsContext.Items["axisExtents"].Enabled = false;
-                channelsContext.Items["channelInfo"].Enabled = true;
-            }
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void axisInfo_Click(object sender, EventArgs e)
-        {
-            String axisName = axisChannelTree.SelectedNode.Text;
-
-            AxisInfo axisDlg = new AxisInfo();
-            axisDlg.Text = axisName + " Info";
-            axisDlg.RangeMinimum = globalAxes[axisName].AxisRange[0];
-            axisDlg.RangeMaximum = globalAxes[axisName].AxisRange[1];
-            if (axisDlg.ShowDialog() == DialogResult.OK)
-            {
-                globalAxes[axisName].AxisRange[0] = axisDlg.RangeMinimum;
-                globalAxes[axisName].AxisRange[1] = axisDlg.RangeMaximum;
-                globalAxes[axisName].AxisRange[2] = globalAxes[axisName].AxisRange[1] - globalAxes[axisName].AxisRange[0];
-                globalAxes[axisName].DisplayOffset = -1 * globalAxes[axisName].AxisRange[0];
-                globalAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / globalAxes[axisName].AxisRange[2];
-                globalAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / globalAxes[axisName].AxisRange[2];
-
-                stripChartPanel.Invalidate();
-            }
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void channelInfo_Click(object sender, EventArgs e)
-        {
-            String channelFullName = axisChannelTree.SelectedNode.Text;
-            int runIdx = Convert.ToInt32(channelFullName.Substring(0, channelFullName.IndexOf('-')));
-            String channelName = channelFullName.Substring(channelFullName.IndexOf('-') + 1);
-
-            ChannelInfoForm channelDlg = new ChannelInfoForm();
-            channelDlg.Text = channelFullName + " Info";
-
-            channelDlg.RangeMinimum = dataLogger.runData[runIdx].channels[channelName].DataRange[0];
-            channelDlg.RangeMaximum = dataLogger.runData[runIdx].channels[channelName].DataRange[1];
-            channelDlg.ChannelColor = runDisplay[runIdx].channelColor[channelName];
-
-            if (channelDlg.ShowDialog() == DialogResult.OK)
-            {
-                runDisplay[runIdx].channelColor[channelName] = channelDlg.ChannelColor;
-
-                globalAxes[channelName].AssociatedChannels[(runIdx.ToString() + "-" + channelName)].ChannelColor = channelDlg.ChannelColor;
-
-                stripChartPanel.Invalidate();
-                chartControl1.Invalidate();
-            }
-        }
-        #endregion
-    }
-    /// <summary>
-    /// display info for all data
-    /// </summary>
-    public partial class GlobalDisplay_Data
-    {
-        // ranges for all data in a channel for all runs
-        // for example, if 'Time' in run 1 is 0-120 and 'Time' in run 2 is 0-360, channelRange["Time"] will be 0-360
-        public Dictionary<String, float[]> channelRanges = new Dictionary<String, float[]>();
-
-        public void AddChannel(String channelName)
-        {
-            if(!channelRanges.ContainsKey(channelName))
-            {
-                channelRanges.Add(channelName, new float[] { float.MaxValue, float.MinValue });
-            }
-        }
-        public void UpdateChannelRange(String channelName, float value)
-        {
-            channelRanges[channelName][0] = value < channelRanges[channelName][0] ? value : channelRanges[channelName][0];
-            channelRanges[channelName][1] = value > channelRanges[channelName][1] ? value : channelRanges[channelName][1];
-        }
-        /// <summary>
-        /// convert sourcePt from data units to display units
-        /// </summary>
-        /// <param name="sourcePt"></param>
-        /// <param name="scaleX"></param>
-        /// <param name="scaleY"></param>
-        /// <param name="offsetX"></param>
-        /// <param name="offsetY"></param>
-        /// <param name="bounds"></param>
-        /// <returns></returns>
-        public PointF ScaleDataToDisplay(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
-        {
-            PointF rPt = new PointF(sourcePt.X, sourcePt.Y);
-            rPt.X = (rPt.X + offsetX) * scaleX + bounds.X;
-            rPt.Y = bounds.Height - ((rPt.Y - offsetY) * scaleY) + bounds.Y;
-            return rPt;
-        }
-        /// <summary>
-        /// convert sourcePt from display units to data units
-        /// </summary>
-        /// <param name="sourcePt"></param>
-        /// <param name="scaleX"></param>
-        /// <param name="scaleY"></param>
-        /// <param name="offsetX"></param>
-        /// <param name="offsetY"></param>
-        /// <param name="bounds"></param>
-        /// <returns></returns>
-        public PointF ScaleDisplayToData(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
-        {
-            PointF rPt = new PointF(sourcePt.X, sourcePt.Y);
-            rPt.X = (rPt.X / scaleX) - offsetX;
-            rPt.Y = -1.0F * ((rPt.Y - (float)bounds.Height ) / scaleY) - offsetY;
-            return rPt;
-        }
-        public void Reset()
-        {
-            channelRanges.Clear();
-        }
     }
     /// <summary>
     /// display infor for runs and channels
