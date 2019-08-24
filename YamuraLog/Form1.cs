@@ -52,30 +52,52 @@ namespace YamuraLog
             runDataGrid.CellEndEdit += new DataGridViewCellEventHandler(RunDataGrid_CellEndEdit);
             runDataGrid.CellValueChanged += new DataGridViewCellEventHandler(RunDataGrid_CellValueChanged);
             runDataGrid.CellMouseUp += new DataGridViewCellMouseEventHandler(RunDataGrid_CellMouseUp);
-            
+
             // initialize the chart controls
+            // stripchart
+            stripChart.ChartName = "Stripchart";
             stripChart.Logger = dataLogger;
             stripChart.CursorMode = ChartControl.CursorStyle.CROSSHAIRS;
             stripChart.CursorUpdateSource = true;
             stripChart.ChartAxes = new Dictionary<string, Axis>();
             stripChart.ShowHScroll = true;
             stripChart.ShowVScroll = true;
-
+            // traction circle
+            tractionCircle.ChartName = "Traction Circle";
             tractionCircle.Logger = dataLogger;
             tractionCircle.CursorMode = ChartControl.CursorStyle.BOX;
             tractionCircle.CursorUpdateSource = false;
             tractionCircle.ChartAxes = new Dictionary<string, Axis>();
             tractionCircle.ShowHScroll = false;
             tractionCircle.ShowVScroll = false;
-
+            // track map
+            trackMap.ChartName = "Track Map";
             trackMap.Logger = dataLogger;
             trackMap.CursorMode = ChartControl.CursorStyle.BOX;
             trackMap.CursorUpdateSource = false;
             trackMap.ChartAxes = new Dictionary<string, Axis>();
             trackMap.ShowHScroll = false;
             trackMap.ShowVScroll = false;
+            // stripchart mouse move event handlers
+            stripChart.ChartMouseMoveEvent += OnChartMouseMove;// new ChartMouseMove(OnChartMouseMove);
+            stripChart.ChartMouseMoveEvent += tractionCircle.OnChartMouseMove;
+            stripChart.ChartMouseMoveEvent += trackMap.OnChartMouseMove;
         }
-
+        #region event handlers       
+        /// <summary>
+        /// handle mouse move events from stripchart
+        /// do nothing for now
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnChartMouseMove(object sender, ChartControlMouseMoveEventArgs e)
+        {
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnClearAll_Click(object sender, EventArgs e)
         {
             runDataGrid.Rows.Clear();
@@ -88,6 +110,11 @@ namespace YamuraLog
             tractionCircle.Invalidate();
             trackMap.Invalidate();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnOpenFile_Click(object sender, EventArgs e)
         {
             if (openLogFile.ShowDialog() != DialogResult.OK)
@@ -106,6 +133,11 @@ namespace YamuraLog
             tractionCircle.Invalidate();
             trackMap.Invalidate();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnAutoAlign_Click(object sender, EventArgs e)
         {
             float autoThreshold = 0.0F;
@@ -120,6 +152,7 @@ namespace YamuraLog
             }
             AutoAlign(autoThreshold);
         }
+        #endregion
         #region read log file
         private void ReadTXTFile(String fileName)
         {
@@ -912,7 +945,7 @@ namespace YamuraLog
         #endregion
     }
     /// <summary>
-    /// display infor for runs and channels
+    /// display info for runs and channels
     /// </summary>
     public partial class RunDisplay_Data
     {

@@ -12,8 +12,11 @@ using Win32Interop.Methods;
 
 namespace YamuraLog
 {
+    public delegate void ChartMouseMove(object sender, ChartControlMouseMoveEventArgs e);
     public partial class ChartControl : UserControl
     {
+        public event ChartMouseMove ChartMouseMoveEvent;
+
         public enum DrawMode
         {
             R2_BLACK = 1,  // Pixel is always black.
@@ -56,6 +59,13 @@ namespace YamuraLog
         {
             get { return chartAxes; }
             set { chartAxes = value; }
+        }
+
+        string chartName = "Chart";
+        public string ChartName
+        {
+            get { return chartName; }
+            set { chartName = value; }
         }
 
         int dragZoomPenWidth = 1;
@@ -162,6 +172,18 @@ namespace YamuraLog
             CursorUpdateSource = true;
         }
 
+        #region control message handlers
+        /// <summary>
+        /// when the control sizes, update positions of the axes and chart it contains
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ChartControl_Resize(object sender, EventArgs e)
+        {
+            UpdateElementPositions();
+        }
+        #endregion
+
         #region chart message handlers
         /// <summary>
         /// 
@@ -170,7 +192,6 @@ namespace YamuraLog
         /// <param name="e"></param>
         private void chartPanel_Paint(object sender, PaintEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("cursors invalid");
             startMouseDrag = false;
             startMouseMove = false;
             // nothing to display yet
@@ -255,7 +276,6 @@ namespace YamuraLog
         /// <param name="e"></param>
         private void chartPanel_Resize(object sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Panel");
             // update the paintable area
             chartBounds.X = chartBorder;
             chartBounds.Y = chartBorder;
@@ -340,7 +360,55 @@ namespace YamuraLog
             }
             #endregion
             // up to now, dealing in screen units. convert current position to X axis value and active Y axis values and raise message
+            if(chartAxes.Count == 0)
+            {
+                return;
+            }
+            // create event args
+            ChartControlMouseMoveEventArgs moveEventArgs = new ChartControlMouseMoveEventArgs();
+            
+            PointF axisPoint = new PointF();
+            // x and y scale
+            float[] displayScale = new float[] { 1.0F, 1.0F };
+            displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisRange[2];
 
+            foreach (KeyValuePair<string, ChannelInfo> channel in chartAxes[xChannelName].AssociatedChannels)
+            {
+                displayScale[1] = 1.0F;
+
+                axisPoint.X = (float)e.Location.X;
+                axisPoint.Y = (float)e.Location.Y;
+
+                axisPoint = ScaleDisplayToData(axisPoint,
+                                   displayScale[0],
+                                   displayScale[1],
+                                   0.0F,
+                                   0.0F,
+                                   chartBounds);
+                moveEventArgs.XAxisValues.Add(channel.Value.RunIndex.ToString() + "-" + channel.Value.ChannelName, axisPoint.X);
+            }
+            foreach (KeyValuePair<string, Axis> axis in chartAxes)
+            {
+                if (!axis.Value.ShowAxis)
+                {
+                    continue;
+                }
+                foreach (KeyValuePair<string, ChannelInfo> channel in axis.Value.AssociatedChannels)
+                {
+                    displayScale[1] = (float)chartBounds.Height / axis.Value.AxisRange[2];
+                    axisPoint.X = (float)e.Location.X;
+                    axisPoint.Y = (float)e.Location.Y;
+
+                    axisPoint = ScaleDisplayToData(axisPoint,
+                                       displayScale[0],
+                                       displayScale[1],
+                                       0.0F,
+                                       0.0F,
+                                       chartBounds);
+                    moveEventArgs.YAxisValues.Add(channel.Value.RunIndex.ToString() + "-" + channel.Value.ChannelName, axisPoint.Y);
+                }
+            }
+            ChartMouseMoveEvent(this, moveEventArgs);        
         }
         /// <summary>
         /// 
@@ -385,6 +453,9 @@ namespace YamuraLog
         //        mapPanel.Invalidate();
         //    }
         //}
+        #endregion
+
+        #region scollbar message handlers
         #endregion
 
         #region GDI support
@@ -552,15 +623,6 @@ namespace YamuraLog
         #endregion
 
         /// <summary>
-        /// when the control sizes, update positions of the axes and chart it contains
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ChartControl_Resize(object sender, EventArgs e)
-        {
-            UpdateElementPositions();
-        }
-        /// <summary>
         /// 
         /// </summary>
         void UpdateElementPositions()
@@ -596,5 +658,41 @@ namespace YamuraLog
             chartPanel.Width = chartRect.Width;
             chartPanel.Height = chartRect.Height;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void OnChartMouseMove(object sender, ChartControlMouseMoveEventArgs e)
+        {
+            System.Diagnostics.Debug.Write("Chart mouse move received by " + ChartName + " from " + (sender as ChartControl).ChartName +  " X axes: ");
+            foreach (KeyValuePair<string, float> kvp in e.XAxisValues)
+            {
+                System.Diagnostics.Debug.Write(">> " + kvp.Key + " " + kvp.Value.ToString() + " << ");
+            }
+            System.Diagnostics.Debug.WriteLine("");
+            System.Diagnostics.Debug.Write("                 Y axes: ");
+            foreach (KeyValuePair<string, float> kvp in e.YAxisValues)
+            {
+                System.Diagnostics.Debug.Write(">> " + kvp.Key + " " + kvp.Value.ToString() + " << ");
+            }
+            System.Diagnostics.Debug.WriteLine("");
+        }
+    }
+    public class ChartControlMouseMoveEventArgs : EventArgs
+    {
+        Dictionary<string, float> xAxisValues = new Dictionary<string, float>();
+        public Dictionary<string, float> XAxisValues
+        {
+            get { return xAxisValues; }
+            set { xAxisValues = value; }
+        }
+        Dictionary<string, float> yAxisValues = new Dictionary<string, float>();
+        public Dictionary<string, float> YAxisValues
+        {
+            get { return yAxisValues; }
+            set { yAxisValues = value; }
+        }
+
     }
 }
