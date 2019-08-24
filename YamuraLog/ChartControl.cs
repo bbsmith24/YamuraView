@@ -134,21 +134,7 @@ namespace YamuraLog
             set
             {
                 showHScroll = value;
-                hScrollBar.Visible = showHScroll;
-                if (showHScroll)
-                {
-                    hScrollBar.Height = 17;
-                    hScrollBar.Width = Width - 17;
-                    hScrollBar.Location = new Point(17, Height - 17);
-                    chartPanel.Location = new Point(17, 0);
-                    chartPanel.Width = Width - 17;
-                }
-                else
-                {
-                    hScrollBar.Location = new Point(0, 0);
-                    chartPanel.Location = new Point(0, 0);
-                    chartPanel.Width = Width;
-                }
+                UpdateElementPositions();
             }
         }
 
@@ -162,20 +148,7 @@ namespace YamuraLog
             set
             {
                 showVScroll = value;
-                vScrollBar.Visible = showVScroll;
-                if (showVScroll)
-                {
-                    vScrollBar.Height = Height - 17;
-                    vScrollBar.Width = 17;
-                    chartPanel.Height = Height - 17;
-                    vScrollBar.Location = new Point(0, 0);
-                }
-                else
-                {
-                    chartPanel.Height = Height;
-                    vScrollBar.Location = new Point(0, 0);
-                }
-
+                UpdateElementPositions();
             }
         }
 
@@ -282,6 +255,7 @@ namespace YamuraLog
         /// <param name="e"></param>
         private void chartPanel_Resize(object sender, EventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine("Panel");
             // update the paintable area
             chartBounds.X = chartBorder;
             chartBounds.Y = chartBorder;
@@ -577,6 +551,50 @@ namespace YamuraLog
         }
         #endregion
 
-    }
+        /// <summary>
+        /// when the control sizes, update positions of the axes and chart it contains
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ChartControl_Resize(object sender, EventArgs e)
+        {
+            UpdateElementPositions();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        void UpdateElementPositions()
+        {
+            Rectangle chartRect = new Rectangle();
+            // default shown positions
+            hScrollBar.Height = 17;
+            hScrollBar.Width = Width - 17;
+            hScrollBar.Location = new Point(17, Height - 17);
 
+            vScrollBar.Height = Height - 17;
+            vScrollBar.Width = 17;
+            vScrollBar.Location = new Point(0, 0);
+
+            chartRect.X = 17;
+            chartRect.Y = 0;
+            chartRect.Width = Width - 17;
+            chartRect.Height = Height - 17;
+
+            if (!showHScroll)
+            {
+                hScrollBar.Visible = false;
+                chartRect.Height = Height;
+            }
+            if (!showVScroll)
+            {
+                vScrollBar.Visible = false;
+                chartRect.X = 0;
+                chartRect.Width = Width;
+            }
+
+            chartPanel.Location = chartRect.Location;
+            chartPanel.Width = chartRect.Width;
+            chartPanel.Height = chartRect.Height;
+        }
+    }
 }
