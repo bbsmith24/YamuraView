@@ -201,62 +201,62 @@
             // 
             // trackMap
             // 
-            this.trackMap.AllowDrag = true;
+            this.trackMap.chartViewForm.AllowDrag = true;
             this.trackMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.trackMap.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.trackMap.ChartAxes = null;
             this.trackMap.ChartName = "Chart";
-            this.trackMap.CursorBoxSize = 10;
-            this.trackMap.CursorMode = YamuraLog.ChartControl.CursorStyle.CROSSHAIRS;
-            this.trackMap.CursorUpdateSource = true;
+            this.trackMap.chartViewForm.CursorBoxSize = 10;
+            this.trackMap.chartViewForm.CursorMode = YamuraLog.ChartView.CursorStyle.CROSSHAIRS;
+            this.trackMap.chartViewForm.CursorUpdateSource = true;
             this.trackMap.Location = new System.Drawing.Point(1194, 305);
             this.trackMap.Logger = null;
             this.trackMap.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.trackMap.Name = "trackMap";
-            this.trackMap.ShowHScroll = true;
-            this.trackMap.ShowVScroll = true;
+            this.trackMap.chartViewForm.ShowHScroll = true;
+            this.trackMap.chartViewForm.ShowVScroll = true;
             this.trackMap.Size = new System.Drawing.Size(471, 684);
             this.trackMap.TabIndex = 36;
             // 
             // tractionCircle
             // 
-            this.tractionCircle.AllowDrag = true;
+            this.tractionCircle.chartViewForm.AllowDrag = true;
             this.tractionCircle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tractionCircle.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tractionCircle.ChartAxes = null;
             this.tractionCircle.ChartName = "Chart";
-            this.tractionCircle.CursorBoxSize = 10;
-            this.tractionCircle.CursorMode = YamuraLog.ChartControl.CursorStyle.CROSSHAIRS;
-            this.tractionCircle.CursorUpdateSource = true;
+            this.tractionCircle.chartViewForm.CursorBoxSize = 10;
+            this.tractionCircle.chartViewForm.CursorMode = YamuraLog.ChartView.CursorStyle.CROSSHAIRS;
+            this.tractionCircle.chartViewForm.CursorUpdateSource = true;
             this.tractionCircle.Location = new System.Drawing.Point(1192, 18);
             this.tractionCircle.Logger = null;
             this.tractionCircle.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.tractionCircle.Name = "tractionCircle";
-            this.tractionCircle.ShowHScroll = true;
-            this.tractionCircle.ShowVScroll = true;
+            this.tractionCircle.chartViewForm.ShowHScroll = true;
+            this.tractionCircle.chartViewForm.ShowVScroll = true;
             this.tractionCircle.Size = new System.Drawing.Size(471, 276);
             this.tractionCircle.TabIndex = 35;
             // 
             // stripChart
             // 
-            this.stripChart.AllowDrag = true;
+            this.stripChart.chartViewForm.AllowDrag = true;
             this.stripChart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.stripChart.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.stripChart.ChartAxes = null;
             this.stripChart.ChartName = "Chart";
-            this.stripChart.CursorBoxSize = 10;
-            this.stripChart.CursorMode = YamuraLog.ChartControl.CursorStyle.CROSSHAIRS;
-            this.stripChart.CursorUpdateSource = false;
+            this.stripChart.chartViewForm.CursorBoxSize = 10;
+            this.stripChart.chartViewForm.CursorMode = YamuraLog.ChartView.CursorStyle.CROSSHAIRS;
+            this.stripChart.chartViewForm.CursorUpdateSource = false;
             this.stripChart.Location = new System.Drawing.Point(17, 308);
             this.stripChart.Logger = null;
             this.stripChart.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.stripChart.Name = "stripChart";
-            this.stripChart.ShowHScroll = true;
-            this.stripChart.ShowVScroll = true;
+            this.stripChart.chartViewForm.ShowHScroll = true;
+            this.stripChart.chartViewForm.ShowVScroll = true;
             this.stripChart.Size = new System.Drawing.Size(1166, 681);
             this.stripChart.TabIndex = 34;
             // 

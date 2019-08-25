@@ -57,31 +57,34 @@ namespace YamuraLog
             // stripchart
             stripChart.ChartName = "Stripchart";
             stripChart.Logger = dataLogger;
-            stripChart.CursorMode = ChartControl.CursorStyle.CROSSHAIRS;
-            stripChart.CursorUpdateSource = true;
+            stripChart.chartViewForm.CursorMode = ChartView.CursorStyle.CROSSHAIRS;
+            stripChart.chartViewForm.CursorUpdateSource = true;
             stripChart.ChartAxes = new Dictionary<string, Axis>();
-            stripChart.ShowHScroll = true;
-            stripChart.ShowVScroll = true;
+            stripChart.chartViewForm.ShowHScroll = true;
+            stripChart.chartViewForm.ShowVScroll = true;
+            stripChart.chartPropertiesForm.ChartXAxisChangeEvent += stripChart.chartViewForm.OnChartXAxisChange;
             // traction circle
             tractionCircle.ChartName = "Traction Circle";
             tractionCircle.Logger = dataLogger;
-            tractionCircle.CursorMode = ChartControl.CursorStyle.BOX;
-            tractionCircle.CursorUpdateSource = false;
+            tractionCircle.chartViewForm.CursorMode = ChartView.CursorStyle.BOX;
+            tractionCircle.chartViewForm.CursorUpdateSource = false;
             tractionCircle.ChartAxes = new Dictionary<string, Axis>();
-            tractionCircle.ShowHScroll = false;
-            tractionCircle.ShowVScroll = false;
+            tractionCircle.chartViewForm.ShowHScroll = false;
+            tractionCircle.chartViewForm.ShowVScroll = false;
+            tractionCircle.chartPropertiesForm.ChartXAxisChangeEvent += tractionCircle.chartViewForm.OnChartXAxisChange;
             // track map
             trackMap.ChartName = "Track Map";
             trackMap.Logger = dataLogger;
-            trackMap.CursorMode = ChartControl.CursorStyle.BOX;
-            trackMap.CursorUpdateSource = false;
+            trackMap.chartViewForm.CursorMode = ChartView.CursorStyle.BOX;
+            trackMap.chartViewForm.CursorUpdateSource = false;
             trackMap.ChartAxes = new Dictionary<string, Axis>();
-            trackMap.ShowHScroll = false;
-            trackMap.ShowVScroll = false;
+            trackMap.chartViewForm.ShowHScroll = false;
+            trackMap.chartViewForm.ShowVScroll = false;
+            trackMap.chartPropertiesForm.ChartXAxisChangeEvent += trackMap.chartViewForm.OnChartXAxisChange;
             // stripchart mouse move event handlers
-            stripChart.ChartMouseMoveEvent += OnChartMouseMove;// new ChartMouseMove(OnChartMouseMove);
-            stripChart.ChartMouseMoveEvent += tractionCircle.OnChartMouseMove;
-            stripChart.ChartMouseMoveEvent += trackMap.OnChartMouseMove;
+            stripChart.chartViewForm.ChartMouseMoveEvent += OnChartMouseMove;// new ChartMouseMove(OnChartMouseMove);
+            stripChart.chartViewForm.ChartMouseMoveEvent += tractionCircle.chartViewForm.OnChartMouseMove;
+            stripChart.chartViewForm.ChartMouseMoveEvent += trackMap.chartViewForm.OnChartMouseMove;
         }
         #region event handlers       
         /// <summary>
@@ -745,7 +748,7 @@ namespace YamuraLog
                     //tractionCircle.ChartAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / tractionCircle.ChartAxes[axisName].AxisRange[2];
                     tractionCircle.ChartAxes[axisName].DisplayOffset = -1 * tractionCircle.ChartAxes[axisName].AxisRange[0];
                     #endregion
-                    #region traction circle control axes create/update
+                    #region track map control axes create/update
                     if (trackMap.ChartAxes.ContainsKey(axisName))
                     {
                         trackMap.ChartAxes[axisName].AxisRange[0] = trackMap.ChartAxes[axisName].AxisRange[0] < curChannel.Value.DataRange[0] ? trackMap.ChartAxes[axisName].AxisRange[0] : curChannel.Value.DataRange[0];
@@ -767,12 +770,28 @@ namespace YamuraLog
                     #endregion
                     channelIdx++;
                 }
+                stripChart.chartViewForm.ChartAxes = stripChart.ChartAxes;
+                stripChart.chartPropertiesForm.ChartAxes = stripChart.ChartAxes;
+                tractionCircle.chartViewForm.ChartAxes = tractionCircle.ChartAxes;
+                tractionCircle.chartPropertiesForm.ChartAxes = tractionCircle.ChartAxes;
+                trackMap.chartViewForm.ChartAxes = trackMap.ChartAxes;
+                trackMap.chartPropertiesForm.ChartAxes = trackMap.ChartAxes;
+
+                stripChart.Logger = dataLogger;
+                stripChart.chartViewForm.Logger = dataLogger;
+
+                tractionCircle.Logger = dataLogger;
+                tractionCircle.chartViewForm.Logger = dataLogger;
+
+                trackMap.Logger = dataLogger;
+                trackMap.chartViewForm.Logger = dataLogger;
             }
             #endregion
 
             // auto align launches
             AutoAlign(0.10F);
 
+            #region populate run data grid
             runDataGrid.Rows.Clear();
             for (int runGridIdx = 0; runGridIdx < runDisplay.Count(); runGridIdx++)
             {
@@ -786,6 +805,7 @@ namespace YamuraLog
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runGridIdx].fileName.ToString();
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
             }
+            #endregion
         }
         #endregion
         #region Auto align

@@ -29,27 +29,11 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.chartPanel = new System.Windows.Forms.Panel();
             this.chartControlContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.selectAxesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.vScrollBar = new System.Windows.Forms.VScrollBar();
-            this.hScrollBar = new System.Windows.Forms.HScrollBar();
+            this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.chartControlContextMenu.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // chartPanel
-            // 
-            this.chartPanel.BackColor = System.Drawing.Color.White;
-            this.chartPanel.ContextMenuStrip = this.chartControlContextMenu;
-            this.chartPanel.Location = new System.Drawing.Point(26, 0);
-            this.chartPanel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.chartPanel.Name = "chartPanel";
-            this.chartPanel.Size = new System.Drawing.Size(705, 565);
-            this.chartPanel.TabIndex = 0;
-            this.chartPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.chartPanel_Paint);
-            this.chartPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chartPanel_MouseMove);
-            this.chartPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.chartPanel_MouseUp);
-            this.chartPanel.Resize += new System.EventHandler(this.chartPanel_Resize);
             // 
             // chartControlContextMenu
             // 
@@ -57,52 +41,39 @@
             this.chartControlContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.selectAxesMenuItem});
             this.chartControlContextMenu.Name = "chartControlContextMenu";
-            this.chartControlContextMenu.Size = new System.Drawing.Size(173, 34);
+            this.chartControlContextMenu.Size = new System.Drawing.Size(134, 26);
             // 
             // selectAxesMenuItem
             // 
             this.selectAxesMenuItem.Name = "selectAxesMenuItem";
-            this.selectAxesMenuItem.Size = new System.Drawing.Size(172, 30);
+            this.selectAxesMenuItem.Size = new System.Drawing.Size(133, 22);
             this.selectAxesMenuItem.Text = "Select Axes";
-            this.selectAxesMenuItem.Click += new System.EventHandler(this.selectAxesMenuItem_Click);
             // 
-            // vScrollBar
+            // dockPanel1
             // 
-            this.vScrollBar.Location = new System.Drawing.Point(0, 0);
-            this.vScrollBar.Name = "vScrollBar";
-            this.vScrollBar.Size = new System.Drawing.Size(17, 565);
-            this.vScrollBar.TabIndex = 1;
-            // 
-            // hScrollBar
-            // 
-            this.hScrollBar.Location = new System.Drawing.Point(26, 568);
-            this.hScrollBar.Name = "hScrollBar";
-            this.hScrollBar.Size = new System.Drawing.Size(705, 17);
-            this.hScrollBar.TabIndex = 2;
+            this.dockPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dockPanel1.DocumentStyle = WeifenLuo.WinFormsUI.Docking.DocumentStyle.DockingWindow;
+            this.dockPanel1.Location = new System.Drawing.Point(0, 0);
+            this.dockPanel1.Name = "dockPanel1";
+            this.dockPanel1.Size = new System.Drawing.Size(485, 389);
+            this.dockPanel1.TabIndex = 1;
             // 
             // ChartControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.Controls.Add(this.hScrollBar);
-            this.Controls.Add(this.vScrollBar);
-            this.Controls.Add(this.chartPanel);
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Controls.Add(this.dockPanel1);
             this.Name = "ChartControl";
-            this.Size = new System.Drawing.Size(728, 598);
-            this.Resize += new System.EventHandler(this.ChartControl_Resize);
+            this.Size = new System.Drawing.Size(485, 389);
             this.chartControlContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private System.Windows.Forms.Panel chartPanel;
-        private System.Windows.Forms.VScrollBar vScrollBar;
-        private System.Windows.Forms.HScrollBar hScrollBar;
         private System.Windows.Forms.ContextMenuStrip chartControlContextMenu;
         private System.Windows.Forms.ToolStripMenuItem selectAxesMenuItem;
+        private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel1;
     }
 }
