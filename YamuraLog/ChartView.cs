@@ -683,6 +683,98 @@ namespace YamuraLog
                 System.Diagnostics.Debug.Write(">> " + kvp.Key + " " + kvp.Value.ToString() + " << ");
             }
             System.Diagnostics.Debug.WriteLine("");
+
+            #region move cursor(s)
+            // position in event args is data - need to scale to screen
+            float[] displayScale = new float[] { 1.0F, 1.0F };
+            displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisRange[2];
+            PointF endPt = new PointF();
+            int axisIdx = 0;
+            string axisFullName = "";
+            if (CursorMode != CursorStyle.NONE)
+            {
+                // check each Y axis
+                foreach (KeyValuePair<string, Axis> yAxis in chartAxes)
+                {
+                    // skip if axis is not displayed
+                    if (!yAxis.Value.ShowAxis)
+                    {
+                        continue;
+                    }
+                    axisFullName = axisIdx.ToString() + "-" + yAxis.Key;
+                    displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisRange[2];
+                    // check each associated channel
+                    foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
+                    {
+                        // skip if channel is not displayed
+                        if (!curChanInfo.Value.ShowChannel)
+                        {
+                            continue;
+                        }
+                        DataChannel curChannel = logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
+
+                        // x axis is time - direct lookup
+                        if (axisFullName == (axisIdx.ToString() + "-Time"))
+                        {
+                            endPt.X = e.XAxisValues[xChannelName];// curChannel.DataPoints[].PointValue;
+                            endPt.Y = curChannel.DataPoints[endPt.X].PointValue;
+                        }
+                        // x axis is not time - find nearest time in axis channel, 
+                        else
+                        {
+                            DataPoint tst = logger.runData[0].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= e.XAxisValues["0-Time"]).Value;
+                            if (tst == null)
+                            {
+                                continue;
+                            }
+                            endPt.X = tst.PointValue;
+                            tst = curChannel.dataPoints.FirstOrDefault(i => i.Key >= e.XAxisValues["0-Time"]).Value;
+                            if (tst == null)
+                            {
+                                continue;
+                            }
+                            endPt.Y = tst.PointValue;
+                        }
+                        endPt = ScaleDataToDisplay(endPt,                                               // point
+                                                                 displayScale[0],                       // scale X
+                                                                 displayScale[1],                       // scale Y
+                                                                 chartAxes[xChannelName].DisplayOffset, // offset X
+                                                                 yAxis.Value.AxisRange[0],              // offset Y
+                                                                 chartBounds);                          // graphics area boundary
+
+
+                        startMouseDrag = false;
+                        #region erase if something was drawn
+                        if (!startMouseMove)
+                        {
+                            chartLastCursorPos.X = (int)endPt.X;
+                            chartLastCursorPos.Y = (int)endPt.Y;
+                        }
+                        else
+                        {
+                            DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
+                        }
+                        #endregion
+                        #region draw new cursor if in chart area
+                        if (((endPt.X >= chartBorder) && (endPt.X <= (chartPanel.Width - chartBorder))) &&
+                            ((endPt.Y >= chartBorder) && (endPt.Y <= (chartPanel.Height - chartBorder))))
+                        {
+                            startMouseMove = true;
+                            chartLastCursorPos.X = (int)endPt.X;
+                            chartLastCursorPos.Y = (int)endPt.Y;
+                            DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
+                        }
+                        // outside of chart, don't draw and not started
+                        else
+                        {
+                            startMouseMove = false;
+                        }
+                        #endregion
+                    }
+                }
+            }
+            #endregion
+
         }
         public void OnChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e)
         {
