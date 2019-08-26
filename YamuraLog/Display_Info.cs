@@ -85,5 +85,22 @@ namespace YamuraLog
             get { return channelColor; }
             set { channelColor = value; }
         }
+
+        float[] axisRange = new float[] { 0.0F, 0.0F, 0.0F };
+        public float[] AxisRange
+        {
+            get { return axisRange; }
+            set { axisRange = value; }
+        }
+
+        float axisOffset = 0.0F;
+        /// <summary>
+        /// axis offset value
+        /// </summary>
+        public float AxisOffset
+        {
+            get { return axisOffset; }
+            set { axisOffset = value; }
+        }
     }
 }

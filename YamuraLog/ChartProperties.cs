@@ -164,6 +164,16 @@ namespace YamuraLog
             ChartControlXAxisChangeEventArgs changeEventArgs = new ChartControlXAxisChangeEventArgs();
             changeEventArgs.XAxisName = cmbXAxis.Text; 
             ChartXAxisChangeEvent(this, changeEventArgs);
+
+            axisOffsetsGrid.Rows.Clear();
+            foreach(KeyValuePair<string, ChannelInfo> kvp in chartAxes[cmbXAxis.Text].AssociatedChannels)
+            {
+                axisOffsetsGrid.Rows.Add();
+                axisOffsetsGrid.Rows[axisOffsetsGrid.Rows.Count - 1].Cells["axisChannel"].Value = kvp.Key;
+                axisOffsetsGrid.Rows[axisOffsetsGrid.Rows.Count - 1].Cells["axisStart"].Value = kvp.Value.AxisRange[0].ToString();
+                axisOffsetsGrid.Rows[axisOffsetsGrid.Rows.Count - 1].Cells["axisEnd"].Value = kvp.Value.AxisRange[1].ToString();
+                axisOffsetsGrid.Rows[axisOffsetsGrid.Rows.Count - 1].Cells["axisOffset"].Value = kvp.Value.AxisOffset.ToString();
+            }
         }
         /// <summary>
         /// 
