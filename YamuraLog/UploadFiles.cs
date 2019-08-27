@@ -9,7 +9,7 @@ namespace YamuraLog
     public partial class UploadFiles : Form
     {
         SerialPort serialPort;
-        string folderPath;
+        string folderPath = "";
         public string FolderPath
         {
             get { return folderPath; }
