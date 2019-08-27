@@ -98,65 +98,6 @@ namespace YamuraLog
         private void OnChartMouseMove(object sender, ChartControlMouseMoveEventArgs e)
         {
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnClearAll_Click(object sender, EventArgs e)
-        {
-            runDataGrid.Rows.Clear();
-            //channelDataGrid.Rows.Clear();
-            dataLogger.Reset();
-            runDisplay.Clear();
-
-
-            stripChart.Invalidate();
-            tractionCircle.Invalidate();
-            trackMap.Invalidate();
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnOpenFile_Click(object sender, EventArgs e)
-        {
-            if (openLogFile.ShowDialog() != DialogResult.OK)
-            {
-                return;
-            }
-            if (openLogFile.FileName.EndsWith("TXT", StringComparison.CurrentCultureIgnoreCase))
-            {
-                ReadTXTFile(openLogFile.FileName);
-            }
-            else if (openLogFile.FileName.EndsWith("YLG", StringComparison.CurrentCultureIgnoreCase))
-            {
-                ReadYLGFile(openLogFile.FileName);
-            }
-            stripChart.Invalidate();
-            tractionCircle.Invalidate();
-            trackMap.Invalidate();
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnAutoAlign_Click(object sender, EventArgs e)
-        {
-            float autoThreshold = 0.0F;
-            try
-            {
-                autoThreshold = Convert.ToSingle(txtAutoAlignThreshold.Text);
-            }
-            catch
-            {
-                MessageBox.Show("Can't convert auto align value " + txtAutoAlignThreshold.Text + " to a number");
-                return;
-            }
-            AutoAlign(autoThreshold);
-        }
         #endregion
         #region read log file
         private void ReadTXTFile(String fileName)
@@ -343,6 +284,7 @@ namespace YamuraLog
             float priorLongVal = 0.0F;
             bool gpsDistanceValid = false;
 
+            initialRunCount = dataLogger.runData.Count();
             dataLogger.runData.Add(new RunData());
 
             logRunsIdx = dataLogger.runData.Count - 1;
@@ -350,7 +292,6 @@ namespace YamuraLog
 
             dataLogger.runData[logRunsIdx].fileName = System.IO.Path.GetFileName(fileName);
 
-            initialRunCount = dataLogger.runData.Count();
 
             using (BinaryReader inFile = new BinaryReader(File.Open(fileName, FileMode.Open)))
             {
@@ -983,6 +924,70 @@ namespace YamuraLog
             return (float)rad;
         }
         #endregion
+
+        private void addRunsMenuItem_Click(object sender, EventArgs e)
+        {
+            if (openLogFile.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+            if (openLogFile.FileName.EndsWith("TXT", StringComparison.CurrentCultureIgnoreCase))
+            {
+                ReadTXTFile(openLogFile.FileName);
+            }
+            else if (openLogFile.FileName.EndsWith("YLG", StringComparison.CurrentCultureIgnoreCase))
+            {
+                ReadYLGFile(openLogFile.FileName);
+            }
+            stripChart.Invalidate();
+            tractionCircle.Invalidate();
+            trackMap.Invalidate();
+
+        }
+
+        private void clearRunsMenuItem_Click(object sender, EventArgs e)
+        {
+            runDataGrid.Rows.Clear();
+            //channelDataGrid.Rows.Clear();
+            dataLogger.Reset();
+            runDisplay.Clear();
+
+
+            stripChart.Invalidate();
+            tractionCircle.Invalidate();
+            trackMap.Invalidate();
+
+        }
+
+        private void autoAlignToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            float autoThreshold = 0.0F;
+            //try
+            //{
+            //    autoThreshold = Convert.ToSingle(txtAutoAlignThreshold.Text);
+            //}
+            //catch
+            //{
+            //    MessageBox.Show("Can't convert auto align value " + txtAutoAlignThreshold.Text + " to a number");
+            //    return;
+            //}
+            AutoAlign(autoThreshold);
+
+        }
+
+        private void uploadAndDeleteMenuItem_Click(object sender, EventArgs e)
+        {
+            UploadFiles uploadDlg = new UploadFiles();
+            uploadDlg.UploadMode = "D";
+            uploadDlg.ShowDialog();
+        }
+
+        private void uploadOnlyMenuItem_Click(object sender, EventArgs e)
+        {
+            UploadFiles uploadDlg = new UploadFiles();
+            uploadDlg.UploadMode = "U";
+            uploadDlg.ShowDialog();
+        }
     }
     /// <summary>
     /// display info for runs and channels

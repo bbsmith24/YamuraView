@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnOpenFile = new System.Windows.Forms.Button();
             this.openLogFile = new System.Windows.Forms.OpenFileDialog();
             this.runDataGrid = new System.Windows.Forms.DataGridView();
             this.colRunNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -41,26 +40,22 @@
             this.colSourceFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.txtCursorPos = new System.Windows.Forms.TextBox();
-            this.btnAutoAlign = new System.Windows.Forms.Button();
-            this.txtAutoAlignThreshold = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.btnClearAll = new System.Windows.Forms.Button();
             this.trackMap = new YamuraLog.ChartControl();
             this.tractionCircle = new YamuraLog.ChartControl();
             this.stripChart = new YamuraLog.ChartControl();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.filesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addRunsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearRunsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.uploadFromLoggerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.uploadAndDeleteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.uploadOnlyMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.autoAlignToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // btnOpenFile
-            // 
-            this.btnOpenFile.Location = new System.Drawing.Point(1049, 18);
-            this.btnOpenFile.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.btnOpenFile.Name = "btnOpenFile";
-            this.btnOpenFile.Size = new System.Drawing.Size(135, 35);
-            this.btnOpenFile.TabIndex = 0;
-            this.btnOpenFile.Text = "Add Runs";
-            this.btnOpenFile.UseVisualStyleBackColor = true;
-            this.btnOpenFile.Click += new System.EventHandler(this.btnOpenFile_Click);
             // 
             // runDataGrid
             // 
@@ -76,11 +71,10 @@
             this.colMaxTime,
             this.colOffsetTime,
             this.colSourceFile});
-            this.runDataGrid.Location = new System.Drawing.Point(16, 18);
-            this.runDataGrid.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.runDataGrid.Location = new System.Drawing.Point(11, 41);
             this.runDataGrid.Name = "runDataGrid";
             this.runDataGrid.RowHeadersVisible = false;
-            this.runDataGrid.Size = new System.Drawing.Size(1024, 277);
+            this.runDataGrid.Size = new System.Drawing.Size(683, 151);
             this.runDataGrid.TabIndex = 18;
             // 
             // colRunNumber
@@ -89,14 +83,14 @@
             this.colRunNumber.HeaderText = "Run";
             this.colRunNumber.Name = "colRunNumber";
             this.colRunNumber.ReadOnly = true;
-            this.colRunNumber.Width = 75;
+            this.colRunNumber.Width = 52;
             // 
             // colShowRun
             // 
             this.colShowRun.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
             this.colShowRun.HeaderText = "Show";
             this.colShowRun.Name = "colShowRun";
-            this.colShowRun.Width = 55;
+            this.colShowRun.Width = 40;
             // 
             // colTraceColor
             // 
@@ -105,7 +99,7 @@
             this.colTraceColor.Name = "colTraceColor";
             this.colTraceColor.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.colTraceColor.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.colTraceColor.Width = 52;
+            this.colTraceColor.Width = 37;
             // 
             // colDate
             // 
@@ -113,7 +107,7 @@
             this.colDate.HeaderText = "Date/Time";
             this.colDate.Name = "colDate";
             this.colDate.ReadOnly = true;
-            this.colDate.Width = 118;
+            this.colDate.Width = 83;
             // 
             // colMinTime
             // 
@@ -121,7 +115,7 @@
             this.colMinTime.HeaderText = "Start";
             this.colMinTime.Name = "colMinTime";
             this.colMinTime.ReadOnly = true;
-            this.colMinTime.Width = 80;
+            this.colMinTime.Width = 54;
             // 
             // colMaxTime
             // 
@@ -129,14 +123,14 @@
             this.colMaxTime.HeaderText = "End";
             this.colMaxTime.Name = "colMaxTime";
             this.colMaxTime.ReadOnly = true;
-            this.colMaxTime.Width = 74;
+            this.colMaxTime.Width = 51;
             // 
             // colOffsetTime
             // 
             this.colOffsetTime.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             this.colOffsetTime.HeaderText = "Offset";
             this.colOffsetTime.Name = "colOffsetTime";
-            this.colOffsetTime.Width = 89;
+            this.colOffsetTime.Width = 60;
             // 
             // colSourceFile
             // 
@@ -149,152 +143,165 @@
             // 
             this.txtCursorPos.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtCursorPos.Location = new System.Drawing.Point(146, 1386);
-            this.txtCursorPos.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.txtCursorPos.Location = new System.Drawing.Point(97, 901);
             this.txtCursorPos.Name = "txtCursorPos";
-            this.txtCursorPos.Size = new System.Drawing.Size(1517, 26);
+            this.txtCursorPos.Size = new System.Drawing.Size(1013, 20);
             this.txtCursorPos.TabIndex = 19;
-            // 
-            // btnAutoAlign
-            // 
-            this.btnAutoAlign.Enabled = false;
-            this.btnAutoAlign.Location = new System.Drawing.Point(1049, 108);
-            this.btnAutoAlign.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.btnAutoAlign.Name = "btnAutoAlign";
-            this.btnAutoAlign.Size = new System.Drawing.Size(135, 35);
-            this.btnAutoAlign.TabIndex = 20;
-            this.btnAutoAlign.Text = "AutoAlign";
-            this.btnAutoAlign.UseVisualStyleBackColor = true;
-            this.btnAutoAlign.Click += new System.EventHandler(this.btnAutoAlign_Click);
-            // 
-            // txtAutoAlignThreshold
-            // 
-            this.txtAutoAlignThreshold.Enabled = false;
-            this.txtAutoAlignThreshold.Location = new System.Drawing.Point(1049, 152);
-            this.txtAutoAlignThreshold.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.txtAutoAlignThreshold.Name = "txtAutoAlignThreshold";
-            this.txtAutoAlignThreshold.Size = new System.Drawing.Size(85, 26);
-            this.txtAutoAlignThreshold.TabIndex = 21;
-            this.txtAutoAlignThreshold.Text = "0.10";
             // 
             // label1
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(18, 1391);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(12, 904);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(119, 20);
+            this.label1.Size = new System.Drawing.Size(79, 13);
             this.label1.TabIndex = 24;
             this.label1.Text = "Cursor position:";
             // 
-            // btnClearAll
-            // 
-            this.btnClearAll.Location = new System.Drawing.Point(1049, 63);
-            this.btnClearAll.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.btnClearAll.Name = "btnClearAll";
-            this.btnClearAll.Size = new System.Drawing.Size(135, 35);
-            this.btnClearAll.TabIndex = 26;
-            this.btnClearAll.Text = "Clear Runs";
-            this.btnClearAll.UseVisualStyleBackColor = true;
-            this.btnClearAll.Click += new System.EventHandler(this.btnClearAll_Click);
-            // 
             // trackMap
             // 
-            this.trackMap.chartViewForm.AllowDrag = true;
             this.trackMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.trackMap.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.trackMap.ChartAxes = null;
             this.trackMap.ChartName = "Chart";
-            this.trackMap.chartViewForm.CursorBoxSize = 10;
-            this.trackMap.chartViewForm.CursorMode = YamuraLog.ChartView.CursorStyle.CROSSHAIRS;
-            this.trackMap.chartViewForm.CursorUpdateSource = true;
-            this.trackMap.Location = new System.Drawing.Point(1194, 305);
+            this.trackMap.Location = new System.Drawing.Point(796, 198);
             this.trackMap.Logger = null;
-            this.trackMap.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
+            this.trackMap.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.trackMap.Name = "trackMap";
-            this.trackMap.chartViewForm.ShowHScroll = true;
-            this.trackMap.chartViewForm.ShowVScroll = true;
-            this.trackMap.Size = new System.Drawing.Size(471, 684);
+            this.trackMap.Size = new System.Drawing.Size(315, 445);
             this.trackMap.TabIndex = 36;
             // 
             // tractionCircle
             // 
-            this.tractionCircle.chartViewForm.AllowDrag = true;
             this.tractionCircle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tractionCircle.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tractionCircle.ChartAxes = null;
             this.tractionCircle.ChartName = "Chart";
-            this.tractionCircle.chartViewForm.CursorBoxSize = 10;
-            this.tractionCircle.chartViewForm.CursorMode = YamuraLog.ChartView.CursorStyle.CROSSHAIRS;
-            this.tractionCircle.chartViewForm.CursorUpdateSource = true;
-            this.tractionCircle.Location = new System.Drawing.Point(1192, 18);
+            this.tractionCircle.Location = new System.Drawing.Point(795, 12);
             this.tractionCircle.Logger = null;
-            this.tractionCircle.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
+            this.tractionCircle.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tractionCircle.Name = "tractionCircle";
-            this.tractionCircle.chartViewForm.ShowHScroll = true;
-            this.tractionCircle.chartViewForm.ShowVScroll = true;
-            this.tractionCircle.Size = new System.Drawing.Size(471, 276);
+            this.tractionCircle.Size = new System.Drawing.Size(315, 180);
             this.tractionCircle.TabIndex = 35;
             // 
             // stripChart
             // 
-            this.stripChart.chartViewForm.AllowDrag = true;
             this.stripChart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.stripChart.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.stripChart.ChartAxes = null;
             this.stripChart.ChartName = "Chart";
-            this.stripChart.chartViewForm.CursorBoxSize = 10;
-            this.stripChart.chartViewForm.CursorMode = YamuraLog.ChartView.CursorStyle.CROSSHAIRS;
-            this.stripChart.chartViewForm.CursorUpdateSource = false;
-            this.stripChart.Location = new System.Drawing.Point(17, 308);
+            this.stripChart.Location = new System.Drawing.Point(11, 200);
             this.stripChart.Logger = null;
-            this.stripChart.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
+            this.stripChart.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.stripChart.Name = "stripChart";
-            this.stripChart.chartViewForm.ShowHScroll = true;
-            this.stripChart.chartViewForm.ShowVScroll = true;
-            this.stripChart.Size = new System.Drawing.Size(1166, 681);
+            this.stripChart.Size = new System.Drawing.Size(778, 443);
             this.stripChart.TabIndex = 34;
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.filesToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1115, 24);
+            this.menuStrip1.TabIndex = 37;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // filesToolStripMenuItem
+            // 
+            this.filesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addRunsMenuItem,
+            this.clearRunsMenuItem,
+            this.uploadFromLoggerToolStripMenuItem,
+            this.settingsToolStripMenuItem,
+            this.autoAlignToolStripMenuItem});
+            this.filesToolStripMenuItem.Name = "filesToolStripMenuItem";
+            this.filesToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.filesToolStripMenuItem.Text = "File";
+            // 
+            // addRunsMenuItem
+            // 
+            this.addRunsMenuItem.Name = "addRunsMenuItem";
+            this.addRunsMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.addRunsMenuItem.Text = "Add Runs";
+            this.addRunsMenuItem.Click += new System.EventHandler(this.addRunsMenuItem_Click);
+            // 
+            // clearRunsMenuItem
+            // 
+            this.clearRunsMenuItem.Name = "clearRunsMenuItem";
+            this.clearRunsMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.clearRunsMenuItem.Text = "Clear Runs";
+            this.clearRunsMenuItem.Click += new System.EventHandler(this.clearRunsMenuItem_Click);
+            // 
+            // uploadFromLoggerToolStripMenuItem
+            // 
+            this.uploadFromLoggerToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.uploadAndDeleteMenuItem,
+            this.uploadOnlyMenuItem});
+            this.uploadFromLoggerToolStripMenuItem.Name = "uploadFromLoggerToolStripMenuItem";
+            this.uploadFromLoggerToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.uploadFromLoggerToolStripMenuItem.Text = "Upload from Logger";
+            // 
+            // uploadAndDeleteMenuItem
+            // 
+            this.uploadAndDeleteMenuItem.Name = "uploadAndDeleteMenuItem";
+            this.uploadAndDeleteMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.uploadAndDeleteMenuItem.Text = "Upload and Delete";
+            this.uploadAndDeleteMenuItem.Click += new System.EventHandler(this.uploadAndDeleteMenuItem_Click);
+            // 
+            // uploadOnlyMenuItem
+            // 
+            this.uploadOnlyMenuItem.Name = "uploadOnlyMenuItem";
+            this.uploadOnlyMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.uploadOnlyMenuItem.Text = "Upload Only";
+            this.uploadOnlyMenuItem.Click += new System.EventHandler(this.uploadOnlyMenuItem_Click);
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.settingsToolStripMenuItem.Text = "Settings";
+            // 
+            // autoAlignToolStripMenuItem
+            // 
+            this.autoAlignToolStripMenuItem.Name = "autoAlignToolStripMenuItem";
+            this.autoAlignToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.autoAlignToolStripMenuItem.Text = "AutoAlign";
+            this.autoAlignToolStripMenuItem.Click += new System.EventHandler(this.autoAlignToolStripMenuItem_Click);
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1673, 1050);
+            this.ClientSize = new System.Drawing.Size(1115, 682);
             this.Controls.Add(this.trackMap);
             this.Controls.Add(this.tractionCircle);
             this.Controls.Add(this.stripChart);
-            this.Controls.Add(this.btnClearAll);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.txtAutoAlignThreshold);
-            this.Controls.Add(this.btnAutoAlign);
             this.Controls.Add(this.txtCursorPos);
             this.Controls.Add(this.runDataGrid);
-            this.Controls.Add(this.btnOpenFile);
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "Team Yamura data logger viewer";
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).EndInit();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.Button btnOpenFile;
         private System.Windows.Forms.OpenFileDialog openLogFile;
         private System.Windows.Forms.DataGridView runDataGrid;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.TextBox txtCursorPos;
-        private System.Windows.Forms.Button btnAutoAlign;
-        private System.Windows.Forms.TextBox txtAutoAlignThreshold;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button btnClearAll;
         private System.Windows.Forms.DataGridViewTextBoxColumn colRunNumber;
         private System.Windows.Forms.DataGridViewCheckBoxColumn colShowRun;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTraceColor;
@@ -306,6 +313,15 @@
         private ChartControl stripChart;
         private ChartControl tractionCircle;
         private ChartControl trackMap;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem filesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addRunsMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearRunsMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem uploadFromLoggerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem uploadAndDeleteMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem uploadOnlyMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem autoAlignToolStripMenuItem;
     }
 }
 
