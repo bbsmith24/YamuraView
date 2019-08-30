@@ -9,7 +9,7 @@ namespace YamuraLog
     public partial class UploadFiles : Form
     {
         SerialPort serialPort;
-        string folderPath = "";
+        string folderPath = "D:\\Temp\\Test Data";
         public string FolderPath
         {
             get { return folderPath; }
@@ -38,6 +38,7 @@ namespace YamuraLog
             {
                 cmbPort.Items.Add(s);
             }
+            txtSaveTo.Text = "D:\\Temp\\Test Data";
         }
 
         private void btnGetFiles_Click(object sender, EventArgs e)
@@ -110,6 +111,7 @@ namespace YamuraLog
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
                 folderPath = folderBrowserDialog1.SelectedPath;
+                txtSaveTo.Text = folderPath;
             }
         }
     }

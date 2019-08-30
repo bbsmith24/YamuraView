@@ -36,6 +36,8 @@
             this.cmbPort = new System.Windows.Forms.ComboBox();
             this.btnGetFiles = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.txtSaveTo = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnFolderLocator
@@ -50,11 +52,11 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(15, 67);
+            this.textBox1.Location = new System.Drawing.Point(15, 93);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(260, 183);
+            this.textBox1.Size = new System.Drawing.Size(260, 157);
             this.textBox1.TabIndex = 12;
             // 
             // label2
@@ -89,6 +91,7 @@
             this.cmbBaud.Name = "cmbBaud";
             this.cmbBaud.Size = new System.Drawing.Size(121, 21);
             this.cmbBaud.TabIndex = 10;
+            this.cmbBaud.Text = "115200";
             // 
             // label1
             // 
@@ -117,11 +120,29 @@
             this.btnGetFiles.UseVisualStyleBackColor = true;
             this.btnGetFiles.Click += new System.EventHandler(this.btnGetFiles_Click);
             // 
+            // txtSaveTo
+            // 
+            this.txtSaveTo.Location = new System.Drawing.Point(52, 67);
+            this.txtSaveTo.Name = "txtSaveTo";
+            this.txtSaveTo.Size = new System.Drawing.Size(220, 20);
+            this.txtSaveTo.TabIndex = 14;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(9, 70);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(20, 13);
+            this.label3.TabIndex = 15;
+            this.label3.Text = "To";
+            // 
             // UploadFiles
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.txtSaveTo);
             this.Controls.Add(this.btnFolderLocator);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label2);
@@ -146,5 +167,7 @@
         private System.Windows.Forms.ComboBox cmbPort;
         private System.Windows.Forms.Button btnGetFiles;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private System.Windows.Forms.TextBox txtSaveTo;
+        private System.Windows.Forms.Label label3;
     }
 }
