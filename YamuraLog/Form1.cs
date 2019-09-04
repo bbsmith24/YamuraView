@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using GDI;
 using Win32Interop.Methods;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace YamuraLog
 {
@@ -87,6 +88,39 @@ namespace YamuraLog
             stripChart.chartViewForm.ChartMouseMoveEvent += OnChartMouseMove;// new ChartMouseMove(OnChartMouseMove);
             stripChart.chartViewForm.ChartMouseMoveEvent += tractionCircle.chartViewForm.OnChartMouseMove;
             stripChart.chartViewForm.ChartMouseMoveEvent += trackMap.chartViewForm.OnChartMouseMove;
+
+            dockPanel1.Dock = DockStyle.None;
+            dockPanel1.BackColor = Color.White;
+            dockPanel1.Anchor = AnchorStyles.Bottom | AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            dockPanel1.Dock = DockStyle.Fill;
+            dockPanel1.BringToFront();
+
+
+            stripChart.ShowHint = DockState.Document;
+            stripChart.Text = "Stripchart";
+            stripChart.Show(dockPanel1);
+            stripChart.DockState = DockState.Document;
+
+            tractionCircle.ShowHint = DockState.Document;
+            tractionCircle.Text = "Traction Circle";
+            tractionCircle.Show(dockPanel1);
+            tractionCircle.DockState = DockState.DockRightAutoHide;
+
+            trackMap.ShowHint = DockState.Document;
+            trackMap.Text = "Track Map";
+            trackMap.Show(dockPanel1);
+            trackMap.DockState = DockState.DockRightAutoHide;
+
+            runDataGrid.Dock = DockStyle.Fill;
+            DockContent dockpanel2 = new DockContent();
+            dockpanel2.Controls.Add(runDataGrid);
+            dockpanel2.ShowHint = DockState.Document;
+            dockpanel2.Text = "Run Info";
+            dockpanel2.Show(dockPanel1);
+            dockpanel2.DockState = DockState.DockRightAutoHide;
+
+
+
         }
         #region event handlers       
         /// <summary>

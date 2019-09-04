@@ -53,6 +53,7 @@
             this.uploadOnlyMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autoAlignToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -74,7 +75,7 @@
             this.runDataGrid.Location = new System.Drawing.Point(11, 41);
             this.runDataGrid.Name = "runDataGrid";
             this.runDataGrid.RowHeadersVisible = false;
-            this.runDataGrid.Size = new System.Drawing.Size(683, 151);
+            this.runDataGrid.Size = new System.Drawing.Size(108, 151);
             this.runDataGrid.TabIndex = 18;
             // 
             // colRunNumber
@@ -163,43 +164,40 @@
             this.trackMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.trackMap.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.trackMap.ChartAxes = null;
             this.trackMap.ChartName = "Chart";
+            this.trackMap.ClientSize = new System.Drawing.Size(299, 406);
             this.trackMap.Location = new System.Drawing.Point(796, 198);
             this.trackMap.Logger = null;
             this.trackMap.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.trackMap.Name = "trackMap";
-            this.trackMap.Size = new System.Drawing.Size(315, 445);
-            this.trackMap.TabIndex = 36;
+            this.trackMap.Visible = false;
             // 
             // tractionCircle
             // 
             this.tractionCircle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tractionCircle.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tractionCircle.ChartAxes = null;
             this.tractionCircle.ChartName = "Chart";
+            this.tractionCircle.ClientSize = new System.Drawing.Size(299, 141);
             this.tractionCircle.Location = new System.Drawing.Point(795, 12);
             this.tractionCircle.Logger = null;
             this.tractionCircle.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tractionCircle.Name = "tractionCircle";
-            this.tractionCircle.Size = new System.Drawing.Size(315, 180);
-            this.tractionCircle.TabIndex = 35;
+            this.tractionCircle.Visible = false;
             // 
             // stripChart
             // 
             this.stripChart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.stripChart.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.stripChart.ChartAxes = null;
             this.stripChart.ChartName = "Chart";
+            this.stripChart.ClientSize = new System.Drawing.Size(762, 404);
             this.stripChart.Location = new System.Drawing.Point(11, 200);
             this.stripChart.Logger = null;
             this.stripChart.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.stripChart.Name = "stripChart";
-            this.stripChart.Size = new System.Drawing.Size(778, 443);
-            this.stripChart.TabIndex = 34;
+            this.stripChart.Visible = false;
             // 
             // menuStrip1
             // 
@@ -273,17 +271,24 @@
             this.autoAlignToolStripMenuItem.Text = "AutoAlign";
             this.autoAlignToolStripMenuItem.Click += new System.EventHandler(this.autoAlignToolStripMenuItem_Click);
             // 
+            // dockPanel1
+            // 
+            this.dockPanel1.BackColor = System.Drawing.Color.White;
+            this.dockPanel1.DocumentStyle = WeifenLuo.WinFormsUI.Docking.DocumentStyle.DockingWindow;
+            this.dockPanel1.Location = new System.Drawing.Point(125, 12);
+            this.dockPanel1.Name = "dockPanel1";
+            this.dockPanel1.Size = new System.Drawing.Size(978, 658);
+            this.dockPanel1.TabIndex = 38;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1115, 682);
-            this.Controls.Add(this.trackMap);
-            this.Controls.Add(this.tractionCircle);
-            this.Controls.Add(this.stripChart);
+            this.Controls.Add(this.dockPanel1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtCursorPos);
-            this.Controls.Add(this.runDataGrid);
+            //this.Controls.Add(this.runDataGrid);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
@@ -322,6 +327,7 @@
         private System.Windows.Forms.ToolStripMenuItem uploadOnlyMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem autoAlignToolStripMenuItem;
+        private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel1;
     }
 }
 

@@ -250,6 +250,10 @@ namespace YamuraLog
                             else
                             {
                                 DataPoint tst = logger.runData[0].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+                                if(tst == null)
+                                {
+                                    continue;
+                                }
                                 endPt.X = tst.PointValue;
                                 endPt.Y = curData.Value.PointValue;
                             }

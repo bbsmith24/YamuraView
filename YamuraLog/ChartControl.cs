@@ -16,7 +16,7 @@ namespace YamuraLog
     public delegate void ChartMouseMove(object sender, ChartControlMouseMoveEventArgs e);
     public delegate void ChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e);
 
-    public partial class ChartControl : UserControl
+    public partial class ChartControl :  WeifenLuo.WinFormsUI.Docking.DockContent//UserControl
     {
         DataLogger logger;
         public DataLogger Logger
