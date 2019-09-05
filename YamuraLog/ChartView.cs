@@ -75,10 +75,13 @@ namespace YamuraLog
         int dragZoomPenWidth = 1;
         int chartBorder = 10;
         Rectangle chartBounds = new Rectangle(0, 0, 0, 0);
-        bool startMouseDrag = false;
-        bool startMouseMove = false;
-        Point chartLastCursorPos = new Point(0, 0);
-        Point chartStartCursorPos = new Point(0, 0);
+        List<bool> startMouseDrag = new List<bool>();
+        List<bool> startMouseMove = new List<bool>();
+        //Point chartLastCursorPos = new Point(0, 0);
+        //Point chartStartCursorPos = new Point(0, 0);
+        List<Point> chartLastCursorPos = new List<Point>();
+        List<Point> chartStartCursorPos = new List<Point>();
+
         string xChannelName;
         public string XChannelName
         {
@@ -176,6 +179,11 @@ namespace YamuraLog
             InitializeComponent();
             xChannelName = "Time";
             CursorUpdateSource = true;
+
+            chartLastCursorPos.Add(new Point(0, 0));
+            chartStartCursorPos.Add(new Point(0, 0));
+            startMouseMove.Add(false);
+            startMouseDrag.Add(false);
         }
 
         #region control message handlers
@@ -198,8 +206,14 @@ namespace YamuraLog
         /// <param name="e"></param>
         private void chartPanel_Paint(object sender, PaintEventArgs e)
         {
-            startMouseDrag = false;
-            startMouseMove = false;
+System.Diagnostics.Debug.WriteLine("reset " + startMouseMove.Count.ToString() + " cursors");
+            for (int moveIdx = 0; moveIdx < startMouseMove.Count; moveIdx++)
+            {
+                startMouseMove[moveIdx] = false;
+                startMouseDrag[moveIdx] = false;
+                chartStartCursorPos[moveIdx] = new Point(0, 0);
+                chartLastCursorPos[moveIdx] = new Point(0, 0);
+            }
             // nothing to display yet
             if ((chartAxes == null) || (chartAxes.Count == 0))
             {
@@ -249,7 +263,7 @@ namespace YamuraLog
                             // x axis is not time - find nearest time in axis channel, 
                             else
                             {
-                                DataPoint tst = logger.runData[0].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+                                DataPoint tst = logger.runData[curChanInfo.Value.RunIndex].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
                                 if(tst == null)
                                 {
                                     continue;
@@ -310,30 +324,28 @@ namespace YamuraLog
             if ((e.Button == MouseButtons.Left) && AllowDrag)
             {
                 // starting mouse drag - erase old cursor if needed, save initial start and end locations
-                if (!startMouseDrag)
+                if (!startMouseDrag[0])
                 {
                     // was moving mouse with left button up, erase cursor
-                    if (startMouseMove)
+                    if (startMouseMove[0])
                     {
-                        DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
+                        DrawCursorAt(chartLastCursorPos[0].X, chartLastCursorPos[0].Y);
                     }
                     // save location
-                    chartStartCursorPos.X = e.Location.X;
-                    chartStartCursorPos.Y = 0;
-                    chartLastCursorPos.X = e.Location.X;
-                    chartLastCursorPos.Y = chartPanel.Height;
+                    chartStartCursorPos[0] = new Point (e.Location.X, 0);
+                    chartLastCursorPos[0] = new Point(e.Location.X, chartPanel.Height);
                 }
                 // continue mouse drag - erase last box
                 else
                 {
-                    DrawSelectArea(chartStartCursorPos.X, chartStartCursorPos.Y, chartLastCursorPos.X, chartLastCursorPos.Y);
+                    DrawSelectArea(chartStartCursorPos[0].X, chartStartCursorPos[0].Y, chartLastCursorPos[0].X, chartLastCursorPos[0].Y);
                 }
                 // continue mouse drag, save current end location and draw new box
-                chartLastCursorPos.X = e.Location.X;
-                DrawSelectArea(chartStartCursorPos.X, chartStartCursorPos.Y, chartLastCursorPos.X, chartLastCursorPos.Y);
+                chartLastCursorPos[0] = new Point(e.Location.X, chartLastCursorPos[0].Y);
+                DrawSelectArea(chartStartCursorPos[0].X, chartStartCursorPos[0].Y, chartLastCursorPos[0].X, chartLastCursorPos[0].Y);
                 // mouse drag has started, mouse move has stopped
-                startMouseDrag = true;
-                startMouseMove = false;
+                startMouseDrag[0] = true;
+                startMouseMove[0] = false;
             }
             #endregion
             #region just moving the mouse with no buttons
@@ -341,29 +353,29 @@ namespace YamuraLog
             {
                 if (CursorMode != CursorStyle.NONE)
                 {
-                    startMouseDrag = false;
+                    startMouseDrag[0] = false;
                     #region erase if something was drawn
-                    if (!startMouseMove)
+                    if (!startMouseMove[0])
                     {
-                        chartLastCursorPos = e.Location;
+                        chartLastCursorPos[0] = e.Location;
                     }
                     else
                     {
-                        DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
+                        DrawCursorAt(chartLastCursorPos[0].X, chartLastCursorPos[0].Y);
                     }
                     #endregion
                     #region draw new cursor if in chart area
                     if (((e.Location.X >= chartBorder) && (e.Location.X <= (chartPanel.Width - chartBorder))) &&
                         ((e.Location.Y >= chartBorder) && (e.Location.Y <= (chartPanel.Height - chartBorder))))
                     {
-                        startMouseMove = true;
-                        chartLastCursorPos = e.Location;
-                        DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
+                        startMouseMove[0] = true;
+                        chartLastCursorPos[0] = e.Location;
+                        DrawCursorAt(chartLastCursorPos[0].X, chartLastCursorPos[0].Y);
                     }
                     // outside of chart, don't draw and not started
                     else
                     {
-                        startMouseMove = false;
+                        startMouseMove[0] = false;
                     }
                     #endregion
                 }
@@ -427,9 +439,9 @@ namespace YamuraLog
         /// <param name="e"></param>
         private void chartPanel_MouseUp(object sender, MouseEventArgs e)
         {
-            if ((startMouseDrag) && AllowDrag)
+            if ((startMouseDrag[0]) && AllowDrag)
             {
-                startMouseDrag = false;
+                startMouseDrag[0] = false;
                 chartPanel.Invalidate();
             }
         }
@@ -695,8 +707,10 @@ namespace YamuraLog
             PointF endPt = new PointF();
             int axisIdx = 0;
             string axisFullName = "";
+            int cursorIdx = -1;
             if (CursorMode != CursorStyle.NONE)
             {
+System.Diagnostics.Debug.WriteLine("slave cursor(s) for " + chartName);
                 // check each Y axis
                 foreach (KeyValuePair<string, Axis> yAxis in chartAxes)
                 {
@@ -705,6 +719,7 @@ namespace YamuraLog
                     {
                         continue;
                     }
+System.Diagnostics.Debug.WriteLine("yAxis " + yAxis.Key);
                     axisFullName = axisIdx.ToString() + "-" + yAxis.Key;
                     displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisRange[2];
                     // check each associated channel
@@ -714,6 +729,18 @@ namespace YamuraLog
                         if (!curChanInfo.Value.ShowChannel)
                         {
                             continue;
+                        }
+                        cursorIdx++;
+System.Diagnostics.Debug.WriteLine("channel " + curChanInfo.Key + " run " + curChanInfo.Value.RunIndex + " cursor idx " + cursorIdx);
+                        // add new cursor info if needed
+                        if (startMouseMove.Count <= cursorIdx)
+                        {
+System.Diagnostics.Debug.WriteLine("add slaveed cursor");
+
+                            startMouseMove.Add(false);
+                            startMouseDrag.Add(false);
+                            chartStartCursorPos.Add(new Point(0, 0));
+                            chartLastCursorPos.Add(new Point(0, 0));
                         }
                         DataChannel curChannel = logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
 
@@ -726,7 +753,7 @@ namespace YamuraLog
                         // x axis is not time - find nearest time in axis channel, 
                         else
                         {
-                            DataPoint tst = logger.runData[0].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= e.XAxisValues["0-Time"]).Value;
+                            DataPoint tst = logger.runData[curChanInfo.Value.RunIndex].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= e.XAxisValues["0-Time"]).Value;
                             if (tst == null)
                             {
                                 continue;
@@ -747,31 +774,31 @@ namespace YamuraLog
                                                                  chartBounds);                          // graphics area boundary
 
 
-                        startMouseDrag = false;
+                        startMouseDrag[cursorIdx] = false;
                         #region erase if something was drawn
-                        if (!startMouseMove)
+                        if (!startMouseMove[cursorIdx])
                         {
-                            chartLastCursorPos.X = (int)endPt.X;
-                            chartLastCursorPos.Y = (int)endPt.Y;
+                            chartLastCursorPos[cursorIdx] = new Point((int)endPt.X, (int)endPt.Y);
                         }
                         else
                         {
-                            DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
+System.Diagnostics.Debug.Write(" ERASE ");
+                            DrawCursorAt(chartLastCursorPos[cursorIdx].X, chartLastCursorPos[cursorIdx].Y);
                         }
                         #endregion
                         #region draw new cursor if in chart area
                         if (((endPt.X >= chartBorder) && (endPt.X <= (chartPanel.Width - chartBorder))) &&
                             ((endPt.Y >= chartBorder) && (endPt.Y <= (chartPanel.Height - chartBorder))))
                         {
-                            startMouseMove = true;
-                            chartLastCursorPos.X = (int)endPt.X;
-                            chartLastCursorPos.Y = (int)endPt.Y;
-                            DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
+                            startMouseMove[cursorIdx] = true;
+                            chartLastCursorPos[cursorIdx] = new Point((int)endPt.X, (int)endPt.Y);
+System.Diagnostics.Debug.WriteLine(" DRAW ");
+                            DrawCursorAt(chartLastCursorPos[cursorIdx].X, chartLastCursorPos[cursorIdx].Y);
                         }
                         // outside of chart, don't draw and not started
                         else
                         {
-                            startMouseMove = false;
+                            startMouseMove[cursorIdx] = false;
                         }
                         #endregion
                     }

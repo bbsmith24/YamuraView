@@ -50,8 +50,6 @@ namespace YamuraLog
         }
 
         Rectangle chartBounds = new Rectangle(0, 0, 0, 0);
-        Point chartLastCursorPos = new Point(0, 0);
-        Point chartStartCursorPos = new Point(0, 0);
 
         // panel forms
         public ChartView chartViewForm = new ChartView();
