@@ -206,7 +206,6 @@ namespace YamuraLog
         /// <param name="e"></param>
         private void chartPanel_Paint(object sender, PaintEventArgs e)
         {
-System.Diagnostics.Debug.WriteLine("reset " + startMouseMove.Count.ToString() + " cursors");
             for (int moveIdx = 0; moveIdx < startMouseMove.Count; moveIdx++)
             {
                 startMouseMove[moveIdx] = false;

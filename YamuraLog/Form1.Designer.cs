@@ -41,9 +41,6 @@
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.txtCursorPos = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.trackMap = new YamuraLog.ChartControl();
-            this.tractionCircle = new YamuraLog.ChartControl();
-            this.stripChart = new YamuraLog.ChartControl();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.filesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addRunsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,12 +62,12 @@
             this.runDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.runDataGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colRunNumber,
-            this.colShowRun,
-            this.colTraceColor,
+            //this.colShowRun,
+            //this.colTraceColor,
             this.colDate,
             this.colMinTime,
             this.colMaxTime,
-            this.colOffsetTime,
+            //this.colOffsetTime,
             this.colSourceFile});
             this.runDataGrid.Location = new System.Drawing.Point(11, 41);
             this.runDataGrid.Name = "runDataGrid";
@@ -159,46 +156,6 @@
             this.label1.TabIndex = 24;
             this.label1.Text = "Cursor position:";
             // 
-            // trackMap
-            // 
-            this.trackMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.trackMap.ChartAxes = null;
-            this.trackMap.ChartName = "Chart";
-            this.trackMap.ClientSize = new System.Drawing.Size(299, 406);
-            this.trackMap.Location = new System.Drawing.Point(796, 198);
-            this.trackMap.Logger = null;
-            this.trackMap.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.trackMap.Name = "trackMap";
-            this.trackMap.Visible = false;
-            // 
-            // tractionCircle
-            // 
-            this.tractionCircle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tractionCircle.ChartAxes = null;
-            this.tractionCircle.ChartName = "Chart";
-            this.tractionCircle.ClientSize = new System.Drawing.Size(299, 141);
-            this.tractionCircle.Location = new System.Drawing.Point(795, 12);
-            this.tractionCircle.Logger = null;
-            this.tractionCircle.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.tractionCircle.Name = "tractionCircle";
-            this.tractionCircle.Visible = false;
-            // 
-            // stripChart
-            // 
-            this.stripChart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.stripChart.ChartAxes = null;
-            this.stripChart.ChartName = "Chart";
-            this.stripChart.ClientSize = new System.Drawing.Size(762, 404);
-            this.stripChart.Location = new System.Drawing.Point(11, 200);
-            this.stripChart.Logger = null;
-            this.stripChart.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.stripChart.Name = "stripChart";
-            this.stripChart.Visible = false;
-            // 
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -274,10 +231,11 @@
             // dockPanel1
             // 
             this.dockPanel1.BackColor = System.Drawing.Color.White;
+            this.dockPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dockPanel1.DocumentStyle = WeifenLuo.WinFormsUI.Docking.DocumentStyle.DockingWindow;
-            this.dockPanel1.Location = new System.Drawing.Point(125, 12);
+            this.dockPanel1.Location = new System.Drawing.Point(0, 24);
             this.dockPanel1.Name = "dockPanel1";
-            this.dockPanel1.Size = new System.Drawing.Size(978, 658);
+            this.dockPanel1.Size = new System.Drawing.Size(1115, 658);
             this.dockPanel1.TabIndex = 38;
             // 
             // Form1
@@ -288,7 +246,6 @@
             this.Controls.Add(this.dockPanel1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtCursorPos);
-            //this.Controls.Add(this.runDataGrid);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
@@ -315,9 +272,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colMaxTime;
         private System.Windows.Forms.DataGridViewTextBoxColumn colOffsetTime;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSourceFile;
-        private ChartControl stripChart;
-        private ChartControl tractionCircle;
-        private ChartControl trackMap;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem filesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addRunsMenuItem;

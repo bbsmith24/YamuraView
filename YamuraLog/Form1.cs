@@ -28,7 +28,11 @@ namespace YamuraLog
 
         float gpsDist = 0.0F;
         // runs processed to logger prior to latest read (for TXT files with start/stop markers)
-        int initialRunCount = 0; 
+        int initialRunCount = 0;
+
+        ChartControl stripChart = new ChartControl();
+        ChartControl tractionCircle = new ChartControl();
+        ChartControl trackMap = new ChartControl();
 
         public Form1()
         {
@@ -49,12 +53,6 @@ namespace YamuraLog
 
             colorButton.Text = "Generate Report";
             colorButton.Dock = DockStyle.Top;
-
-            // Add a CellClick handler to handle clicks in the button column.
-            runDataGrid.CellClick += new DataGridViewCellEventHandler(RunDataGrid_CellClick);
-            runDataGrid.CellEndEdit += new DataGridViewCellEventHandler(RunDataGrid_CellEndEdit);
-            runDataGrid.CellValueChanged += new DataGridViewCellEventHandler(RunDataGrid_CellValueChanged);
-            runDataGrid.CellMouseUp += new DataGridViewCellMouseEventHandler(RunDataGrid_CellMouseUp);
 
             // initialize the chart controls
             // stripchart
@@ -94,8 +92,7 @@ namespace YamuraLog
             dockPanel1.Anchor = AnchorStyles.Bottom | AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             dockPanel1.Dock = DockStyle.Fill;
             dockPanel1.BringToFront();
-
-
+            // add charts to dock panel
             stripChart.ShowHint = DockState.Document;
             stripChart.Text = "Stripchart";
             stripChart.Show(dockPanel1);
@@ -110,7 +107,7 @@ namespace YamuraLog
             trackMap.Text = "Track Map";
             trackMap.Show(dockPanel1);
             trackMap.DockState = DockState.DockRightAutoHide;
-
+            // add new content pane, add runDataGrid control to new content pane
             runDataGrid.Dock = DockStyle.Fill;
             DockContent dockpanel2 = new DockContent();
             dockpanel2.Controls.Add(runDataGrid);
@@ -118,9 +115,6 @@ namespace YamuraLog
             dockpanel2.Text = "Run Info";
             dockpanel2.Show(dockPanel1);
             dockpanel2.DockState = DockState.DockRightAutoHide;
-
-
-
         }
         #region event handlers       
         /// <summary>
@@ -773,12 +767,15 @@ namespace YamuraLog
 
                     stripChart.Logger = dataLogger;
                     stripChart.chartViewForm.Logger = dataLogger;
+                    stripChart.chartPropertiesForm.Logger = dataLogger;
 
                     tractionCircle.Logger = dataLogger;
                     tractionCircle.chartViewForm.Logger = dataLogger;
+                    tractionCircle.chartPropertiesForm.Logger = dataLogger;
 
                     trackMap.Logger = dataLogger;
                     trackMap.chartViewForm.Logger = dataLogger;
+                    trackMap.chartPropertiesForm.Logger = dataLogger;
                 }
             }
             #endregion
@@ -792,13 +789,13 @@ namespace YamuraLog
             {
                 runDataGrid.Rows.Add();
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runGridIdx + 1).ToString();
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = false; //runDisplay[runGridIdx].showRun;
+                //runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = false; //runDisplay[runGridIdx].showRun;
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = dataLogger.runData[runGridIdx].dateStr + " " + dataLogger.runData[runGridIdx].timeStr;
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runGridIdx].channels["Time"].DataRange[0];
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runGridIdx].channels["Time"].DataRange[1];
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = runDisplay[runGridIdx].stipchart_Offset[0];
+                //runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = runDisplay[runGridIdx].stipchart_Offset[0];
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runGridIdx].fileName.ToString();
-                runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
+                //runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
             }
             #endregion
         }
@@ -856,59 +853,6 @@ namespace YamuraLog
             //    }
             //    runCount++;
             //}
-        }
-        #endregion
-        #region data grid events
-        private void RunDataGrid_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            // Ignore clicks that are not on button cells. 
-            if (e.RowIndex >= 0 && e.ColumnIndex == runDataGrid.Columns["colTraceColor"].Index)
-            {
-                colorDialog1.ShowDialog();
-                Color resultColor = colorDialog1.Color;
-                runDataGrid.Rows[e.RowIndex].Cells["colTraceColor"].Style.BackColor = resultColor;
-                //
-                runDisplay[e.RowIndex].runColor = resultColor;
-
-                runDataGrid.Invalidate();
-                trackMap.Invalidate();
-                tractionCircle.Invalidate();
-                stripChart.Invalidate();
-            }
-            return;
-        }
-        private void RunDataGrid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            // Ignore clicks that are not on button cells. 
-            if (e.RowIndex >= 0 && ((e.ColumnIndex == runDataGrid.Columns["colTraceColor"].Index) ||
-                                    (e.ColumnIndex == runDataGrid.Columns["colShowRun"].Index)))
-            {
-                stripChart.Invalidate();
-                trackMap.Invalidate();
-                tractionCircle.Invalidate();
-            }
-            return;
-        }
-        private void RunDataGrid_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0 && e.ColumnIndex == runDataGrid.Columns["colOffsetTime"].Index)
-            {
-                runDisplay[e.RowIndex].stipchart_Offset[0] = Convert.ToSingle(runDataGrid.Rows[e.RowIndex].Cells["colOffsetTime"].Value);
-                runDataGrid.Invalidate();
-                trackMap.Invalidate();
-                tractionCircle.Invalidate();
-                stripChart.Invalidate();
-            }
-            return;
-        }
-        private void RunDataGrid_CellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            if (e.RowIndex >= 0 && ((e.ColumnIndex == runDataGrid.Columns["colTraceColor"].Index) ||
-                                    (e.ColumnIndex == runDataGrid.Columns["colShowRun"].Index)))
-            {
-                runDataGrid.EndEdit();
-            }
-
         }
         #endregion
         #region GDI support

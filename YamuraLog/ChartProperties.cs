@@ -12,6 +12,13 @@ namespace YamuraLog
 {
     public partial class ChartProperties : WeifenLuo.WinFormsUI.Docking.DockContent
     {
+        DataLogger logger;
+        public DataLogger Logger
+        {
+            get { return logger; }
+            set { logger = value; }
+        }
+
         public event ChartXAxisChange ChartXAxisChangeEvent;
 
         Dictionary<string, Axis> chartAxes = new Dictionary<string, Axis>();
@@ -65,7 +72,11 @@ namespace YamuraLog
         public string XAxisName
         {
             get { return cmbXAxis.Text; }
-            set { cmbXAxis.Text = value; }
+            set
+            {
+                cmbXAxis.Text = value;
+                axisOffsetsGrid.Columns["axisOffset"].Visible = (cmbXAxis.Text == "Time");
+            }
         }
         /// <summary>
         /// 
@@ -83,7 +94,25 @@ namespace YamuraLog
             colorDialogHost.Name = "channelColor";
             channelsContext.Items.Add(colorDialogHost);
             channelsContext.Items["channelColor"].Visible = true;
+            axisOffsetsGrid.Columns["axisOffset"].Visible = false;
+            axisOffsetsGrid.Columns["axisChannel"].AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            axisOffsetsGrid.CellEndEdit += AxisOffsetsGrid_CellEndEdit;
         }
+
+        private void AxisOffsetsGrid_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            // only handle change to offset value
+            if(e.ColumnIndex != axisOffsetsGrid.Columns["axisOffset"].Index)
+            {
+                return;
+            }
+            string[] channelInfo = axisOffsetsGrid.Rows[e.RowIndex].Cells["axisChannel"].Value.ToString().Split(new char[] { '-' });
+            int runIdx = Convert.ToInt32(channelInfo[0]);
+
+            int val = logger.runData[runIdx].channels[channelInfo[1]].dataPoints.Count;
+
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -164,6 +193,17 @@ namespace YamuraLog
             ChartControlXAxisChangeEventArgs changeEventArgs = new ChartControlXAxisChangeEventArgs();
             changeEventArgs.XAxisName = cmbXAxis.Text; 
             ChartXAxisChangeEvent(this, changeEventArgs);
+
+            if (cmbXAxis.Text == "Time")
+            {
+                axisOffsetsGrid.Columns["axisOffset"].Visible = true;
+                axisOffsetsGrid.Columns["axisOffset"].AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            }
+            else
+            {
+                axisOffsetsGrid.Columns["axisOffset"].Visible = false;
+                axisOffsetsGrid.Columns["axisChannel"].AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            }
 
             axisOffsetsGrid.Rows.Clear();
             foreach(KeyValuePair<string, ChannelInfo> kvp in chartAxes[cmbXAxis.Text].AssociatedChannels)
