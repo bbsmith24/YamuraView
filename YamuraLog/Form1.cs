@@ -16,15 +16,13 @@ namespace YamuraLog
 {
     public partial class Form1 : Form
     {
+        #region members
         private Button colorButton = new Button();
         List<Color> penColors = new List<Color>();
         private List<Task> tasks = new List<Task>();
 
         // DataLogger contains runs, which contain channels which contain data points
         DataLogger dataLogger = new DataLogger();
-
-        // run for display data
-        List<RunDisplay_Data> runDisplay = new List<RunDisplay_Data>();
 
         float gpsDist = 0.0F;
         // runs processed to logger prior to latest read (for TXT files with start/stop markers)
@@ -33,7 +31,8 @@ namespace YamuraLog
         ChartControl stripChart = new ChartControl();
         ChartControl tractionCircle = new ChartControl();
         ChartControl trackMap = new ChartControl();
-
+        #endregion
+        #region constructors
         public Form1()
         {
             InitializeComponent();
@@ -116,6 +115,7 @@ namespace YamuraLog
             dockpanel2.Show(dockPanel1);
             dockpanel2.DockState = DockState.DockRightAutoHide;
         }
+        #endregion
         #region event handlers       
         /// <summary>
         /// handle mouse move events from stripchart
@@ -127,7 +127,7 @@ namespace YamuraLog
         {
         }
         #endregion
-        #region read log file
+        #region read various log file formats
         private void ReadTXTFile(String fileName)
         {
             #region create a temp file to write cleaned up data stream
@@ -664,25 +664,14 @@ namespace YamuraLog
         public void UpdateData()
         {
             int channelIdx = 0;
-            //int runIdx = 0;
             #region update display info
             for (int runIdx = initialRunCount; runIdx < dataLogger.runData.Count; runIdx++)
             {
                 RunData curRun = dataLogger.runData[dataLogger.runData.Count - 1];
                 {
-                    runDisplay.Add(new RunDisplay_Data());
-                    //runIdx = runDisplay.Count - 1;
-                    runDisplay[runIdx].runColor = penColors[runIdx % penColors.Count()];
-                    runDisplay[runIdx].stipchart_Offset[0] = 0.0F;
-                    runDisplay[runIdx].stipchart_Offset[1] = 0.0F;
-
                     channelIdx = 0;
                     foreach (KeyValuePair<String, DataChannel> curChannel in curRun.channels)
                     {
-                        #region channel display
-                        runDisplay[runIdx].channelDisplay.Add(curChannel.Key, false);
-                        runDisplay[runIdx].channelColor.Add(curChannel.Key, penColors[channelIdx % penColors.Count()]);
-                        #endregion
                         String axisName = curChannel.Key;
                         #region strip chart control axes create/update
                         if (stripChart.ChartAxes.ContainsKey(axisName))
@@ -779,17 +768,14 @@ namespace YamuraLog
 
             #region populate run data grid
             runDataGrid.Rows.Clear();
-            for (int runGridIdx = 0; runGridIdx < runDisplay.Count(); runGridIdx++)
+            for(int runGridIdx = 0; runGridIdx < dataLogger.runData.Count; runGridIdx++)
             {
                 runDataGrid.Rows.Add();
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runGridIdx + 1).ToString();
-                //runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colShowRun"].Value = false; //runDisplay[runGridIdx].showRun;
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = dataLogger.runData[runGridIdx].dateStr + " " + dataLogger.runData[runGridIdx].timeStr;
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runGridIdx].channels["Time"].DataRange[0];
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runGridIdx].channels["Time"].DataRange[1];
-                //runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colOffsetTime"].Value = runDisplay[runGridIdx].stipchart_Offset[0];
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runGridIdx].fileName.ToString();
-                //runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colTraceColor"].Style.BackColor = runDisplay[runDataGrid.Rows.Count - 1].runColor;
             }
             #endregion
         }
@@ -896,7 +882,7 @@ namespace YamuraLog
             return (float)rad;
         }
         #endregion
-
+        #region toolbar menu click handlers
         private void addRunsMenuItem_Click(object sender, EventArgs e)
         {
             if (openLogFile.ShowDialog() != DialogResult.OK)
@@ -920,30 +906,12 @@ namespace YamuraLog
         private void clearRunsMenuItem_Click(object sender, EventArgs e)
         {
             runDataGrid.Rows.Clear();
-            //channelDataGrid.Rows.Clear();
             dataLogger.Reset();
-            runDisplay.Clear();
 
 
             stripChart.Invalidate();
             tractionCircle.Invalidate();
             trackMap.Invalidate();
-
-        }
-
-        private void autoAlignToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            float autoThreshold = 0.0F;
-            //try
-            //{
-            //    autoThreshold = Convert.ToSingle(txtAutoAlignThreshold.Text);
-            //}
-            //catch
-            //{
-            //    MessageBox.Show("Can't convert auto align value " + txtAutoAlignThreshold.Text + " to a number");
-            //    return;
-            //}
-            AutoAlign(autoThreshold);
 
         }
 
@@ -960,22 +928,38 @@ namespace YamuraLog
             uploadDlg.UploadMode = "U";
             uploadDlg.ShowDialog();
         }
-    }
-    /// <summary>
-    /// display info for runs and channels
-    /// </summary>
-    public partial class RunDisplay_Data
-    {
-        public Color runColor = Color.Black;
-        public float[] stipchart_Offset = new float[] { 0.0F, 0.0F };
-        public bool showRun = true;
-        public Dictionary<String, bool> channelDisplay = new Dictionary<String, bool>();
-        public Dictionary<String, Color> channelColor = new Dictionary<String, Color>();
-        public void Reset()
+
+        private void listFilesMenuItem_Click(object sender, EventArgs e)
         {
-            stipchart_Offset = new float[] { 0.0F, 0.0F };
-            channelDisplay.Clear();
-            channelColor.Clear();
+
         }
+
+        private void clearFilesMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void exitMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+        #endregion
+        #region obsolete or saved....
+        private void autoAlignToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            float autoThreshold = 0.0F;
+            //try
+            //{
+            //    autoThreshold = Convert.ToSingle(txtAutoAlignThreshold.Text);
+            //}
+            //catch
+            //{
+            //    MessageBox.Show("Can't convert auto align value " + txtAutoAlignThreshold.Text + " to a number");
+            //    return;
+            //}
+            AutoAlign(autoThreshold);
+
+        }
+        #endregion
     }
 }

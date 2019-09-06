@@ -69,11 +69,9 @@ namespace YamuraLog
                 {
                     fileName = serialPort.ReadLine();
                     rStr.Insert(0, fileName + System.Environment.NewLine);
-                    System.Diagnostics.Debug.WriteLine("reading filename " + fileName);
                 }
                 catch
                 {
-                    System.Diagnostics.Debug.WriteLine("error reading filename");
                     break;
                 }
                 fileName = fileName.Trim();

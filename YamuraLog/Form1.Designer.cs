@@ -31,13 +31,13 @@
             this.openLogFile = new System.Windows.Forms.OpenFileDialog();
             this.runDataGrid = new System.Windows.Forms.DataGridView();
             this.colRunNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colShowRun = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.colTraceColor = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colMinTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colMaxTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colOffsetTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colSourceFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colShowRun = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.colTraceColor = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colOffsetTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.txtCursorPos = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -46,11 +46,19 @@
             this.addRunsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearRunsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uploadFromLoggerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.uploadAndDeleteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.listFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uploadOnlyMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.autoAlignToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.uploadAndDeleteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
+            this.exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.openWorkspaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveWorkspaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -62,12 +70,9 @@
             this.runDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.runDataGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colRunNumber,
-            //this.colShowRun,
-            //this.colTraceColor,
             this.colDate,
             this.colMinTime,
             this.colMaxTime,
-            //this.colOffsetTime,
             this.colSourceFile});
             this.runDataGrid.Location = new System.Drawing.Point(11, 41);
             this.runDataGrid.Name = "runDataGrid";
@@ -81,14 +86,40 @@
             this.colRunNumber.HeaderText = "Run";
             this.colRunNumber.Name = "colRunNumber";
             this.colRunNumber.ReadOnly = true;
-            this.colRunNumber.Width = 52;
+            // 
+            // colDate
+            // 
+            this.colDate.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colDate.HeaderText = "Date/Time";
+            this.colDate.Name = "colDate";
+            this.colDate.ReadOnly = true;
+            // 
+            // colMinTime
+            // 
+            this.colMinTime.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colMinTime.HeaderText = "Start";
+            this.colMinTime.Name = "colMinTime";
+            this.colMinTime.ReadOnly = true;
+            // 
+            // colMaxTime
+            // 
+            this.colMaxTime.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colMaxTime.HeaderText = "End";
+            this.colMaxTime.Name = "colMaxTime";
+            this.colMaxTime.ReadOnly = true;
+            // 
+            // colSourceFile
+            // 
+            this.colSourceFile.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colSourceFile.HeaderText = "Source";
+            this.colSourceFile.Name = "colSourceFile";
+            this.colSourceFile.ReadOnly = true;
             // 
             // colShowRun
             // 
             this.colShowRun.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
             this.colShowRun.HeaderText = "Show";
             this.colShowRun.Name = "colShowRun";
-            this.colShowRun.Width = 40;
             // 
             // colTraceColor
             // 
@@ -97,45 +128,12 @@
             this.colTraceColor.Name = "colTraceColor";
             this.colTraceColor.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.colTraceColor.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.colTraceColor.Width = 37;
-            // 
-            // colDate
-            // 
-            this.colDate.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colDate.HeaderText = "Date/Time";
-            this.colDate.Name = "colDate";
-            this.colDate.ReadOnly = true;
-            this.colDate.Width = 83;
-            // 
-            // colMinTime
-            // 
-            this.colMinTime.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colMinTime.HeaderText = "Start";
-            this.colMinTime.Name = "colMinTime";
-            this.colMinTime.ReadOnly = true;
-            this.colMinTime.Width = 54;
-            // 
-            // colMaxTime
-            // 
-            this.colMaxTime.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colMaxTime.HeaderText = "End";
-            this.colMaxTime.Name = "colMaxTime";
-            this.colMaxTime.ReadOnly = true;
-            this.colMaxTime.Width = 51;
             // 
             // colOffsetTime
             // 
             this.colOffsetTime.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             this.colOffsetTime.HeaderText = "Offset";
             this.colOffsetTime.Name = "colOffsetTime";
-            this.colOffsetTime.Width = 60;
-            // 
-            // colSourceFile
-            // 
-            this.colSourceFile.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colSourceFile.HeaderText = "Source";
-            this.colSourceFile.Name = "colSourceFile";
-            this.colSourceFile.ReadOnly = true;
             // 
             // txtCursorPos
             // 
@@ -172,8 +170,12 @@
             this.addRunsMenuItem,
             this.clearRunsMenuItem,
             this.uploadFromLoggerToolStripMenuItem,
+            this.toolStripSeparator4,
+            this.openWorkspaceToolStripMenuItem,
+            this.saveWorkspaceToolStripMenuItem,
+            this.toolStripSeparator3,
             this.settingsToolStripMenuItem,
-            this.autoAlignToolStripMenuItem});
+            this.exitMenuItem});
             this.filesToolStripMenuItem.Name = "filesToolStripMenuItem";
             this.filesToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.filesToolStripMenuItem.Text = "File";
@@ -181,32 +183,36 @@
             // addRunsMenuItem
             // 
             this.addRunsMenuItem.Name = "addRunsMenuItem";
-            this.addRunsMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.addRunsMenuItem.Size = new System.Drawing.Size(164, 22);
             this.addRunsMenuItem.Text = "Add Runs";
             this.addRunsMenuItem.Click += new System.EventHandler(this.addRunsMenuItem_Click);
             // 
             // clearRunsMenuItem
             // 
             this.clearRunsMenuItem.Name = "clearRunsMenuItem";
-            this.clearRunsMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.clearRunsMenuItem.Size = new System.Drawing.Size(164, 22);
             this.clearRunsMenuItem.Text = "Clear Runs";
             this.clearRunsMenuItem.Click += new System.EventHandler(this.clearRunsMenuItem_Click);
             // 
             // uploadFromLoggerToolStripMenuItem
             // 
             this.uploadFromLoggerToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.listFilesMenuItem,
+            this.uploadOnlyMenuItem,
             this.uploadAndDeleteMenuItem,
-            this.uploadOnlyMenuItem});
+            this.clearFilesMenuItem,
+            this.toolStripSeparator1,
+            this.toolStripSeparator2});
             this.uploadFromLoggerToolStripMenuItem.Name = "uploadFromLoggerToolStripMenuItem";
-            this.uploadFromLoggerToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.uploadFromLoggerToolStripMenuItem.Text = "Upload from Logger";
+            this.uploadFromLoggerToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.uploadFromLoggerToolStripMenuItem.Text = "Logger";
             // 
-            // uploadAndDeleteMenuItem
+            // listFilesMenuItem
             // 
-            this.uploadAndDeleteMenuItem.Name = "uploadAndDeleteMenuItem";
-            this.uploadAndDeleteMenuItem.Size = new System.Drawing.Size(171, 22);
-            this.uploadAndDeleteMenuItem.Text = "Upload and Delete";
-            this.uploadAndDeleteMenuItem.Click += new System.EventHandler(this.uploadAndDeleteMenuItem_Click);
+            this.listFilesMenuItem.Name = "listFilesMenuItem";
+            this.listFilesMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.listFilesMenuItem.Text = "List Files";
+            this.listFilesMenuItem.Click += new System.EventHandler(this.listFilesMenuItem_Click);
             // 
             // uploadOnlyMenuItem
             // 
@@ -215,18 +221,29 @@
             this.uploadOnlyMenuItem.Text = "Upload Only";
             this.uploadOnlyMenuItem.Click += new System.EventHandler(this.uploadOnlyMenuItem_Click);
             // 
-            // settingsToolStripMenuItem
+            // uploadAndDeleteMenuItem
             // 
-            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.settingsToolStripMenuItem.Text = "Settings";
+            this.uploadAndDeleteMenuItem.Name = "uploadAndDeleteMenuItem";
+            this.uploadAndDeleteMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.uploadAndDeleteMenuItem.Text = "Upload and Delete";
+            this.uploadAndDeleteMenuItem.Click += new System.EventHandler(this.uploadAndDeleteMenuItem_Click);
             // 
-            // autoAlignToolStripMenuItem
+            // clearFilesMenuItem
             // 
-            this.autoAlignToolStripMenuItem.Name = "autoAlignToolStripMenuItem";
-            this.autoAlignToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.autoAlignToolStripMenuItem.Text = "AutoAlign";
-            this.autoAlignToolStripMenuItem.Click += new System.EventHandler(this.autoAlignToolStripMenuItem_Click);
+            this.clearFilesMenuItem.Name = "clearFilesMenuItem";
+            this.clearFilesMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.clearFilesMenuItem.Text = "Clear Files";
+            this.clearFilesMenuItem.Click += new System.EventHandler(this.clearFilesMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(168, 6);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(168, 6);
             // 
             // dockPanel1
             // 
@@ -237,6 +254,41 @@
             this.dockPanel1.Name = "dockPanel1";
             this.dockPanel1.Size = new System.Drawing.Size(1115, 658);
             this.dockPanel1.TabIndex = 38;
+            // 
+            // exitMenuItem
+            // 
+            this.exitMenuItem.Name = "exitMenuItem";
+            this.exitMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.exitMenuItem.Text = "Exit";
+            this.exitMenuItem.Click += new System.EventHandler(this.exitMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(161, 6);
+            // 
+            // openWorkspaceToolStripMenuItem
+            // 
+            this.openWorkspaceToolStripMenuItem.Name = "openWorkspaceToolStripMenuItem";
+            this.openWorkspaceToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.openWorkspaceToolStripMenuItem.Text = "Open Workspace";
+            // 
+            // saveWorkspaceToolStripMenuItem
+            // 
+            this.saveWorkspaceToolStripMenuItem.Name = "saveWorkspaceToolStripMenuItem";
+            this.saveWorkspaceToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.saveWorkspaceToolStripMenuItem.Text = "Save Workspace";
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(161, 6);
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.settingsToolStripMenuItem.Text = "Settings";
             // 
             // Form1
             // 
@@ -279,9 +331,17 @@
         private System.Windows.Forms.ToolStripMenuItem uploadFromLoggerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem uploadAndDeleteMenuItem;
         private System.Windows.Forms.ToolStripMenuItem uploadOnlyMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem autoAlignToolStripMenuItem;
         private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel1;
+        private System.Windows.Forms.ToolStripMenuItem listFilesMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearFilesMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem openWorkspaceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveWorkspaceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exitMenuItem;
     }
 }
 

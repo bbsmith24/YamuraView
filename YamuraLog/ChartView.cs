@@ -695,20 +695,6 @@ namespace YamuraLog
         /// <param name="e"></param>
         public void OnChartMouseMove(object sender, ChartControlMouseMoveEventArgs e)
         {
-System.Diagnostics.Debug.Write("Chart mouse move received by " + ChartName + " from " + (sender as ChartView).ChartName + System.Environment.NewLine);
-System.Diagnostics.Debug.Write("X axes:" + System.Environment.NewLine);
-foreach (KeyValuePair<string, float> kvp in e.XAxisValues)
-{
-    System.Diagnostics.Debug.Write("\t>>" + kvp.Key + " " + kvp.Value.ToString() + " <<" + System.Environment.NewLine);
-}
-System.Diagnostics.Debug.WriteLine(System.Environment.NewLine);
-System.Diagnostics.Debug.Write("Y axes:" + System.Environment.NewLine);
-foreach (KeyValuePair<string, float> kvp in e.YAxisValues)
-{
-    System.Diagnostics.Debug.Write("\t>>" + kvp.Key + " " + kvp.Value.ToString() + " <<" + System.Environment.NewLine);
-}
-System.Diagnostics.Debug.WriteLine(System.Environment.NewLine);
-
             #region move cursor(s)
             // position in event args is data - need to scale to screen
             float[] displayScale = new float[] { 1.0F, 1.0F };
@@ -819,7 +805,6 @@ System.Diagnostics.Debug.WriteLine(System.Environment.NewLine);
 
         public void OnAxisOffsetUpdate(object sender, AxisOffsetUpdateEventArgs e)
         {
-            int i = 0;
             // offset channel on X axis
             string associatedAxisName = e.RunIdx.ToString() + "-" + e.ChannelName;
             if(e.AxisIdx == 0)
