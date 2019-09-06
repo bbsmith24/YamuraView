@@ -274,12 +274,14 @@ namespace YamuraLog
                             // at this point, the value is already offset on the X axis by any user defined time shift
                             // just need to offset by the stripchart panned position (H scrollbar)
                             //
-                            endPt = ScaleDataToDisplay(endPt,                                               // point
-                                                                     displayScale[0],                       // scale X
-                                                                     displayScale[1],                       // scale Y
-                                                                     chartAxes[xChannelName].DisplayOffset, // offset X
-                                                                     yAxis.Value.AxisRange[0],              // offset Y
-                                                                     chartBounds);                          // graphics area boundary
+                            endPt = ScaleDataToDisplay(endPt,                                                                                     // point
+                                                                     displayScale[0],                                                             // scale X
+                                                                     displayScale[1],                                                             // scale Y
+                                                                     -1* chartAxes[xChannelName].AxisRange[0] + 
+                                                                         chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
+                                                                     yAxis.Value.AxisRange[0] +
+                                                                         chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1],  // offset Y
+                                                                     chartBounds);                                                                // graphics area boundary
                             if ((initialValue) && (startPt.X < chartBounds.Width) && (endPt.X > 0))
                             {
                                 chartGraphics.DrawLine(drawPen, startPt, endPt);
@@ -406,6 +408,9 @@ namespace YamuraLog
                                    0.0F,
                                    0.0F,
                                    chartBounds);
+                axisPoint.X -= (-1 * chartAxes[xChannelName].AxisRange[0] +
+                                       chartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0]);  // offset X
+
                 moveEventArgs.XAxisValues.Add(channel.Value.RunIndex.ToString() + "-" + channel.Value.ChannelName, axisPoint.X);
             }
             foreach (KeyValuePair<string, Axis> axis in chartAxes)
@@ -426,6 +431,10 @@ namespace YamuraLog
                                        0.0F,
                                        0.0F,
                                        chartBounds);
+
+                    axisPoint.Y -= (channel.Value.AxisRange[0] +
+                                       chartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1]);
+
                     moveEventArgs.YAxisValues.Add(channel.Value.RunIndex.ToString() + "-" + channel.Value.ChannelName, axisPoint.Y);
                 }
             }
@@ -686,18 +695,19 @@ namespace YamuraLog
         /// <param name="e"></param>
         public void OnChartMouseMove(object sender, ChartControlMouseMoveEventArgs e)
         {
-            System.Diagnostics.Debug.Write("Chart mouse move received by " + ChartName + " from " + (sender as ChartView).ChartName + " X axes: ");
-            foreach (KeyValuePair<string, float> kvp in e.XAxisValues)
-            {
-                System.Diagnostics.Debug.Write(">> " + kvp.Key + " " + kvp.Value.ToString() + " << ");
-            }
-            System.Diagnostics.Debug.WriteLine("");
-            System.Diagnostics.Debug.Write("                 Y axes: ");
-            foreach (KeyValuePair<string, float> kvp in e.YAxisValues)
-            {
-                System.Diagnostics.Debug.Write(">> " + kvp.Key + " " + kvp.Value.ToString() + " << ");
-            }
-            System.Diagnostics.Debug.WriteLine("");
+System.Diagnostics.Debug.Write("Chart mouse move received by " + ChartName + " from " + (sender as ChartView).ChartName + System.Environment.NewLine);
+System.Diagnostics.Debug.Write("X axes:" + System.Environment.NewLine);
+foreach (KeyValuePair<string, float> kvp in e.XAxisValues)
+{
+    System.Diagnostics.Debug.Write("\t>>" + kvp.Key + " " + kvp.Value.ToString() + " <<" + System.Environment.NewLine);
+}
+System.Diagnostics.Debug.WriteLine(System.Environment.NewLine);
+System.Diagnostics.Debug.Write("Y axes:" + System.Environment.NewLine);
+foreach (KeyValuePair<string, float> kvp in e.YAxisValues)
+{
+    System.Diagnostics.Debug.Write("\t>>" + kvp.Key + " " + kvp.Value.ToString() + " <<" + System.Environment.NewLine);
+}
+System.Diagnostics.Debug.WriteLine(System.Environment.NewLine);
 
             #region move cursor(s)
             // position in event args is data - need to scale to screen
@@ -709,7 +719,6 @@ namespace YamuraLog
             int cursorIdx = -1;
             if (CursorMode != CursorStyle.NONE)
             {
-System.Diagnostics.Debug.WriteLine("slave cursor(s) for " + chartName);
                 // check each Y axis
                 foreach (KeyValuePair<string, Axis> yAxis in chartAxes)
                 {
@@ -718,7 +727,6 @@ System.Diagnostics.Debug.WriteLine("slave cursor(s) for " + chartName);
                     {
                         continue;
                     }
-System.Diagnostics.Debug.WriteLine("yAxis " + yAxis.Key);
                     axisFullName = axisIdx.ToString() + "-" + yAxis.Key;
                     displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisRange[2];
                     // check each associated channel
@@ -730,12 +738,9 @@ System.Diagnostics.Debug.WriteLine("yAxis " + yAxis.Key);
                             continue;
                         }
                         cursorIdx++;
-System.Diagnostics.Debug.WriteLine("channel " + curChanInfo.Key + " run " + curChanInfo.Value.RunIndex + " cursor idx " + cursorIdx);
                         // add new cursor info if needed
                         if (startMouseMove.Count <= cursorIdx)
                         {
-System.Diagnostics.Debug.WriteLine("add slaveed cursor");
-
                             startMouseMove.Add(false);
                             startMouseDrag.Add(false);
                             chartStartCursorPos.Add(new Point(0, 0));
@@ -752,25 +757,27 @@ System.Diagnostics.Debug.WriteLine("add slaveed cursor");
                         // x axis is not time - find nearest time in axis channel, 
                         else
                         {
-                            DataPoint tst = logger.runData[curChanInfo.Value.RunIndex].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= e.XAxisValues["0-Time"]).Value;
+                            DataPoint tst = logger.runData[curChanInfo.Value.RunIndex].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= e.XAxisValues[curChanInfo.Value.RunIndex.ToString() + "-Time"]).Value;
                             if (tst == null)
                             {
                                 continue;
                             }
                             endPt.X = tst.PointValue;
-                            tst = curChannel.dataPoints.FirstOrDefault(i => i.Key >= e.XAxisValues["0-Time"]).Value;
+                            tst = curChannel.dataPoints.FirstOrDefault(i => i.Key >= e.XAxisValues[curChanInfo.Value.RunIndex.ToString() + "-Time"]).Value;
                             if (tst == null)
                             {
                                 continue;
                             }
                             endPt.Y = tst.PointValue;
                         }
-                        endPt = ScaleDataToDisplay(endPt,                                               // point
-                                                                 displayScale[0],                       // scale X
-                                                                 displayScale[1],                       // scale Y
-                                                                 chartAxes[xChannelName].DisplayOffset, // offset X
-                                                                 yAxis.Value.AxisRange[0],              // offset Y
-                                                                 chartBounds);                          // graphics area boundary
+                        endPt = ScaleDataToDisplay(endPt,                                                      // point
+                                                   displayScale[0],                              // scale X
+                                                   displayScale[1],                              // scale Y
+                                                   -1 * chartAxes[xChannelName].AxisRange[0] +
+                                                               chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
+                                                   yAxis.Value.AxisRange[0] +
+                                                               chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1],  // offset Y
+                                                   chartBounds);                                 // graphics area boundary
 
 
                         startMouseDrag[cursorIdx] = false;
@@ -781,7 +788,6 @@ System.Diagnostics.Debug.WriteLine("add slaveed cursor");
                         }
                         else
                         {
-System.Diagnostics.Debug.Write(" ERASE ");
                             DrawCursorAt(chartLastCursorPos[cursorIdx].X, chartLastCursorPos[cursorIdx].Y);
                         }
                         #endregion
@@ -791,7 +797,6 @@ System.Diagnostics.Debug.Write(" ERASE ");
                         {
                             startMouseMove[cursorIdx] = true;
                             chartLastCursorPos[cursorIdx] = new Point((int)endPt.X, (int)endPt.Y);
-System.Diagnostics.Debug.WriteLine(" DRAW ");
                             DrawCursorAt(chartLastCursorPos[cursorIdx].X, chartLastCursorPos[cursorIdx].Y);
                         }
                         // outside of chart, don't draw and not started
@@ -808,8 +813,19 @@ System.Diagnostics.Debug.WriteLine(" DRAW ");
         }
         public void OnChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Change X Axis of " + ChartName + " to " + e.XAxisName);
             xChannelName = e.XAxisName;
+            chartPanel.Invalidate();
+        }
+
+        public void OnAxisOffsetUpdate(object sender, AxisOffsetUpdateEventArgs e)
+        {
+            int i = 0;
+            // offset channel on X axis
+            string associatedAxisName = e.RunIdx.ToString() + "-" + e.ChannelName;
+            if(e.AxisIdx == 0)
+            {
+                chartAxes[e.ChannelName].AssociatedChannels[associatedAxisName].AxisOffset[0] = e.OffsetVal;
+            }
             chartPanel.Invalidate();
         }
     }

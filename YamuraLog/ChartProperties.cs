@@ -12,6 +12,8 @@ namespace YamuraLog
 {
     public partial class ChartProperties : WeifenLuo.WinFormsUI.Docking.DockContent
     {
+        public event AxisOffsetUpdate AxisOffsetUpdateEvent;
+
         DataLogger logger;
         public DataLogger Logger
         {
@@ -108,11 +110,12 @@ namespace YamuraLog
             }
             string[] channelInfo = axisOffsetsGrid.Rows[e.RowIndex].Cells["axisChannel"].Value.ToString().Split(new char[] { '-' });
             int runIdx = Convert.ToInt32(channelInfo[0]);
+            string channelName = channelInfo[1];
+            float offsetValue = Convert.ToSingle(axisOffsetsGrid.Rows[e.RowIndex].Cells["axisOffset"].Value);
 
-            int val = logger.runData[runIdx].channels[channelInfo[1]].dataPoints.Count;
-
+            AxisOffsetUpdateEventArgs updateArgs = new AxisOffsetUpdateEventArgs(channelName, runIdx, 0, offsetValue);
+            AxisOffsetUpdateEvent(this, updateArgs);
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -212,7 +215,7 @@ namespace YamuraLog
                 axisOffsetsGrid.Rows[axisOffsetsGrid.Rows.Count - 1].Cells["axisChannel"].Value = kvp.Key;
                 axisOffsetsGrid.Rows[axisOffsetsGrid.Rows.Count - 1].Cells["axisStart"].Value = kvp.Value.AxisRange[0].ToString();
                 axisOffsetsGrid.Rows[axisOffsetsGrid.Rows.Count - 1].Cells["axisEnd"].Value = kvp.Value.AxisRange[1].ToString();
-                axisOffsetsGrid.Rows[axisOffsetsGrid.Rows.Count - 1].Cells["axisOffset"].Value = kvp.Value.AxisOffset.ToString();
+                axisOffsetsGrid.Rows[axisOffsetsGrid.Rows.Count - 1].Cells["axisOffset"].Value = kvp.Value.AxisOffset[0].ToString();
             }
         }
         /// <summary>
@@ -239,6 +242,41 @@ namespace YamuraLog
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             channelsContext.Close();
+        }
+    }
+    public class AxisOffsetUpdateEventArgs : EventArgs
+    {
+        string channelName;
+        public string ChannelName
+        {
+            get { return channelName; }
+            set { channelName = value; }
+        }
+        int axisIdx;
+        public int AxisIdx
+        {
+            get { return axisIdx; }
+            set { axisIdx = value; }
+        }
+        int runIdx;
+        public int RunIdx
+        {
+            get { return runIdx; }
+            set { runIdx = value; }
+        }
+        float offsetVal;
+        public float OffsetVal
+        {
+            get { return offsetVal; }
+            set { offsetVal = value; }
+        }
+
+        public AxisOffsetUpdateEventArgs(string name, int run, int axis, float offset)
+        {
+            ChannelName = name;
+            RunIdx = run;
+            AxisIdx = axis;
+            OffsetVal = offset;
         }
     }
 }

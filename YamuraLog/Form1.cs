@@ -700,13 +700,11 @@ namespace YamuraLog
                         stripChart.ChartAxes[axisName].AxisRange[2] = stripChart.ChartAxes[axisName].AxisRange[1] - stripChart.ChartAxes[axisName].AxisRange[0];
                         stripChart.ChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, curChannel.Key));
                         stripChart.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
-                        stripChart.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset = 0.0F;
+                        stripChart.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[0] = 0.0F;
+                        stripChart.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[1] = 0.0F;
                         stripChart.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[0] = stripChart.ChartAxes[axisName].AxisRange[0];
                         stripChart.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[1] = stripChart.ChartAxes[axisName].AxisRange[1];
                         stripChart.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[2] = stripChart.ChartAxes[axisName].AxisRange[2];
-                        //stripChart.ChartAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / stripChart.ChartAxes[axisName].AxisRange[2];
-                        //stripChart.ChartAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / stripChart.ChartAxes[axisName].AxisRange[2];
-                        stripChart.ChartAxes[axisName].DisplayOffset = -1 * stripChart.ChartAxes[axisName].AxisRange[0];
                         #endregion
                         #region traction circle control axes create/update
                         if (tractionCircle.ChartAxes.ContainsKey(axisName))
@@ -724,13 +722,11 @@ namespace YamuraLog
                         tractionCircle.ChartAxes[axisName].AxisRange[2] = tractionCircle.ChartAxes[axisName].AxisRange[1] - tractionCircle.ChartAxes[axisName].AxisRange[0];
                         tractionCircle.ChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, curChannel.Key));
                         tractionCircle.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
-                        tractionCircle.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset = 0.0F;
+                        tractionCircle.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[0] = 0.0F;
+                        tractionCircle.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[1] = 0.0F;
                         tractionCircle.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[0] = tractionCircle.ChartAxes[axisName].AxisRange[0];
                         tractionCircle.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[1] = tractionCircle.ChartAxes[axisName].AxisRange[1];
                         tractionCircle.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[2] = tractionCircle.ChartAxes[axisName].AxisRange[2];
-                        //tractionCircle.ChartAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / tractionCircle.ChartAxes[axisName].AxisRange[2];
-                        //tractionCircle.ChartAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / tractionCircle.ChartAxes[axisName].AxisRange[2];
-                        tractionCircle.ChartAxes[axisName].DisplayOffset = -1 * tractionCircle.ChartAxes[axisName].AxisRange[0];
                         #endregion
                         #region track map control axes create/update
                         if (trackMap.ChartAxes.ContainsKey(axisName))
@@ -748,13 +744,11 @@ namespace YamuraLog
                         trackMap.ChartAxes[axisName].AxisRange[2] = trackMap.ChartAxes[axisName].AxisRange[1] - trackMap.ChartAxes[axisName].AxisRange[0];
                         trackMap.ChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, curChannel.Key));
                         trackMap.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
-                        trackMap.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset = 0.0F;
+                        trackMap.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[0] = 0.0F;
+                        trackMap.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[1] = 0.0F;
                         trackMap.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[0] = trackMap.ChartAxes[axisName].AxisRange[0];
                         trackMap.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[1] = trackMap.ChartAxes[axisName].AxisRange[1];
                         trackMap.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[2] = trackMap.ChartAxes[axisName].AxisRange[2];
-                        //trackMap.ChartAxes[axisName].DisplayScale[0] = (float)stripChartPanelBounds.Width / trackMap.ChartAxes[axisName].AxisRange[2];
-                        //trackMap.ChartAxes[axisName].DisplayScale[1] = (float)stripChartPanelBounds.Height / trackMap.ChartAxes[axisName].AxisRange[2];
-                        trackMap.ChartAxes[axisName].DisplayOffset = -1 * trackMap.ChartAxes[axisName].AxisRange[0];
                         #endregion
                         channelIdx++;
                     }

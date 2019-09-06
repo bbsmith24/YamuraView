@@ -30,20 +30,6 @@ namespace YamuraLog
             set { associatedChannels = value; }
         }
 
-        float[] displayScale = new float[] { 1.0F, 1.0F };
-        public float[] DisplayScale
-        {
-            get { return displayScale; }
-            set { displayScale = value; }
-        }
-
-        float displayOffset = 0.0F;
-        public float DisplayOffset
-        {
-            get { return displayOffset; }
-            set { displayOffset = value; }
-        }
-
         bool showAxis = false;
         public bool ShowAxis
         {
@@ -73,11 +59,6 @@ namespace YamuraLog
             get { return showChannel; }
             set { showChannel = value; }
         }
-        public ChannelInfo(int idx, String name)
-        {
-            runIndex = idx;
-            channelName = name;
-        }
 
         Color channelColor = Color.Black;
         public Color ChannelColor
@@ -93,14 +74,20 @@ namespace YamuraLog
             set { axisRange = value; }
         }
 
-        float axisOffset = 0.0F;
+        float[] axisOffset = new float[] { 0.0F, 0.0F};
         /// <summary>
         /// axis offset value
         /// </summary>
-        public float AxisOffset
+        public float[] AxisOffset
         {
             get { return axisOffset; }
             set { axisOffset = value; }
+        }
+
+        public ChannelInfo(int idx, String name)
+        {
+            runIndex = idx;
+            channelName = name;
         }
     }
 }

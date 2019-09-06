@@ -15,6 +15,7 @@ namespace YamuraLog
 {
     public delegate void ChartMouseMove(object sender, ChartControlMouseMoveEventArgs e);
     public delegate void ChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e);
+    public delegate void AxisOffsetUpdate(object sender, AxisOffsetUpdateEventArgs e);
 
     public partial class ChartControl :  WeifenLuo.WinFormsUI.Docking.DockContent//UserControl
     {
@@ -75,6 +76,8 @@ namespace YamuraLog
             chartPropertiesForm.ShowHint = DockState.Document;
             chartPropertiesForm.Text = "Stripchart Channels Setup";
             chartPropertiesForm.Show(dockPanel1);
+
+            chartPropertiesForm.AxisOffsetUpdateEvent += chartViewForm.OnAxisOffsetUpdate;
         }
     }
     public class ChartControlMouseMoveEventArgs : EventArgs
