@@ -883,6 +883,11 @@ namespace YamuraLog
         }
         #endregion
         #region toolbar menu click handlers
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void addRunsMenuItem_Click(object sender, EventArgs e)
         {
             if (openLogFile.ShowDialog() != DialogResult.OK)
@@ -902,7 +907,11 @@ namespace YamuraLog
             trackMap.Invalidate();
 
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void clearRunsMenuItem_Click(object sender, EventArgs e)
         {
             runDataGrid.Rows.Clear();
@@ -914,29 +923,49 @@ namespace YamuraLog
             trackMap.Invalidate();
 
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void uploadAndDeleteMenuItem_Click(object sender, EventArgs e)
         {
             UploadFiles uploadDlg = new UploadFiles();
             uploadDlg.UploadMode = "D";
             uploadDlg.ShowDialog();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void uploadOnlyMenuItem_Click(object sender, EventArgs e)
         {
             UploadFiles uploadDlg = new UploadFiles();
             uploadDlg.UploadMode = "U";
             uploadDlg.ShowDialog();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void listFilesMenuItem_Click(object sender, EventArgs e)
         {
-
+            UploadFiles uploadDlg = new UploadFiles();
+            uploadDlg.UploadMode = "L";
+            uploadDlg.ShowDialog();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void clearFilesMenuItem_Click(object sender, EventArgs e)
         {
-
+            UploadFiles uploadDlg = new UploadFiles();
+            uploadDlg.UploadMode = "X";
+            uploadDlg.ShowDialog();
         }
 
         private void exitMenuItem_Click(object sender, EventArgs e)

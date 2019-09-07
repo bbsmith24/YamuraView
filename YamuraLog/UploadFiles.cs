@@ -21,13 +21,42 @@ namespace YamuraLog
             get { return uploadMode; }
             set
             {
-                if((value != "U") &&
-                   (value != "D") &&
-                   (value != "X"))
+                if((value != "L") &&   // list 
+                   (value != "U") &&   // upload
+                   (value != "D") &&   // upload and delete
+                   (value != "X"))     // delete
                 {
                     return;
                 }
                 uploadMode = value;
+                if(value == "L")
+                {
+                    btnFolderLocator.Enabled = false;
+                    btnGetFiles.Text = "List";
+                    Text = "List";
+                    cmbFileAction.SelectedIndex = 0;
+                }
+                else if (value == "U")
+                {
+                    btnFolderLocator.Enabled = true;
+                    btnGetFiles.Text = "Upload";
+                    Text = "Upload";
+                    cmbFileAction.SelectedIndex = 1;
+                }
+                else if (value == "D")
+                {
+                    btnFolderLocator.Enabled = true;
+                    btnGetFiles.Text = "Upload/Delete";
+                    Text = "Upload and Delete";
+                    cmbFileAction.SelectedIndex = 2;
+                }
+                else if (value == "X")
+                {
+                    btnFolderLocator.Enabled = false;
+                    btnGetFiles.Text = "Delete";
+                    Text = "Delete";
+                    cmbFileAction.SelectedIndex = 3;
+                }
             }
         }
 
@@ -74,29 +103,38 @@ namespace YamuraLog
                 {
                     break;
                 }
-                fileName = fileName.Trim();
-                if (folderPath.Length > 0)
+                // upload or upload/delete
+                if ((uploadMode == "U") ||
+                   (uploadMode == "D"))
                 {
-                    fileName = folderPath + "\\" + fileName;
+                    fileName = fileName.Trim();
+                    if (folderPath.Length > 0)
+                    {
+                        fileName = folderPath + "\\" + fileName;
+                    }
+                    using (System.IO.BinaryWriter outFile = new BinaryWriter(File.Open(fileName, FileMode.Create)))
+                    {
+                        serialPort.Write(uploadMode);
+                        while (true)
+                        {
+                            try
+                            {
+                                inByte = (byte)serialPort.ReadByte();
+                            }
+                            catch
+                            {
+                                break;
+                            }
+                            outFile.Write((byte)inByte);
+                            //rStr.AppendFormat("{0:X02} ", inByte);
+                        }
+                        textBox1.Text = rStr.ToString();
+                        outFile.Close();
+                    }
                 }
-                using (System.IO.BinaryWriter outFile = new BinaryWriter(File.Open(fileName, FileMode.Create)))
+                else if (uploadMode == "X")
                 {
                     serialPort.Write(uploadMode);
-                    while (true)
-                    {
-                        try
-                        {
-                            inByte = (byte)serialPort.ReadByte();
-                        }
-                        catch
-                        {
-                            break;
-                        }
-                        outFile.Write((byte)inByte);
-                        //rStr.AppendFormat("{0:X02} ", inByte);
-                    }
-                    textBox1.Text = rStr.ToString();
-                    outFile.Close();
                 }
             }
             serialPort.Close();
@@ -110,6 +148,35 @@ namespace YamuraLog
             {
                 folderPath = folderBrowserDialog1.SelectedPath;
                 txtSaveTo.Text = folderPath;
+            }
+        }
+
+        private void cmbPort_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            btnGetFiles.Enabled = true;
+        }
+
+        private void cmbFileAction_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // List
+            // Upload
+            // Upload and Delete
+            // Delete
+            if (cmbFileAction.Text == "List")
+            {
+                UploadMode = "L";
+            }
+            else if (cmbFileAction.Text == "Upload")
+            {
+                UploadMode = "U";
+            }
+            else if (cmbFileAction.Text == "Upload and Delete")
+            {
+                UploadMode = "D";
+            }
+            else if (cmbFileAction.Text == "Delete")
+            {
+                UploadMode = "X";
             }
         }
     }
