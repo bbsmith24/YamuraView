@@ -45,20 +45,14 @@
             this.filesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addRunsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearRunsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.uploadFromLoggerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.listFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.uploadOnlyMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.uploadAndDeleteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.clearFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
-            this.exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.loggerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.openWorkspaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveWorkspaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -86,6 +80,7 @@
             this.colRunNumber.HeaderText = "Run";
             this.colRunNumber.Name = "colRunNumber";
             this.colRunNumber.ReadOnly = true;
+            this.colRunNumber.Width = 52;
             // 
             // colDate
             // 
@@ -93,6 +88,7 @@
             this.colDate.HeaderText = "Date/Time";
             this.colDate.Name = "colDate";
             this.colDate.ReadOnly = true;
+            this.colDate.Width = 83;
             // 
             // colMinTime
             // 
@@ -100,6 +96,7 @@
             this.colMinTime.HeaderText = "Start";
             this.colMinTime.Name = "colMinTime";
             this.colMinTime.ReadOnly = true;
+            this.colMinTime.Width = 54;
             // 
             // colMaxTime
             // 
@@ -107,6 +104,7 @@
             this.colMaxTime.HeaderText = "End";
             this.colMaxTime.Name = "colMaxTime";
             this.colMaxTime.ReadOnly = true;
+            this.colMaxTime.Width = 51;
             // 
             // colSourceFile
             // 
@@ -169,7 +167,7 @@
             this.filesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addRunsMenuItem,
             this.clearRunsMenuItem,
-            this.uploadFromLoggerToolStripMenuItem,
+            this.loggerToolStripMenuItem,
             this.toolStripSeparator4,
             this.openWorkspaceToolStripMenuItem,
             this.saveWorkspaceToolStripMenuItem,
@@ -194,78 +192,17 @@
             this.clearRunsMenuItem.Text = "Clear Runs";
             this.clearRunsMenuItem.Click += new System.EventHandler(this.clearRunsMenuItem_Click);
             // 
-            // uploadFromLoggerToolStripMenuItem
+            // loggerToolStripMenuItem
             // 
-            this.uploadFromLoggerToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.listFilesMenuItem,
-            this.uploadOnlyMenuItem,
-            this.uploadAndDeleteMenuItem,
-            this.clearFilesMenuItem,
-            this.toolStripSeparator1,
-            this.toolStripSeparator2});
-            this.uploadFromLoggerToolStripMenuItem.Name = "uploadFromLoggerToolStripMenuItem";
-            this.uploadFromLoggerToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
-            this.uploadFromLoggerToolStripMenuItem.Text = "Logger";
+            this.loggerToolStripMenuItem.Name = "loggerToolStripMenuItem";
+            this.loggerToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.loggerToolStripMenuItem.Text = "Logger";
+            this.loggerToolStripMenuItem.Click += new System.EventHandler(this.loggerToolStripMenuItem_Click);
             // 
-            // listFilesMenuItem
+            // toolStripSeparator4
             // 
-            this.listFilesMenuItem.Name = "listFilesMenuItem";
-            this.listFilesMenuItem.Size = new System.Drawing.Size(171, 22);
-            this.listFilesMenuItem.Text = "List Files";
-            this.listFilesMenuItem.Click += new System.EventHandler(this.listFilesMenuItem_Click);
-            // 
-            // uploadOnlyMenuItem
-            // 
-            this.uploadOnlyMenuItem.Name = "uploadOnlyMenuItem";
-            this.uploadOnlyMenuItem.Size = new System.Drawing.Size(171, 22);
-            this.uploadOnlyMenuItem.Text = "Upload Only";
-            this.uploadOnlyMenuItem.Click += new System.EventHandler(this.uploadOnlyMenuItem_Click);
-            // 
-            // uploadAndDeleteMenuItem
-            // 
-            this.uploadAndDeleteMenuItem.Name = "uploadAndDeleteMenuItem";
-            this.uploadAndDeleteMenuItem.Size = new System.Drawing.Size(171, 22);
-            this.uploadAndDeleteMenuItem.Text = "Upload and Delete";
-            this.uploadAndDeleteMenuItem.Click += new System.EventHandler(this.uploadAndDeleteMenuItem_Click);
-            // 
-            // clearFilesMenuItem
-            // 
-            this.clearFilesMenuItem.Name = "clearFilesMenuItem";
-            this.clearFilesMenuItem.Size = new System.Drawing.Size(171, 22);
-            this.clearFilesMenuItem.Text = "Clear Files";
-            this.clearFilesMenuItem.Click += new System.EventHandler(this.clearFilesMenuItem_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(168, 6);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(168, 6);
-            // 
-            // dockPanel1
-            // 
-            this.dockPanel1.BackColor = System.Drawing.Color.White;
-            this.dockPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dockPanel1.DocumentStyle = WeifenLuo.WinFormsUI.Docking.DocumentStyle.DockingWindow;
-            this.dockPanel1.Location = new System.Drawing.Point(0, 24);
-            this.dockPanel1.Name = "dockPanel1";
-            this.dockPanel1.Size = new System.Drawing.Size(1115, 658);
-            this.dockPanel1.TabIndex = 38;
-            // 
-            // exitMenuItem
-            // 
-            this.exitMenuItem.Name = "exitMenuItem";
-            this.exitMenuItem.Size = new System.Drawing.Size(164, 22);
-            this.exitMenuItem.Text = "Exit";
-            this.exitMenuItem.Click += new System.EventHandler(this.exitMenuItem_Click);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(161, 6);
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(161, 6);
             // 
             // openWorkspaceToolStripMenuItem
             // 
@@ -279,16 +216,33 @@
             this.saveWorkspaceToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
             this.saveWorkspaceToolStripMenuItem.Text = "Save Workspace";
             // 
-            // toolStripSeparator4
+            // toolStripSeparator3
             // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(161, 6);
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(161, 6);
             // 
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
             this.settingsToolStripMenuItem.Text = "Settings";
+            // 
+            // exitMenuItem
+            // 
+            this.exitMenuItem.Name = "exitMenuItem";
+            this.exitMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.exitMenuItem.Text = "Exit";
+            this.exitMenuItem.Click += new System.EventHandler(this.exitMenuItem_Click);
+            // 
+            // dockPanel1
+            // 
+            this.dockPanel1.BackColor = System.Drawing.Color.White;
+            this.dockPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dockPanel1.DocumentStyle = WeifenLuo.WinFormsUI.Docking.DocumentStyle.DockingWindow;
+            this.dockPanel1.Location = new System.Drawing.Point(0, 24);
+            this.dockPanel1.Name = "dockPanel1";
+            this.dockPanel1.Size = new System.Drawing.Size(1115, 658);
+            this.dockPanel1.TabIndex = 38;
             // 
             // Form1
             // 
@@ -328,14 +282,8 @@
         private System.Windows.Forms.ToolStripMenuItem filesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addRunsMenuItem;
         private System.Windows.Forms.ToolStripMenuItem clearRunsMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem uploadFromLoggerToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem uploadAndDeleteMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem uploadOnlyMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loggerToolStripMenuItem;
         private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel1;
-        private System.Windows.Forms.ToolStripMenuItem listFilesMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem clearFilesMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem openWorkspaceToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveWorkspaceToolStripMenuItem;

@@ -928,49 +928,16 @@ namespace YamuraLog
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void uploadAndDeleteMenuItem_Click(object sender, EventArgs e)
+        private void exitMenuItem_Click(object sender, EventArgs e)
         {
-            UploadFiles uploadDlg = new UploadFiles();
-            uploadDlg.UploadMode = "D";
-            uploadDlg.ShowDialog();
+            Close();
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void uploadOnlyMenuItem_Click(object sender, EventArgs e)
+        private void loggerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             UploadFiles uploadDlg = new UploadFiles();
             uploadDlg.UploadMode = "U";
             uploadDlg.ShowDialog();
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void listFilesMenuItem_Click(object sender, EventArgs e)
-        {
-            UploadFiles uploadDlg = new UploadFiles();
-            uploadDlg.UploadMode = "L";
-            uploadDlg.ShowDialog();
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void clearFilesMenuItem_Click(object sender, EventArgs e)
-        {
-            UploadFiles uploadDlg = new UploadFiles();
-            uploadDlg.UploadMode = "X";
-            uploadDlg.ShowDialog();
-        }
 
-        private void exitMenuItem_Click(object sender, EventArgs e)
-        {
-            Close();
         }
         #endregion
         #region obsolete or saved....
@@ -990,5 +957,6 @@ namespace YamuraLog
 
         }
         #endregion
+
     }
 }

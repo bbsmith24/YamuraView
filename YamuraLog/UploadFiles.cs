@@ -16,6 +16,9 @@ namespace YamuraLog
             set { folderPath = value; }
         }
         string uploadMode = "U";
+        /// <summary>
+        /// 
+        /// </summary>
         public string UploadMode
         {
             get { return uploadMode; }
@@ -59,7 +62,9 @@ namespace YamuraLog
                 }
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public UploadFiles()
         {
             InitializeComponent();
@@ -69,7 +74,11 @@ namespace YamuraLog
             }
             txtSaveTo.Text = "D:\\Temp\\Test Data";
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnGetFiles_Click(object sender, EventArgs e)
         {
             byte inByte;
@@ -141,7 +150,11 @@ namespace YamuraLog
             rStr.Insert(0, "Done" + System.Environment.NewLine);
             textBox1.Text = rStr.ToString();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnFolderLocator_Click(object sender, EventArgs e)
         {
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
@@ -150,12 +163,20 @@ namespace YamuraLog
                 txtSaveTo.Text = folderPath;
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cmbPort_SelectedIndexChanged(object sender, EventArgs e)
         {
             btnGetFiles.Enabled = true;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cmbFileAction_SelectedIndexChanged(object sender, EventArgs e)
         {
             // List
@@ -177,6 +198,33 @@ namespace YamuraLog
             else if (cmbFileAction.Text == "Delete")
             {
                 UploadMode = "X";
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (tabControl1.TabPages[tabControl1.SelectedIndex].Text == "Log Files")
+            {
+                // reset the button state and dialog text
+                UploadMode = UploadMode;
+            }
+            else
+            {
+                Text = "Logger Setup";
+            }
+
+        }
+
+        private void btnLoadSetupFile_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.Filter = "*.ini | Logger Setup Files";
+            if(openFileDialog1.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
             }
         }
     }
