@@ -84,6 +84,12 @@ namespace YamuraLog
             ChartAxes[chartViewForm.XChannelName].AxisDisplayRange[0] = ChartAxes[chartViewForm.XChannelName].AxisValueRange[0];
             ChartAxes[chartViewForm.XChannelName].AxisDisplayRange[1] = ChartAxes[chartViewForm.XChannelName].AxisValueRange[1];
             ChartAxes[chartViewForm.XChannelName].AxisDisplayRange[2] = ChartAxes[chartViewForm.XChannelName].AxisValueRange[2];
+
+            chartViewForm.hScrollBar.Minimum = (int)chartAxes[chartViewForm.XChannelName].AxisValueRange[0];
+            chartViewForm.hScrollBar.Maximum = (int)chartAxes[chartViewForm.XChannelName].AxisValueRange[1];
+            chartViewForm.hScrollBar.Value = (int)chartAxes[chartViewForm.XChannelName].AxisDisplayRange[0];
+            chartViewForm.hScrollBar.LargeChange = (int)chartAxes[chartViewForm.XChannelName].AxisDisplayRange[2];
+
             chartViewForm.chartPanel.Invalidate();
         }
     }

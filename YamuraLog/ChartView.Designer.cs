@@ -75,9 +75,8 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.HScrollBar hScrollBar;
-        private System.Windows.Forms.VScrollBar vScrollBar;
         public System.Windows.Forms.Panel chartPanel;
+        public System.Windows.Forms.HScrollBar hScrollBar;
+        public System.Windows.Forms.VScrollBar vScrollBar;
     }
 }
