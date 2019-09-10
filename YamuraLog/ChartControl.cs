@@ -79,6 +79,13 @@ namespace YamuraLog
 
             chartPropertiesForm.AxisOffsetUpdateEvent += chartViewForm.OnAxisOffsetUpdate;
         }
+        private void zoomAllMenuItem_Click(object sender, EventArgs e)
+        {
+            ChartAxes[chartViewForm.XChannelName].AxisDisplayRange[0] = ChartAxes[chartViewForm.XChannelName].AxisValueRange[0];
+            ChartAxes[chartViewForm.XChannelName].AxisDisplayRange[1] = ChartAxes[chartViewForm.XChannelName].AxisValueRange[1];
+            ChartAxes[chartViewForm.XChannelName].AxisDisplayRange[2] = ChartAxes[chartViewForm.XChannelName].AxisValueRange[2];
+            chartViewForm.chartPanel.Invalidate();
+        }
     }
     public class ChartControlMouseMoveEventArgs : EventArgs
     {

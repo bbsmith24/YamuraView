@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.chartControlContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.selectAxesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.zoomAllMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.chartControlContextMenu.SuspendLayout();
             this.SuspendLayout();
@@ -39,33 +39,34 @@
             // 
             this.chartControlContextMenu.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.chartControlContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectAxesMenuItem});
+            this.zoomAllMenuItem});
             this.chartControlContextMenu.Name = "chartControlContextMenu";
-            this.chartControlContextMenu.Size = new System.Drawing.Size(134, 26);
+            this.chartControlContextMenu.Size = new System.Drawing.Size(153, 48);
             // 
-            // selectAxesMenuItem
+            // zoomAllMenuItem
             // 
-            this.selectAxesMenuItem.Name = "selectAxesMenuItem";
-            this.selectAxesMenuItem.Size = new System.Drawing.Size(133, 22);
-            this.selectAxesMenuItem.Text = "Select Axes";
+            this.zoomAllMenuItem.Name = "zoomAllMenuItem";
+            this.zoomAllMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.zoomAllMenuItem.Text = "Zoom All";
+            this.zoomAllMenuItem.Click += new System.EventHandler(this.zoomAllMenuItem_Click);
             // 
             // dockPanel1
             // 
+            this.dockPanel1.ContextMenuStrip = this.chartControlContextMenu;
             this.dockPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dockPanel1.DocumentStyle = WeifenLuo.WinFormsUI.Docking.DocumentStyle.DockingWindow;
             this.dockPanel1.Location = new System.Drawing.Point(0, 0);
             this.dockPanel1.Name = "dockPanel1";
-            this.dockPanel1.Size = new System.Drawing.Size(485, 389);
+            this.dockPanel1.Size = new System.Drawing.Size(469, 350);
             this.dockPanel1.TabIndex = 1;
             // 
             // ChartControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            //this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ClientSize = new System.Drawing.Size(469, 350);
             this.Controls.Add(this.dockPanel1);
             this.Name = "ChartControl";
-            this.Size = new System.Drawing.Size(485, 389);
             this.chartControlContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -73,7 +74,7 @@
 
         #endregion
         private System.Windows.Forms.ContextMenuStrip chartControlContextMenu;
-        private System.Windows.Forms.ToolStripMenuItem selectAxesMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem zoomAllMenuItem;
         private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel1;
     }
 }

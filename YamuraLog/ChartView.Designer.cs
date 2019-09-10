@@ -78,6 +78,6 @@
 
         private System.Windows.Forms.HScrollBar hScrollBar;
         private System.Windows.Forms.VScrollBar vScrollBar;
-        private System.Windows.Forms.Panel chartPanel;
+        public System.Windows.Forms.Panel chartPanel;
     }
 }

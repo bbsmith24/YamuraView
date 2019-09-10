@@ -16,12 +16,20 @@ namespace YamuraLog
             set { axisName = value; }
         }
 
-        float[] axisRange = new float[] { float.MaxValue, float.MinValue, float.MaxValue };
-        public float[] AxisRange
+        float[] axisValueRange = new float[] { float.MaxValue, float.MinValue, float.MaxValue };
+        public float[] AxisValueRange
         {
-            get { return axisRange; }
-            set { axisRange = value; }
+            get { return axisValueRange; }
+            set { axisValueRange = value; }
         }
+
+        float[] axisDisplayRange = new float[] { float.MaxValue, float.MinValue, float.MaxValue };
+        public float[] AxisDisplayRange
+        {
+            get { return axisDisplayRange; }
+            set { axisDisplayRange = value; }
+        }
+
 
         Dictionary<string, ChannelInfo> associatedChannels = new Dictionary<string, ChannelInfo>();
         public Dictionary<string, ChannelInfo> AssociatedChannels

@@ -171,8 +171,8 @@ namespace YamuraLog
 
                 String axisName = axisChannelTree.SelectedNode.Text;
 
-                channelsContext.Items["txtAxisMinValue"].Text = ChartAxes[axisName].AxisRange[0].ToString();
-                channelsContext.Items["txtAxisMaxValue"].Text = ChartAxes[axisName].AxisRange[1].ToString();
+                channelsContext.Items["txtAxisMinValue"].Text = ChartAxes[axisName].AxisValueRange[0].ToString();
+                channelsContext.Items["txtAxisMaxValue"].Text = ChartAxes[axisName].AxisValueRange[1].ToString();
 
             }
             else
@@ -229,9 +229,9 @@ namespace YamuraLog
 
             if (axisChannelTree.SelectedNode.Parent == null)
             {
-                ChartAxes[nodeName].AxisRange[0] = Convert.ToSingle(channelsContext.Items["txtAxisMinValue"].Text);
-                ChartAxes[nodeName].AxisRange[1] = Convert.ToSingle(channelsContext.Items["txtAxisMaxValue"].Text);
-                ChartAxes[nodeName].AxisRange[2] = ChartAxes[nodeName].AxisRange[1] - ChartAxes[nodeName].AxisRange[0];
+                ChartAxes[nodeName].AxisValueRange[0] = Convert.ToSingle(channelsContext.Items["txtAxisMinValue"].Text);
+                ChartAxes[nodeName].AxisValueRange[1] = Convert.ToSingle(channelsContext.Items["txtAxisMaxValue"].Text);
+                ChartAxes[nodeName].AxisValueRange[2] = ChartAxes[nodeName].AxisValueRange[1] - ChartAxes[nodeName].AxisValueRange[0];
             }
         }
         /// <summary>

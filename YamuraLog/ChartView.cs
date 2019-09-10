@@ -184,8 +184,8 @@ namespace YamuraLog
             chartStartCursorPos.Add(new Point(0, 0));
             startMouseMove.Add(false);
             startMouseDrag.Add(false);
+            hScrollBar.Scroll += HScrollBar_Scroll;
         }
-
         #region control message handlers
         /// <summary>
         /// when the control sizes, update positions of the axes and chart it contains
@@ -224,7 +224,7 @@ namespace YamuraLog
             bool initialValue = false;
             // x and y scale
             float[] displayScale = new float[] { 1.0F, 1.0F };
-            displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisRange[2];
+            displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
 
             // get the graphics context
             using (Graphics chartGraphics = chartPanel.CreateGraphics())
@@ -237,7 +237,7 @@ namespace YamuraLog
                     {
                         continue;
                     }
-                    displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisRange[2];
+                    displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
 
                     // check each associated channel
                     foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
@@ -277,9 +277,9 @@ namespace YamuraLog
                             endPt = ScaleDataToDisplay(endPt,                                                                                     // point
                                                                      displayScale[0],                                                             // scale X
                                                                      displayScale[1],                                                             // scale Y
-                                                                     -1* chartAxes[xChannelName].AxisRange[0] + 
+                                                                     -1 * chartAxes[xChannelName].AxisDisplayRange[0] +
                                                                          chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
-                                                                     yAxis.Value.AxisRange[0] +
+                                                                     yAxis.Value.AxisDisplayRange[0] +
                                                                          chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1],  // offset Y
                                                                      chartBounds);                                                                // graphics area boundary
                             if ((initialValue) && (startPt.X < chartBounds.Width) && (endPt.X > 0))
@@ -393,7 +393,7 @@ namespace YamuraLog
             PointF axisPoint = new PointF();
             // x and y scale
             float[] displayScale = new float[] { 1.0F, 1.0F };
-            displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisRange[2];
+            displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
 
             foreach (KeyValuePair<string, ChannelInfo> channel in chartAxes[xChannelName].AssociatedChannels)
             {
@@ -408,7 +408,7 @@ namespace YamuraLog
                                    0.0F,
                                    0.0F,
                                    chartBounds);
-                axisPoint.X -= (-1 * chartAxes[xChannelName].AxisRange[0] +
+                axisPoint.X -= (-1 * chartAxes[xChannelName].AxisDisplayRange[0] +
                                        chartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0]);  // offset X
 
                 moveEventArgs.XAxisValues.Add(channel.Value.RunIndex.ToString() + "-" + channel.Value.ChannelName, axisPoint.X);
@@ -421,7 +421,7 @@ namespace YamuraLog
                 }
                 foreach (KeyValuePair<string, ChannelInfo> channel in axis.Value.AssociatedChannels)
                 {
-                    displayScale[1] = (float)chartBounds.Height / axis.Value.AxisRange[2];
+                    displayScale[1] = (float)chartBounds.Height / axis.Value.AxisDisplayRange[2];
                     axisPoint.X = (float)e.Location.X;
                     axisPoint.Y = (float)e.Location.Y;
 
@@ -449,6 +449,34 @@ namespace YamuraLog
         {
             if ((startMouseDrag[0]) && AllowDrag)
             {
+                // original scaling
+                float[] displayScale = new float[] { 1.0F, 1.0F };
+                displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
+
+                PointF scaledStart = chartStartCursorPos[0];
+                PointF scaledEnd = chartLastCursorPos[0];
+                scaledStart = ScaleDisplayToData(scaledStart,
+                                   displayScale[0],
+                                   displayScale[1],
+                                   0.0F,
+                                   0.0F,
+                                   chartBounds);
+                scaledEnd = ScaleDisplayToData(scaledEnd,
+                                   displayScale[0],
+                                   displayScale[1],
+                                   0.0F,
+                                   0.0F,
+                                   chartBounds);
+
+                chartAxes[xChannelName].AxisDisplayRange[0] = scaledStart.X < scaledEnd.X ? scaledStart.X : scaledEnd.X;
+                chartAxes[xChannelName].AxisDisplayRange[1] = scaledStart.X < scaledEnd.X ? scaledEnd.X : scaledStart.X;
+                chartAxes[xChannelName].AxisDisplayRange[2] = chartAxes[xChannelName].AxisDisplayRange[1] - chartAxes[xChannelName].AxisDisplayRange[0];
+
+
+                hScrollBar.Minimum = (int)chartAxes[xChannelName].AxisValueRange[0];
+                hScrollBar.Maximum = (int)chartAxes[xChannelName].AxisValueRange[1];
+                hScrollBar.Value = (int)chartAxes[xChannelName].AxisDisplayRange[0];
+                hScrollBar.LargeChange = (int)chartAxes[xChannelName].AxisDisplayRange[2];
                 startMouseDrag[0] = false;
                 chartPanel.Invalidate();
             }
@@ -486,6 +514,19 @@ namespace YamuraLog
         #endregion
 
         #region scollbar message handlers
+        private void HScrollBar_Scroll(object sender, ScrollEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("Scroll to " + e.NewValue.ToString());
+            // original scaling
+            float[] displayScale = new float[] { 1.0F, 1.0F };
+            displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
+
+            PointF scaledStart = new PointF(e.NewValue, 0);
+            chartAxes[xChannelName].AxisDisplayRange[0] = scaledStart.X;
+            chartAxes[xChannelName].AxisDisplayRange[1] = scaledStart.X + chartAxes[xChannelName].AxisDisplayRange[2];
+            chartPanel.Invalidate();
+
+        }
         #endregion
 
         #region GDI support
@@ -698,7 +739,7 @@ namespace YamuraLog
             #region move cursor(s)
             // position in event args is data - need to scale to screen
             float[] displayScale = new float[] { 1.0F, 1.0F };
-            displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisRange[2];
+            displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
             PointF endPt = new PointF();
             int axisIdx = 0;
             string axisFullName = "";
@@ -714,7 +755,7 @@ namespace YamuraLog
                         continue;
                     }
                     axisFullName = axisIdx.ToString() + "-" + yAxis.Key;
-                    displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisRange[2];
+                    displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
                     // check each associated channel
                     foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
                     {
@@ -759,9 +800,9 @@ namespace YamuraLog
                         endPt = ScaleDataToDisplay(endPt,                                                      // point
                                                    displayScale[0],                              // scale X
                                                    displayScale[1],                              // scale Y
-                                                   -1 * chartAxes[xChannelName].AxisRange[0] +
+                                                   -1 * chartAxes[xChannelName].AxisDisplayRange[0] +
                                                                chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
-                                                   yAxis.Value.AxisRange[0] +
+                                                   yAxis.Value.AxisDisplayRange[0] +
                                                                chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1],  // offset Y
                                                    chartBounds);                                 // graphics area boundary
 
@@ -797,12 +838,21 @@ namespace YamuraLog
             #endregion
 
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void OnChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e)
         {
             xChannelName = e.XAxisName;
             chartPanel.Invalidate();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void OnAxisOffsetUpdate(object sender, AxisOffsetUpdateEventArgs e)
         {
             // offset channel on X axis
