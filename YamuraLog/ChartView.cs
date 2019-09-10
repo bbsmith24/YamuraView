@@ -481,40 +481,6 @@ namespace YamuraLog
                 chartPanel.Invalidate();
             }
         }
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="sender"></param>
-        ///// <param name="e"></param>
-        //private void selectAxesMenuItem_Click(object sender, EventArgs e)
-        //{
-        //    ChartProperties axesDialog = new ChartProperties();
-        //    axesDialog.ChartAxes = chartAxes;
-        //    axesDialog.XAxisName = xChannelName;
-
-        //    if (axesDialog.ShowDialog() == DialogResult.OK)
-        //    {
-        //        xChannelName = axesDialog.XAxisName;
-        //        hScrollBar.Minimum = (int)chartAxes[xChannelName].AxisValueRange[0];
-        //        hScrollBar.Maximum = (int)chartAxes[xChannelName].AxisValueRange[1];
-        //        hScrollBar.Value = (int)chartAxes[xChannelName].AxisDisplayRange[0];
-        //        hScrollBar.LargeChange = (int)chartAxes[xChannelName].AxisDisplayRange[2];
-        //        chartPanel.Invalidate();
-        //    }
-        //}
-        //
-        // from old form - this reset the zoom and offset...
-        //
-        //private void stripChart_KeyDown(object sender, KeyPressEventArgs e)
-        //{
-        //    if ((e.KeyChar == '1') || (e.KeyChar == 'R') || (e.KeyChar == 'r'))
-        //    {
-        //        //stripChartScaleFactorX = 1.0F;
-        //        stripChartPanel.Invalidate();
-        //        tractionCirclePanel.Invalidate();
-        //        mapPanel.Invalidate();
-        //    }
-        //}
         #endregion
 
         #region scollbar message handlers
