@@ -74,6 +74,7 @@ namespace YamuraLog
             }
             txtSaveTo.Text = "D:\\Temp\\Test Data";
         }
+        #region logger data files tab message handler
         /// <summary>
         /// 
         /// </summary>
@@ -218,14 +219,67 @@ namespace YamuraLog
             }
 
         }
-
+        #endregion
+        #region logger setup files tab message handler
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnLoadSetupFile_Click(object sender, EventArgs e)
         {
+            openFileDialog1.FileName = "*.ini";
             openFileDialog1.Filter = "*.ini | Logger Setup Files";
-            if(openFileDialog1.ShowDialog() == DialogResult.Cancel)
+            if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
             {
                 return;
             }
+            txtSetupFile.Text = openFileDialog1.FileName;
+            StreamReader readSetup = new StreamReader(txtSetupFile.Text, true);
+            String inputLine;
+            StringBuilder inputText = new StringBuilder();
+            while (!readSetup.EndOfStream)
+            {
+                #region skip blanks
+                inputLine = readSetup.ReadLine();
+                if (inputLine.Length == 0)
+                {
+                    continue;
+                }
+                inputText.AppendLine(inputLine);
+                #endregion
+            }
+            readSetup.Close();
+            loggerINIFile.Text = inputText.ToString();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnDownloadINI_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnUploadINI_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSaveINI_Click(object sender, EventArgs e)
+        {
+            saveFileDialog1.FileName = txtSetupFile.Text;
+            saveFileDialog1.Filter = "*.ini | Logger Setup Files";
+            if (saveFileDialog1.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+            txtSetupFile.Text = saveFileDialog1.FileName;
+            StreamWriter writeSetup = new StreamWriter(txtSetupFile.Text, false);
+            writeSetup.Write(loggerINIFile.Text.ToCharArray());
+            writeSetup.Close();
+        }
+        #endregion
     }
 }

@@ -50,6 +50,8 @@
             this.btnDownloadINI = new System.Windows.Forms.Button();
             this.loggerINIFile = new System.Windows.Forms.TextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.btnUploadINI = new System.Windows.Forms.Button();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -225,6 +227,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.btnUploadINI);
             this.tabPage2.Controls.Add(this.btnSaveINI);
             this.tabPage2.Controls.Add(this.btnLoadSetupFile);
             this.tabPage2.Controls.Add(this.txtSetupFile);
@@ -242,12 +245,13 @@
             // btnSaveINI
             // 
             this.btnSaveINI.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSaveINI.Location = new System.Drawing.Point(274, 283);
+            this.btnSaveINI.Location = new System.Drawing.Point(223, 283);
             this.btnSaveINI.Name = "btnSaveINI";
             this.btnSaveINI.Size = new System.Drawing.Size(77, 23);
             this.btnSaveINI.TabIndex = 19;
             this.btnSaveINI.Text = "Save";
             this.btnSaveINI.UseVisualStyleBackColor = true;
+            this.btnSaveINI.Click += new System.EventHandler(this.btnSaveINI_Click);
             // 
             // btnLoadSetupFile
             // 
@@ -281,12 +285,13 @@
             // btnDownloadINI
             // 
             this.btnDownloadINI.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDownloadINI.Location = new System.Drawing.Point(191, 283);
+            this.btnDownloadINI.Location = new System.Drawing.Point(57, 283);
             this.btnDownloadINI.Name = "btnDownloadINI";
             this.btnDownloadINI.Size = new System.Drawing.Size(77, 23);
             this.btnDownloadINI.TabIndex = 1;
             this.btnDownloadINI.Text = "Download";
             this.btnDownloadINI.UseVisualStyleBackColor = true;
+            this.btnDownloadINI.Click += new System.EventHandler(this.btnDownloadINI_Click);
             // 
             // loggerINIFile
             // 
@@ -303,6 +308,17 @@
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // btnUploadINI
+            // 
+            this.btnUploadINI.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnUploadINI.Location = new System.Drawing.Point(140, 283);
+            this.btnUploadINI.Name = "btnUploadINI";
+            this.btnUploadINI.Size = new System.Drawing.Size(77, 23);
+            this.btnUploadINI.TabIndex = 20;
+            this.btnUploadINI.Text = "Upload";
+            this.btnUploadINI.UseVisualStyleBackColor = true;
+            this.btnUploadINI.Click += new System.EventHandler(this.btnUploadINI_Click);
             // 
             // UploadFiles
             // 
@@ -350,5 +366,7 @@
         private System.Windows.Forms.Button btnDownloadINI;
         private System.Windows.Forms.TextBox loggerINIFile;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.Button btnUploadINI;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
     }
 }
