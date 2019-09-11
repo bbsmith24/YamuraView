@@ -44,6 +44,11 @@
             this.axisStart = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.axisEnd = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.axisOffset = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cmbAlignAxis = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.txtAutoThreshold = new System.Windows.Forms.TextBox();
+            this.btnDoAutoAlign = new System.Windows.Forms.Button();
             this.channelsContext.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axisOffsetsGrid)).BeginInit();
             this.SuspendLayout();
@@ -55,9 +60,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.axisChannelTree.CheckBoxes = true;
             this.axisChannelTree.ContextMenuStrip = this.channelsContext;
-            this.axisChannelTree.Location = new System.Drawing.Point(12, 144);
+            this.axisChannelTree.Location = new System.Drawing.Point(12, 175);
             this.axisChannelTree.Name = "axisChannelTree";
-            this.axisChannelTree.Size = new System.Drawing.Size(348, 240);
+            this.axisChannelTree.Size = new System.Drawing.Size(348, 209);
             this.axisChannelTree.TabIndex = 30;
             this.axisChannelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.axisChannelTree_AfterCheck);
             // 
@@ -108,9 +113,9 @@
             this.cmbXAxis.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbXAxis.FormattingEnabled = true;
-            this.cmbXAxis.Location = new System.Drawing.Point(54, 12);
+            this.cmbXAxis.Location = new System.Drawing.Point(63, 12);
             this.cmbXAxis.Name = "cmbXAxis";
-            this.cmbXAxis.Size = new System.Drawing.Size(306, 21);
+            this.cmbXAxis.Size = new System.Drawing.Size(297, 21);
             this.cmbXAxis.TabIndex = 32;
             this.cmbXAxis.SelectedIndexChanged += new System.EventHandler(this.cmbXAxis_SelectedIndexChanged);
             // 
@@ -126,7 +131,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 128);
+            this.label3.Location = new System.Drawing.Point(12, 159);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(83, 13);
             this.label3.TabIndex = 33;
@@ -143,7 +148,7 @@
             this.axisStart,
             this.axisEnd,
             this.axisOffset});
-            this.axisOffsetsGrid.Location = new System.Drawing.Point(15, 41);
+            this.axisOffsetsGrid.Location = new System.Drawing.Point(15, 72);
             this.axisOffsetsGrid.Name = "axisOffsetsGrid";
             this.axisOffsetsGrid.RowHeadersVisible = false;
             this.axisOffsetsGrid.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
@@ -178,12 +183,68 @@
             this.axisOffset.HeaderText = "Offset";
             this.axisOffset.Name = "axisOffset";
             // 
+            // cmbAlignAxis
+            // 
+            this.cmbAlignAxis.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmbAlignAxis.Enabled = false;
+            this.cmbAlignAxis.FormattingEnabled = true;
+            this.cmbAlignAxis.Location = new System.Drawing.Point(63, 40);
+            this.cmbAlignAxis.Name = "cmbAlignAxis";
+            this.cmbAlignAxis.Size = new System.Drawing.Size(90, 21);
+            this.cmbAlignAxis.TabIndex = 36;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 44);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(47, 13);
+            this.label1.TabIndex = 35;
+            this.label1.Text = "Align On";
+            // 
+            // label4
+            // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(159, 44);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(54, 13);
+            this.label4.TabIndex = 37;
+            this.label4.Text = "Threshold";
+            // 
+            // txtAutoThreshold
+            // 
+            this.txtAutoThreshold.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtAutoThreshold.Enabled = false;
+            this.txtAutoThreshold.Location = new System.Drawing.Point(219, 40);
+            this.txtAutoThreshold.Name = "txtAutoThreshold";
+            this.txtAutoThreshold.Size = new System.Drawing.Size(100, 20);
+            this.txtAutoThreshold.TabIndex = 38;
+            // 
+            // btnDoAutoAlign
+            // 
+            this.btnDoAutoAlign.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDoAutoAlign.Enabled = false;
+            this.btnDoAutoAlign.Location = new System.Drawing.Point(325, 39);
+            this.btnDoAutoAlign.Name = "btnDoAutoAlign";
+            this.btnDoAutoAlign.Size = new System.Drawing.Size(35, 23);
+            this.btnDoAutoAlign.TabIndex = 39;
+            this.btnDoAutoAlign.Text = "Go";
+            this.btnDoAutoAlign.UseVisualStyleBackColor = true;
+            this.btnDoAutoAlign.Click += new System.EventHandler(this.btnDoAutoAlign_Click);
+            // 
             // ChartProperties
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(372, 396);
             this.CloseButton = false;
+            this.Controls.Add(this.btnDoAutoAlign);
+            this.Controls.Add(this.txtAutoThreshold);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.cmbAlignAxis);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.axisOffsetsGrid);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.cmbXAxis);
@@ -216,5 +277,10 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn axisStart;
         private System.Windows.Forms.DataGridViewTextBoxColumn axisEnd;
         private System.Windows.Forms.DataGridViewTextBoxColumn axisOffset;
+        private System.Windows.Forms.ComboBox cmbAlignAxis;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox txtAutoThreshold;
+        private System.Windows.Forms.Button btnDoAutoAlign;
     }
 }

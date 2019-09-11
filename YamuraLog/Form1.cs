@@ -775,10 +775,6 @@ namespace YamuraLog
                 }
             }
             #endregion
-
-            // auto align launches
-            AutoAlign(0.10F);
-
             #region populate run data grid
             runDataGrid.Rows.Clear();
             for(int runGridIdx = 0; runGridIdx < dataLogger.runData.Count; runGridIdx++)
@@ -791,61 +787,6 @@ namespace YamuraLog
                 runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runGridIdx].fileName.ToString();
             }
             #endregion
-        }
-        #endregion
-        #region Auto align
-        /// <summary>
-        /// estimate launch point offset from speed data
-        /// find first speed > 30, walk back to first speed = 0
-        /// </summary>
-        private void AutoAlign(float launchThreshold)
-        {
-            //int runCount = 0;
-            //float baseLaunch = 0.0F;
-            //int launchIdx = 0;
-            //foreach (RunData curRun in dataLogger.runData)
-            //{
-            //    if(dataLogger[runCount].minMaxSpeed[1] < 20.0F)
-            //    {
-            //        runDisplay[runCount].showRun = false;
-            //        runCount++;
-            //        continue;
-            //    }
-            //    foreach (KeyValuePair<float, DataBlock> curBlock in curPath)
-            //    {
-            //        if (!curBlock.Value.gps.isValid)
-            //        {
-            //            continue;
-            //        }
-            //        if(curBlock.Value.gps.mph < 30.0F)
-            //        {
-            //            continue;
-            //        }
-            //        // found point after launch, walk back to speed 0
-            //        launchIdx = curPath.IndexOfKey(curBlock.Value.micros);
-            //        while(launchIdx >= 0)
-            //        {
-            //            // not valid gps, no speed - continue
-            //            if(!curPath.ElementAt(launchIdx).Value.gps.isValid)
-            //            {
-            //                launchIdx--;
-            //                continue;
-            //            }
-            //            // speed - 0 = this is last point prior to launch
-            //            if(curPath.ElementAt(launchIdx).Value.gps.mph <= launchThreshold)
-            //            {
-            //                if(runCount == 0)
-            //                {
-            //                    baseLaunch = curPath.ElementAt(launchIdx).Value.micros;
-            //                }
-            //                runDisplay[runCount].stipchart_Offset[0] = baseLaunch - curPath.ElementAt(launchIdx).Value.micros;
-            //                break;
-            //            }
-            //            launchIdx--;
-            //        }
-            //    }
-            //    runCount++;
-            //}
         }
         #endregion
         #region GDI support
@@ -953,23 +894,5 @@ namespace YamuraLog
 
         }
         #endregion
-        #region obsolete or saved....
-        private void autoAlignToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            float autoThreshold = 0.0F;
-            //try
-            //{
-            //    autoThreshold = Convert.ToSingle(txtAutoAlignThreshold.Text);
-            //}
-            //catch
-            //{
-            //    MessageBox.Show("Can't convert auto align value " + txtAutoAlignThreshold.Text + " to a number");
-            //    return;
-            //}
-            AutoAlign(autoThreshold);
-
-        }
-        #endregion
-
     }
 }

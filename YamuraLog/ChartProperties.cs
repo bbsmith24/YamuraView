@@ -36,9 +36,12 @@ namespace YamuraLog
                 }
                 axisChannelTree.Nodes.Clear();
                 cmbXAxis.Items.Clear();
+                cmbAlignAxis.Items.Clear();
+                txtAutoThreshold.Text = "0.0";
                 foreach (KeyValuePair<String, Axis> curAxis in chartAxes)
                 {
                     cmbXAxis.Items.Add(curAxis.Key);
+                    cmbAlignAxis.Items.Add(curAxis.Key);
 
                     bool axisFound = false;
                     foreach (TreeNode axisItem in axisChannelTree.Nodes)
@@ -201,11 +204,17 @@ namespace YamuraLog
             {
                 axisOffsetsGrid.Columns["axisOffset"].Visible = true;
                 axisOffsetsGrid.Columns["axisOffset"].AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+                cmbAlignAxis.Enabled = true;
+                txtAutoThreshold.Enabled = true;
+                btnDoAutoAlign.Enabled = true;
             }
             else
             {
                 axisOffsetsGrid.Columns["axisOffset"].Visible = false;
                 axisOffsetsGrid.Columns["axisChannel"].AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+                cmbAlignAxis.Enabled = false;
+                txtAutoThreshold.Enabled = false;
+                btnDoAutoAlign.Enabled = false;
             }
 
             axisOffsetsGrid.Rows.Clear();
@@ -243,6 +252,42 @@ namespace YamuraLog
         {
             channelsContext.Close();
         }
+
+        private void btnDoAutoAlign_Click(object sender, EventArgs e)
+        {
+            AutoAlign(Convert.ToSingle(txtAutoThreshold.Text), cmbAlignAxis.Text);
+        }
+        #region Auto align
+        /// <summary>
+        /// estimate launch point offset from speed data
+        /// find first speed > 30, walk back to first speed = 0
+        /// </summary>
+        private void AutoAlign(float launchThreshold, string alignAxis)
+        {
+            List<float> launchPoints = new List<float>();
+            int runCount = 0;
+            foreach (RunData curRun in logger.runData)
+            {
+                foreach (KeyValuePair<float, DataPoint> curPoint in curRun.channels[alignAxis].DataPoints)
+                {
+                    if (Math.Abs(curPoint.Value.PointValue) > launchThreshold)
+                    {
+                        launchPoints.Add(curPoint.Key);
+                        break;
+                    }
+                }
+                runCount++;
+            }
+            float minPoint = launchPoints.Min();
+            for (int launchIdx = 0; launchIdx < launchPoints.Count; launchIdx++)
+            {
+                launchPoints[launchIdx] -= minPoint;
+                axisOffsetsGrid.Rows[launchIdx].Cells["axisOffset"].Value = (-1 * launchPoints[launchIdx]).ToString();
+                AxisOffsetUpdateEventArgs updateArgs = new AxisOffsetUpdateEventArgs("Time", launchIdx, 0, -1* launchPoints[launchIdx]);
+                AxisOffsetUpdateEvent(this, updateArgs);
+            }
+        }
+        #endregion
     }
     public class AxisOffsetUpdateEventArgs : EventArgs
     {
