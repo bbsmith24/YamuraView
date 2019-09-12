@@ -326,7 +326,7 @@ namespace YamuraLog
                 // check for EOF
                 while (inFile.BaseStream.Position != inFile.BaseStream.Length)
                 {
-                    #region readf 1 char, exception on EOF
+                    #region read 1 char, exception on EOF
                     try
                     {
                         b[0] = (char)inFile.ReadByte();// inFile.ReadChar();
@@ -539,6 +539,37 @@ namespace YamuraLog
                     dataSentence += c;
                     c = (char)inFile.ReadByte();
                 }
+                #region checksum
+                // malformed, no * 
+                if (dataSentence.IndexOf('*') < 0)
+                {
+                    continue;
+                }
+                int receivedChecksum = 0;
+                // check for malformed, illegal char in hex value
+                try
+                {
+                    receivedChecksum = Convert.ToInt32(dataSentence.Substring(dataSentence.IndexOf('*') + 1), 16);
+                }
+                catch
+                {
+                    continue;
+                }
+                // calculate checksum for characters between $ and *
+                int calculatedChecksum = 0;
+                int charIdx = 1;
+                while(dataSentence[charIdx] != '*')
+                {
+                    calculatedChecksum ^= Convert.ToByte(dataSentence[charIdx]);
+                    charIdx++;
+                }
+                // bad checksum - skip this sentence
+                if(calculatedChecksum != receivedChecksum)
+                {
+                    continue;
+                }
+                #endregion
+
                 String[] words = dataSentence.Split(new char[] { ',' });
                 #endregion
                 try

@@ -486,7 +486,6 @@ namespace YamuraLog
         #region scollbar message handlers
         private void HScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Scroll to " + e.NewValue.ToString());
             // original scaling
             float[] displayScale = new float[] { 1.0F, 1.0F };
             displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];

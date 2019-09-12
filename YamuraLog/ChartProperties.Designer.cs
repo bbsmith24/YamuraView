@@ -49,6 +49,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.txtAutoThreshold = new System.Windows.Forms.TextBox();
             this.btnDoAutoAlign = new System.Windows.Forms.Button();
+            this.invertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.channelsContext.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axisOffsetsGrid)).BeginInit();
             this.SuspendLayout();
@@ -69,13 +70,14 @@
             // channelsContext
             // 
             this.channelsContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.closeToolStripMenuItem,
+            this.invertToolStripMenuItem,
             this.lblAxisMin,
             this.txtAxisMinValue,
             this.lblAxisMax,
-            this.txtAxisMaxValue});
+            this.txtAxisMaxValue,
+            this.closeToolStripMenuItem});
             this.channelsContext.Name = "channelsContext";
-            this.channelsContext.Size = new System.Drawing.Size(161, 126);
+            this.channelsContext.Size = new System.Drawing.Size(161, 170);
             this.channelsContext.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler(this.channelsContext_Closed);
             this.channelsContext.Opening += new System.ComponentModel.CancelEventHandler(this.channelsContext_Opening);
             // 
@@ -234,6 +236,13 @@
             this.btnDoAutoAlign.UseVisualStyleBackColor = true;
             this.btnDoAutoAlign.Click += new System.EventHandler(this.btnDoAutoAlign_Click);
             // 
+            // invertToolStripMenuItem
+            // 
+            this.invertToolStripMenuItem.Name = "invertToolStripMenuItem";
+            this.invertToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.invertToolStripMenuItem.Text = "Invert";
+            this.invertToolStripMenuItem.Click += new System.EventHandler(this.invertToolStripMenuItem_Click);
+            // 
             // ChartProperties
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -282,5 +291,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtAutoThreshold;
         private System.Windows.Forms.Button btnDoAutoAlign;
+        private System.Windows.Forms.ToolStripMenuItem invertToolStripMenuItem;
     }
 }

@@ -252,6 +252,38 @@ namespace YamuraLog
         {
             channelsContext.Close();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void invertToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // selected channel
+            if (axisChannelTree.SelectedNode.Parent != null)
+            {
+                string channelName = axisChannelTree.SelectedNode.Text;
+                int runIdx = Convert.ToInt32(channelName.Substring(0, channelName.IndexOf('-')));
+                channelName = channelName.Substring(channelName.IndexOf('-') + 1);
+                foreach (KeyValuePair<float, DataPoint>kvp in logger.runData[runIdx].channels[channelName].DataPoints)
+                {
+                    logger.runData[runIdx].channels[channelName].DataPoints[kvp.Key].PointValue = logger.runData[runIdx].channels[channelName].DataRange[1] - kvp.Value.PointValue + logger.runData[runIdx].channels[channelName].DataRange[0];
+                }
+            }
+            // all channels
+            else
+            {
+                string channelName = axisChannelTree.SelectedNode.Text;
+                for (int runIdx = 0; runIdx < logger.runData.Count; runIdx++)
+                {
+                    foreach (KeyValuePair<float, DataPoint> kvp in logger.runData[runIdx].channels[channelName].DataPoints)
+                    {
+                        logger.runData[runIdx].channels[channelName].DataPoints[kvp.Key].PointValue = logger.runData[runIdx].channels[channelName].DataRange[1] - kvp.Value.PointValue + logger.runData[runIdx].channels[channelName].DataRange[0];
+                    }
+                }
+            }
+
+        }
 
         private void btnDoAutoAlign_Click(object sender, EventArgs e)
         {
@@ -288,6 +320,7 @@ namespace YamuraLog
             }
         }
         #endregion
+
     }
     public class AxisOffsetUpdateEventArgs : EventArgs
     {
