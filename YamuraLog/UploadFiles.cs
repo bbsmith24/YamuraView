@@ -74,17 +74,8 @@ namespace YamuraLog
             }
             txtSaveTo.Text = "D:\\Temp\\Test Data";
         }
-        #region logger data files tab message handler
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnGetFiles_Click(object sender, EventArgs e)
+        public void SetupSerialPort()
         {
-            byte inByte;
-            string fileName;
-            StringBuilder rStr = new StringBuilder();
             // Create a new SerialPort object with default settings.
             serialPort = new SerialPort();
             // Allow the user to set the appropriate properties.
@@ -97,8 +88,23 @@ namespace YamuraLog
             // Set the read/write timeouts
             serialPort.ReadTimeout = 500;
             serialPort.WriteTimeout = 500;
+        }
 
-            textBox1.Text = "Start";
+        #region logger data files tab message handler
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnGetFiles_Click(object sender, EventArgs e)
+        {
+            byte inByte;
+            string fileName;
+            StringBuilder rStr = new StringBuilder();
+
+            SetupSerialPort();
+
+            txtFileInfo.Text = "Start";
 
             serialPort.Open();
             while (true)
@@ -138,7 +144,7 @@ namespace YamuraLog
                             outFile.Write((byte)inByte);
                             //rStr.AppendFormat("{0:X02} ", inByte);
                         }
-                        textBox1.Text = rStr.ToString();
+                        txtFileInfo.Text = rStr.ToString();
                         outFile.Close();
                     }
                 }
@@ -149,7 +155,7 @@ namespace YamuraLog
             }
             serialPort.Close();
             rStr.Insert(0, "Done" + System.Environment.NewLine);
-            textBox1.Text = rStr.ToString();
+            txtFileInfo.Text = rStr.ToString();
         }
         /// <summary>
         /// 
@@ -172,6 +178,8 @@ namespace YamuraLog
         private void cmbPort_SelectedIndexChanged(object sender, EventArgs e)
         {
             btnGetFiles.Enabled = true;
+            btnDownloadINI.Enabled = true;
+            btnUploadINI.Enabled = true;
         }
         /// <summary>
         /// 
@@ -259,14 +267,61 @@ namespace YamuraLog
         /// <param name="e"></param>
         private void btnDownloadINI_Click(object sender, EventArgs e)
         {
+            SetupSerialPort();
 
+            serialPort.Open();
+            serialPort.Write("B");
+            try
+            {
+                serialPort.Write(loggerINIFile.Text.ToString());
+            }
+            catch
+            {
+            }
+            serialPort.Close();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnUploadINI_Click(object sender, EventArgs e)
         {
+            byte inByte;
+            StringBuilder inStr = new StringBuilder();
 
+            SetupSerialPort();
+
+            serialPort.Open();
+            serialPort.Write("C");
+            while(serialPort.BytesToRead == 0)
+            { }
+            try
+            {
+                while (true)
+                {
+                    try
+                    {
+                        inByte = (byte)serialPort.ReadByte();
+                    }
+                    catch
+                    {
+                        break;
+                    }
+                    inStr.Append((char)inByte);
+                }
+            }
+            catch
+            {
+            }
+            serialPort.Close();
+            loggerINIFile.Text = inStr.ToString();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnSaveINI_Click(object sender, EventArgs e)
         {
             saveFileDialog1.FileName = txtSetupFile.Text;

@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.btnFolderLocator = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtFileInfo = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.cmbBaud = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -43,6 +43,7 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.btnUploadINI = new System.Windows.Forms.Button();
             this.btnSaveINI = new System.Windows.Forms.Button();
             this.btnLoadSetupFile = new System.Windows.Forms.Button();
             this.txtSetupFile = new System.Windows.Forms.TextBox();
@@ -50,7 +51,6 @@
             this.btnDownloadINI = new System.Windows.Forms.Button();
             this.loggerINIFile = new System.Windows.Forms.TextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.btnUploadINI = new System.Windows.Forms.Button();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -68,17 +68,17 @@
             this.btnFolderLocator.UseVisualStyleBackColor = true;
             this.btnFolderLocator.Click += new System.EventHandler(this.btnFolderLocator_Click);
             // 
-            // textBox1
+            // txtFileInfo
             // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.txtFileInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(9, 89);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(337, 220);
-            this.textBox1.TabIndex = 12;
+            this.txtFileInfo.Location = new System.Drawing.Point(9, 89);
+            this.txtFileInfo.Multiline = true;
+            this.txtFileInfo.Name = "txtFileInfo";
+            this.txtFileInfo.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtFileInfo.Size = new System.Drawing.Size(337, 220);
+            this.txtFileInfo.TabIndex = 12;
             // 
             // label2
             // 
@@ -210,7 +210,7 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.textBox1);
+            this.tabPage1.Controls.Add(this.txtFileInfo);
             this.tabPage1.Controls.Add(this.btnFolderLocator);
             this.tabPage1.Controls.Add(this.label4);
             this.tabPage1.Controls.Add(this.txtSaveTo);
@@ -241,6 +241,18 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Logger Setup";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // btnUploadINI
+            // 
+            this.btnUploadINI.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnUploadINI.Enabled = false;
+            this.btnUploadINI.Location = new System.Drawing.Point(140, 283);
+            this.btnUploadINI.Name = "btnUploadINI";
+            this.btnUploadINI.Size = new System.Drawing.Size(77, 23);
+            this.btnUploadINI.TabIndex = 20;
+            this.btnUploadINI.Text = "Upload";
+            this.btnUploadINI.UseVisualStyleBackColor = true;
+            this.btnUploadINI.Click += new System.EventHandler(this.btnUploadINI_Click);
             // 
             // btnSaveINI
             // 
@@ -285,6 +297,7 @@
             // btnDownloadINI
             // 
             this.btnDownloadINI.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDownloadINI.Enabled = false;
             this.btnDownloadINI.Location = new System.Drawing.Point(57, 283);
             this.btnDownloadINI.Name = "btnDownloadINI";
             this.btnDownloadINI.Size = new System.Drawing.Size(77, 23);
@@ -308,17 +321,6 @@
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
-            // 
-            // btnUploadINI
-            // 
-            this.btnUploadINI.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnUploadINI.Location = new System.Drawing.Point(140, 283);
-            this.btnUploadINI.Name = "btnUploadINI";
-            this.btnUploadINI.Size = new System.Drawing.Size(77, 23);
-            this.btnUploadINI.TabIndex = 20;
-            this.btnUploadINI.Text = "Upload";
-            this.btnUploadINI.UseVisualStyleBackColor = true;
-            this.btnUploadINI.Click += new System.EventHandler(this.btnUploadINI_Click);
             // 
             // UploadFiles
             // 
@@ -345,7 +347,7 @@
         #endregion
 
         private System.Windows.Forms.Button btnFolderLocator;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtFileInfo;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox cmbBaud;
         private System.Windows.Forms.Label label1;
