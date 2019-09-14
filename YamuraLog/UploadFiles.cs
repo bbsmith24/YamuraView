@@ -3,6 +3,7 @@ using System.Text;
 using System.IO;
 using System.IO.Ports;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace YamuraLog
 {
@@ -68,9 +69,18 @@ namespace YamuraLog
         public UploadFiles()
         {
             InitializeComponent();
+            List<string> comPorts = new List<string>();
             foreach (string s in SerialPort.GetPortNames())
             {
-                cmbPort.Items.Add(s);
+                if (comPorts.Contains(s))
+                {
+                    continue;
+                }
+                comPorts.Add(s);
+            }
+            foreach (string portName in comPorts)
+            {
+                cmbPort.Items.Add(portName);
             }
             txtSaveTo.Text = "D:\\Temp\\Test Data";
         }

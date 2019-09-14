@@ -282,10 +282,14 @@ namespace YamuraLog
                                                                      yAxis.Value.AxisDisplayRange[0] +
                                                                          chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1],  // offset Y
                                                                      chartBounds);                                                                // graphics area boundary
-                            if ((initialValue) && (startPt.X < chartBounds.Width) && (endPt.X > 0))
+                            try
                             {
-                                chartGraphics.DrawLine(drawPen, startPt, endPt);
+                                if ((initialValue) && (startPt.X < chartBounds.Width) && (endPt.X > 0))
+                                {
+                                    chartGraphics.DrawLine(drawPen, startPt, endPt);
+                                }
                             }
+                            catch { }
                             startPt.X = endPt.X;
                             startPt.Y = endPt.Y;
                             initialValue = true;
