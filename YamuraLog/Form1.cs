@@ -107,6 +107,7 @@ namespace YamuraLog
             trackMap.Show(dockPanel1);
             trackMap.DockState = DockState.DockRightAutoHide;
             // add new content pane, add runDataGrid control to new content pane
+            runDataGrid.ContextMenuStrip = this.runDataContext;
             runDataGrid.Dock = DockStyle.Fill;
             DockContent dockpanel2 = new DockContent();
             dockpanel2.Controls.Add(runDataGrid);
@@ -925,5 +926,40 @@ namespace YamuraLog
 
         }
         #endregion
+
+        private void exportFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // export to TSV file
+            int rowIdx = runDataGrid.SelectedCells[0].RowIndex;
+            String exportTo = runDataGrid.Rows[rowIdx].Cells["colSourceFile"].Value.ToString();
+            exportTo = exportTo.Replace("YLG", "TSV");
+
+            foreach (KeyValuePair<string, DataChannel> channel in dataLogger.runData[rowIdx].channels)
+            {
+                System.Diagnostics.Debug.Print(channel.Key);
+                System.Diagnostics.Debug.Print("\t");
+            }
+            System.Diagnostics.Debug.Print(System.Environment.NewLine);
+            foreach (KeyValuePair<float, DataPoint> timeStamp in dataLogger.runData[rowIdx].channels["Time"].DataPoints)
+            {
+                foreach(KeyValuePair<string, DataChannel> channel in dataLogger.runData[rowIdx].channels)
+                {
+                    if(channel.Value.dataPoints.ContainsKey(timeStamp.Key))
+                    {
+                        System.Diagnostics.Debug.Print(channel.Value.dataPoints[timeStamp.Key].PointValue.ToString());
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.Print("\t");
+                    }
+                    System.Diagnostics.Debug.Print("\t");
+                }
+                System.Diagnostics.Debug.Print(System.Environment.NewLine);
+            }
+
+            //
+            // do export here...
+            //
+        }
     }
 }

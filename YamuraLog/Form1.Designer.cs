@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.openLogFile = new System.Windows.Forms.OpenFileDialog();
             this.runDataGrid = new System.Windows.Forms.DataGridView();
             this.colRunNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -53,8 +54,11 @@
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
+            this.runDataContext = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.exportFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             this.menuStrip1.SuspendLayout();
+            this.runDataContext.SuspendLayout();
             this.SuspendLayout();
             // 
             // runDataGrid
@@ -80,7 +84,6 @@
             this.colRunNumber.HeaderText = "Run";
             this.colRunNumber.Name = "colRunNumber";
             this.colRunNumber.ReadOnly = true;
-            this.colRunNumber.Width = 52;
             // 
             // colDate
             // 
@@ -88,7 +91,6 @@
             this.colDate.HeaderText = "Date/Time";
             this.colDate.Name = "colDate";
             this.colDate.ReadOnly = true;
-            this.colDate.Width = 83;
             // 
             // colMinTime
             // 
@@ -96,7 +98,6 @@
             this.colMinTime.HeaderText = "Start";
             this.colMinTime.Name = "colMinTime";
             this.colMinTime.ReadOnly = true;
-            this.colMinTime.Width = 54;
             // 
             // colMaxTime
             // 
@@ -104,7 +105,6 @@
             this.colMaxTime.HeaderText = "End";
             this.colMaxTime.Name = "colMaxTime";
             this.colMaxTime.ReadOnly = true;
-            this.colMaxTime.Width = 51;
             // 
             // colSourceFile
             // 
@@ -244,6 +244,20 @@
             this.dockPanel1.Size = new System.Drawing.Size(1115, 658);
             this.dockPanel1.TabIndex = 38;
             // 
+            // runDataContext
+            // 
+            this.runDataContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exportFileToolStripMenuItem});
+            this.runDataContext.Name = "runDataContext";
+            this.runDataContext.Size = new System.Drawing.Size(153, 48);
+            // 
+            // exportFileToolStripMenuItem
+            // 
+            this.exportFileToolStripMenuItem.Name = "exportFileToolStripMenuItem";
+            this.exportFileToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exportFileToolStripMenuItem.Text = "Export File";
+            this.exportFileToolStripMenuItem.Click += new System.EventHandler(this.exportFileToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -259,6 +273,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.runDataContext.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -290,6 +305,8 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitMenuItem;
+        private System.Windows.Forms.ContextMenuStrip runDataContext;
+        private System.Windows.Forms.ToolStripMenuItem exportFileToolStripMenuItem;
     }
 }
 
