@@ -63,6 +63,9 @@ namespace YamuraLog
             stripChart.chartViewForm.ShowHScroll = true;
             stripChart.chartViewForm.ShowVScroll = false;
             stripChart.chartPropertiesForm.ChartXAxisChangeEvent += stripChart.chartViewForm.OnChartXAxisChange;
+            stripChart.chartPropertiesForm.ClearGraphicsPathEvent += stripChart.chartViewForm.OnClearGraphicsPath;
+            stripChart.chartPropertiesForm.ClearGraphicsPathEvent += tractionCircle.chartViewForm.OnClearGraphicsPath;
+            stripChart.chartPropertiesForm.ClearGraphicsPathEvent += trackMap.chartViewForm.OnClearGraphicsPath;
             // traction circle
             tractionCircle.ChartName = "Traction Circle";
             tractionCircle.Logger = dataLogger;
@@ -72,6 +75,9 @@ namespace YamuraLog
             tractionCircle.chartViewForm.ShowHScroll = false;
             tractionCircle.chartViewForm.ShowVScroll = false;
             tractionCircle.chartPropertiesForm.ChartXAxisChangeEvent += tractionCircle.chartViewForm.OnChartXAxisChange;
+            tractionCircle.chartPropertiesForm.ClearGraphicsPathEvent += stripChart.chartViewForm.OnClearGraphicsPath;
+            tractionCircle.chartPropertiesForm.ClearGraphicsPathEvent += tractionCircle.chartViewForm.OnClearGraphicsPath;
+            tractionCircle.chartPropertiesForm.ClearGraphicsPathEvent += trackMap.chartViewForm.OnClearGraphicsPath;
             // track map
             trackMap.ChartName = "Track Map";
             trackMap.Logger = dataLogger;
@@ -81,6 +87,9 @@ namespace YamuraLog
             trackMap.chartViewForm.ShowHScroll = false;
             trackMap.chartViewForm.ShowVScroll = false;
             trackMap.chartPropertiesForm.ChartXAxisChangeEvent += trackMap.chartViewForm.OnChartXAxisChange;
+            trackMap.chartPropertiesForm.ClearGraphicsPathEvent += stripChart.chartViewForm.OnClearGraphicsPath;
+            trackMap.chartPropertiesForm.ClearGraphicsPathEvent += tractionCircle.chartViewForm.OnClearGraphicsPath;
+            trackMap.chartPropertiesForm.ClearGraphicsPathEvent += trackMap.chartViewForm.OnClearGraphicsPath;
             // stripchart mouse move event handlers
             stripChart.chartViewForm.ChartMouseMoveEvent += OnChartMouseMove;// new ChartMouseMove(OnChartMouseMove);
             stripChart.chartViewForm.ChartMouseMoveEvent += tractionCircle.chartViewForm.OnChartMouseMove;

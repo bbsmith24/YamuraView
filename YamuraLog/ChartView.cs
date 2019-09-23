@@ -219,8 +219,6 @@ namespace YamuraLog
             {
                 return;
             }
-            PointF startPt = new PointF();
-            PointF endPt = new PointF();
             Pen drawPen = new Pen(Color.Black, 1);
             bool initialValue = false;
             // x and y scale
@@ -280,11 +278,10 @@ namespace YamuraLog
                         }
                     }
                     pathPen = new Pen(curChanInfo.Value.ChannelColor);
-                    //pathPen.Width = 1 / (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
                     using (Graphics chartGraphics = chartPanel.CreateGraphics())
                     {
 
-                        chartGraphics.TranslateTransform(0,  (float)chartBounds.Height);
+                        chartGraphics.TranslateTransform(chartBorder,  (float)chartBounds.Height + chartBorder);
                         chartGraphics.ScaleTransform(((float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2]),
                                                       (-1.0F * ((float)chartBounds.Height / (yAxis.Value.AxisDisplayRange[2]))));
 
@@ -902,6 +899,17 @@ namespace YamuraLog
             hScrollBar.Maximum = (int)chartAxes[xChannelName].AxisValueRange[1];
             hScrollBar.Value = (int)chartAxes[xChannelName].AxisDisplayRange[0];
             hScrollBar.LargeChange = (int)chartAxes[xChannelName].AxisDisplayRange[2];
+            chartPanel.Invalidate();
+        }
+        public void OnClearGraphicsPath(object sender, EventArgs e)
+        {
+            foreach (KeyValuePair<string, Axis> yAxis in chartAxes)
+            {
+                foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
+                {
+                    curChanInfo.Value.ChannelPath = new GraphicsPath();
+                }
+            }
             chartPanel.Invalidate();
         }
         /// <summary>

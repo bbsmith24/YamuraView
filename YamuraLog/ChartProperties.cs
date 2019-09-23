@@ -13,6 +13,7 @@ namespace YamuraLog
     public partial class ChartProperties : WeifenLuo.WinFormsUI.Docking.DockContent
     {
         public event AxisOffsetUpdate AxisOffsetUpdateEvent;
+        public event ClearGraphicsPath ClearGraphicsPathEvent;
 
         DataLogger logger;
         public DataLogger Logger
@@ -269,6 +270,7 @@ namespace YamuraLog
                 {
                     logger.runData[runIdx].channels[channelName].DataPoints[kvp.Key].PointValue = logger.runData[runIdx].channels[channelName].DataRange[1] - kvp.Value.PointValue + logger.runData[runIdx].channels[channelName].DataRange[0];
                 }
+                ClearGraphicsPathEvent(this, new EventArgs());
             }
             // all channels
             else
@@ -281,6 +283,7 @@ namespace YamuraLog
                         logger.runData[runIdx].channels[channelName].DataPoints[kvp.Key].PointValue = logger.runData[runIdx].channels[channelName].DataRange[1] - kvp.Value.PointValue + logger.runData[runIdx].channels[channelName].DataRange[0];
                     }
                 }
+                ClearGraphicsPathEvent(this, new EventArgs());
             }
 
         }
