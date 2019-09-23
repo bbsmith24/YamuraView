@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -92,6 +93,12 @@ namespace YamuraLog
             set { axisOffset = value; }
         }
 
+        GraphicsPath channelPath = new GraphicsPath();
+        public GraphicsPath ChannelPath
+        {
+            get { return channelPath; }
+            set { channelPath = value; }
+        }
         public ChannelInfo(int idx, String name)
         {
             runIndex = idx;

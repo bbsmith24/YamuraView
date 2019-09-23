@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using GDI;
 using Win32Interop.Methods;
 using WeifenLuo.WinFormsUI.Docking;
+using System.Drawing.Drawing2D;
 
 namespace YamuraLog
 {
@@ -226,77 +227,155 @@ namespace YamuraLog
             float[] displayScale = new float[] { 1.0F, 1.0F };
             displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
 
-            // get the graphics context
-            using (Graphics chartGraphics = chartPanel.CreateGraphics())
+            //List<GraphicsPath> gPaths = new List<GraphicsPath>();
+            //List<float> axisRange = new List<float>();
+            PointF[] points = new PointF[] { new PointF(), new PointF() };
+            Pen pathPen = new Pen(Color.Red);
+
+            foreach (KeyValuePair<string, Axis> yAxis in chartAxes)
             {
-                // check each Y axis
-                foreach (KeyValuePair<string, Axis> yAxis in chartAxes)
+                // skip if axis is not displayed
+                if (!yAxis.Value.ShowAxis)
                 {
-                    // skip if axis is not displayed
-                    if (!yAxis.Value.ShowAxis)
+                    continue;
+                }
+                // check each associated channel
+                foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
+                {
+                    // skip if channel is not displayed
+                    if (!curChanInfo.Value.ShowChannel)
                     {
                         continue;
                     }
-                    displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
-
-                    // check each associated channel
-                    foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
+                    // need to build path
+                    if ((curChanInfo.Value.ChannelPath == null) || (curChanInfo.Value.ChannelPath.PointCount == 0))
                     {
-                        // skip if channel is not displayed
-                        if (!curChanInfo.Value.ShowChannel)
-                        {
-                            continue;
-                        }
                         DataChannel curChannel = logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
-                        drawPen = new Pen(curChanInfo.Value.ChannelColor);
-
-                        initialValue = false;
+                        initialValue = true;
                         foreach (KeyValuePair<float, DataPoint> curData in curChannel.DataPoints)
                         {
                             // x axis is time - direct lookup
                             if (xChannelName == "Time")
                             {
-                                endPt.X = curData.Key;
-                                endPt.Y = curData.Value.PointValue;
+                                points[1] = new PointF (curData.Key, curData.Value.PointValue);
                             }
                             // x axis is not time - find nearest time in axis channel, 
                             else
                             {
                                 DataPoint tst = logger.runData[curChanInfo.Value.RunIndex].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
-                                if(tst == null)
+                                if (tst == null)
                                 {
                                     continue;
                                 }
-                                endPt.X = tst.PointValue;
-                                endPt.Y = curData.Value.PointValue;
+                                points[1] = new PointF(tst.PointValue, curData.Value.PointValue);
                             }
-                            //
-                            // at this point, the value is already offset on the X axis by any user defined time shift
-                            // just need to offset by the stripchart panned position (H scrollbar)
-                            //
-                            endPt = ScaleDataToDisplay(endPt,                                                                                     // point
-                                                                     displayScale[0],                                                             // scale X
-                                                                     displayScale[1],                                                             // scale Y
-                                                                     -1 * chartAxes[xChannelName].AxisDisplayRange[0] +
-                                                                         chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
-                                                                     yAxis.Value.AxisDisplayRange[0] +
-                                                                         chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1],  // offset Y
-                                                                     chartBounds);                                                                // graphics area boundary
-                            try
+                            if (initialValue)
                             {
-                                if ((initialValue) && (startPt.X < chartBounds.Width) && (endPt.X > 0))
-                                {
-                                    chartGraphics.DrawLine(drawPen, startPt, endPt);
-                                }
+                                initialValue = false;
+                                points[0] = new PointF(points[1].X, points[1].Y);
+                                continue;
                             }
-                            catch { }
-                            startPt.X = endPt.X;
-                            startPt.Y = endPt.Y;
-                            initialValue = true;
+                            curChanInfo.Value.ChannelPath.AddLine(points[0], points[1]);
+                            points[0] = new PointF(points[1].X, points[1].Y);
                         }
+                    }
+                    pathPen = new Pen(curChanInfo.Value.ChannelColor);
+                    //pathPen.Width = 1 / (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
+                    using (Graphics chartGraphics = chartPanel.CreateGraphics())
+                    {
+
+                        chartGraphics.TranslateTransform(0,  (float)chartBounds.Height);
+                        chartGraphics.ScaleTransform(((float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2]),
+                                                      (-1.0F * ((float)chartBounds.Height / (yAxis.Value.AxisDisplayRange[2]))));
+
+                        chartGraphics.TranslateTransform(-1 * chartAxes[xChannelName].AxisDisplayRange[0] +
+                                                         chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
+                                                         -1* yAxis.Value.AxisDisplayRange[0] +
+                                                         chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1]);  // offset Y
+
+                        pathPen.Width = 0;
+                        chartGraphics.DrawPath(pathPen, curChanInfo.Value.ChannelPath);
+                        chartGraphics.ResetTransform();
                     }
                 }
             }
+            //using (Graphics chartGraphics = chartPanel.CreateGraphics())
+            //{
+            //    for (int pathIdx = 0; pathIdx < gPaths.Count; pathIdx++)
+            //    {
+            //    }
+            //}
+            //// get the graphics context
+            //using (Graphics chartGraphics = chartPanel.CreateGraphics())
+            //{
+            //    // check each Y axis
+            //    foreach (KeyValuePair<string, Axis> yAxis in chartAxes)
+            //    {
+            //        // skip if axis is not displayed
+            //        if (!yAxis.Value.ShowAxis)
+            //        {
+            //            continue;
+            //        }
+            //        displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
+
+            //        // check each associated channel
+            //        foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
+            //        {
+            //            // skip if channel is not displayed
+            //            if (!curChanInfo.Value.ShowChannel)
+            //            {
+            //                continue;
+            //            }
+            //            DataChannel curChannel = logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
+            //            drawPen = new Pen(curChanInfo.Value.ChannelColor);
+
+            //            initialValue = false;
+            //            foreach (KeyValuePair<float, DataPoint> curData in curChannel.DataPoints)
+            //            {
+            //                // x axis is time - direct lookup
+            //                if (xChannelName == "Time")
+            //                {
+            //                    endPt.X = curData.Key;
+            //                    endPt.Y = curData.Value.PointValue;
+            //                }
+            //                // x axis is not time - find nearest time in axis channel, 
+            //                else
+            //                {
+            //                    DataPoint tst = logger.runData[curChanInfo.Value.RunIndex].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+            //                    if(tst == null)
+            //                    {
+            //                        continue;
+            //                    }
+            //                    endPt.X = tst.PointValue;
+            //                    endPt.Y = curData.Value.PointValue;
+            //                }
+            //                //
+            //                // at this point, the value is already offset on the X axis by any user defined time shift
+            //                // just need to offset by the stripchart panned position (H scrollbar)
+            //                //
+            //                endPt = ScaleDataToDisplay(endPt,                                                                                     // point
+            //                                                         displayScale[0],                                                             // scale X
+            //                                                         displayScale[1],                                                             // scale Y
+            //                                                         -1 * chartAxes[xChannelName].AxisDisplayRange[0] +
+            //                                                             chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
+            //                                                         yAxis.Value.AxisDisplayRange[0] +
+            //                                                             chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1],  // offset Y
+            //                                                         chartBounds);                                                                // graphics area boundary
+            //                try
+            //                {
+            //                    if /*(*/(initialValue) //&& (startPt.X < chartBounds.Width) && (endPt.X > 0))
+            //                    {
+            //                        chartGraphics.DrawLine(drawPen, startPt, endPt);
+            //                    }
+            //                }
+            //                catch { }
+            //                startPt.X = endPt.X;
+            //                startPt.Y = endPt.Y;
+            //                initialValue = true;
+            //            }
+            //        }
+            //    }
+            //}
         }
         /// <summary>
         /// 
