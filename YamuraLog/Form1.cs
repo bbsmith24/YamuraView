@@ -62,6 +62,7 @@ namespace YamuraLog
             stripChart.ChartAxes = new Dictionary<string, Axis>();
             stripChart.chartViewForm.ShowHScroll = true;
             stripChart.chartViewForm.ShowVScroll = false;
+            stripChart.chartViewForm.EqualScale = false;
             stripChart.chartPropertiesForm.ChartXAxisChangeEvent += stripChart.chartViewForm.OnChartXAxisChange;
             stripChart.chartPropertiesForm.ClearGraphicsPathEvent += stripChart.chartViewForm.OnClearGraphicsPath;
             stripChart.chartPropertiesForm.ClearGraphicsPathEvent += tractionCircle.chartViewForm.OnClearGraphicsPath;
@@ -74,6 +75,7 @@ namespace YamuraLog
             tractionCircle.ChartAxes = new Dictionary<string, Axis>();
             tractionCircle.chartViewForm.ShowHScroll = false;
             tractionCircle.chartViewForm.ShowVScroll = false;
+            tractionCircle.chartViewForm.EqualScale = true;
             tractionCircle.chartPropertiesForm.ChartXAxisChangeEvent += tractionCircle.chartViewForm.OnChartXAxisChange;
             tractionCircle.chartPropertiesForm.ClearGraphicsPathEvent += stripChart.chartViewForm.OnClearGraphicsPath;
             tractionCircle.chartPropertiesForm.ClearGraphicsPathEvent += tractionCircle.chartViewForm.OnClearGraphicsPath;
@@ -86,6 +88,7 @@ namespace YamuraLog
             trackMap.ChartAxes = new Dictionary<string, Axis>();
             trackMap.chartViewForm.ShowHScroll = false;
             trackMap.chartViewForm.ShowVScroll = false;
+            trackMap.chartViewForm.EqualScale = true;
             trackMap.chartPropertiesForm.ChartXAxisChangeEvent += trackMap.chartViewForm.OnChartXAxisChange;
             trackMap.chartPropertiesForm.ClearGraphicsPathEvent += stripChart.chartViewForm.OnClearGraphicsPath;
             trackMap.chartPropertiesForm.ClearGraphicsPathEvent += tractionCircle.chartViewForm.OnClearGraphicsPath;

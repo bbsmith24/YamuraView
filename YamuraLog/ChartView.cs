@@ -108,7 +108,6 @@ namespace YamuraLog
                 allowDrag = value;
             }
         }
-
         // crosshairs, box, circle work
         // horizontal and vertical look weird
         CursorStyle cursorMode = CursorStyle.CROSSHAIRS;
@@ -120,7 +119,6 @@ namespace YamuraLog
             get { return cursorMode; }
             set { cursorMode = value; }
         }
-
         int cursorBoxSize = 10;
         /// <summary>
         /// size of box and circle cursor
@@ -130,7 +128,6 @@ namespace YamuraLog
             get { return cursorBoxSize; }
             set { cursorBoxSize = value; }
         }
-
         bool cursorUpdateSource = true;
         /// <summary>
         /// chart accepts mouse moves and raises cursor update events for listeners
@@ -146,7 +143,6 @@ namespace YamuraLog
                 cursorUpdateSource = value;
             }
         }
-
         bool showHScroll = true;
         /// <summary>
         /// show the H scrollbar
@@ -160,7 +156,6 @@ namespace YamuraLog
                 UpdateElementPositions();
             }
         }
-
         bool showVScroll = true;
         /// <summary>
         /// show the V scrollbar
@@ -174,7 +169,13 @@ namespace YamuraLog
                 UpdateElementPositions();
             }
         }
-
+        bool equalScale = false;
+        // true if X and Y scale are equal regardless of window size
+        public bool EqualScale
+        {
+            get { return equalScale; }
+            set { equalScale = value; }
+        }
         public ChartView()
         {
             InitializeComponent();
@@ -207,6 +208,7 @@ namespace YamuraLog
         /// <param name="e"></param>
         private void chartPanel_Paint(object sender, PaintEventArgs e)
         {
+            #region initialize mouse/cursor moves
             for (int moveIdx = 0; moveIdx < startMouseMove.Count; moveIdx++)
             {
                 startMouseMove[moveIdx] = false;
@@ -214,38 +216,38 @@ namespace YamuraLog
                 chartStartCursorPos[moveIdx] = new Point(0, 0);
                 chartLastCursorPos[moveIdx] = new Point(0, 0);
             }
+            #endregion
             // nothing to display yet
             if ((chartAxes == null) || (chartAxes.Count == 0))
             {
                 return;
             }
-            Pen drawPen = new Pen(Color.Black, 1);
             bool initialValue = false;
             // x and y scale
             float[] displayScale = new float[] { 1.0F, 1.0F };
-            displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
 
-            //List<GraphicsPath> gPaths = new List<GraphicsPath>();
-            //List<float> axisRange = new List<float>();
             PointF[] points = new PointF[] { new PointF(), new PointF() };
             Pen pathPen = new Pen(Color.Red);
 
+            // process each axis
             foreach (KeyValuePair<string, Axis> yAxis in chartAxes)
             {
-                // skip if axis is not displayed
+                #region skip axis if not displayed
                 if (!yAxis.Value.ShowAxis)
                 {
                     continue;
                 }
-                // check each associated channel
+                #endregion
+                // process each associated channel
                 foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
                 {
-                    // skip if channel is not displayed
+                    #region skip if channel is not displayed
                     if (!curChanInfo.Value.ShowChannel)
                     {
                         continue;
                     }
-                    // need to build path
+                    #endregion
+                    #region build unscaled path
                     if ((curChanInfo.Value.ChannelPath == null) || (curChanInfo.Value.ChannelPath.PointCount == 0))
                     {
                         DataChannel curChannel = logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
@@ -277,102 +279,45 @@ namespace YamuraLog
                             points[0] = new PointF(points[1].X, points[1].Y);
                         }
                     }
+                    #endregion
+                    #region draw to transformed graphic context
                     pathPen = new Pen(curChanInfo.Value.ChannelColor);
                     using (Graphics chartGraphics = chartPanel.CreateGraphics())
                     {
+                        displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
+                        displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
+                        if(EqualScale)
+                        {
+                            if(displayScale[0] < displayScale[1])
+                            {
+                                displayScale[1] = displayScale[0];
+                            }
+                            else
+                            {
+                                displayScale[0] = displayScale[1];
+                            }
+                        }
+                        displayScale[1] *= -1.0F;
 
+                        // translate to lower left corner of display area
                         chartGraphics.TranslateTransform(chartBorder,  (float)chartBounds.Height + chartBorder);
-                        chartGraphics.ScaleTransform(((float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2]),
-                                                      (-1.0F * ((float)chartBounds.Height / (yAxis.Value.AxisDisplayRange[2]))));
-
+                        // scale to display range in X and Y
+                        chartGraphics.ScaleTransform(displayScale[0], displayScale[1]);
+                        // translate by -1 * minimum display range + axis offset (scrolling)
                         chartGraphics.TranslateTransform(-1 * chartAxes[xChannelName].AxisDisplayRange[0] +
                                                          chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
                                                          -1* yAxis.Value.AxisDisplayRange[0] +
                                                          chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1]);  // offset Y
-
+                        // set pen width to 0 (1 pixel)
                         pathPen.Width = 0;
+                        // draw the path
                         chartGraphics.DrawPath(pathPen, curChanInfo.Value.ChannelPath);
+                        // reset to original orientation
                         chartGraphics.ResetTransform();
                     }
+                    #endregion
                 }
             }
-            //using (Graphics chartGraphics = chartPanel.CreateGraphics())
-            //{
-            //    for (int pathIdx = 0; pathIdx < gPaths.Count; pathIdx++)
-            //    {
-            //    }
-            //}
-            //// get the graphics context
-            //using (Graphics chartGraphics = chartPanel.CreateGraphics())
-            //{
-            //    // check each Y axis
-            //    foreach (KeyValuePair<string, Axis> yAxis in chartAxes)
-            //    {
-            //        // skip if axis is not displayed
-            //        if (!yAxis.Value.ShowAxis)
-            //        {
-            //            continue;
-            //        }
-            //        displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
-
-            //        // check each associated channel
-            //        foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
-            //        {
-            //            // skip if channel is not displayed
-            //            if (!curChanInfo.Value.ShowChannel)
-            //            {
-            //                continue;
-            //            }
-            //            DataChannel curChannel = logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
-            //            drawPen = new Pen(curChanInfo.Value.ChannelColor);
-
-            //            initialValue = false;
-            //            foreach (KeyValuePair<float, DataPoint> curData in curChannel.DataPoints)
-            //            {
-            //                // x axis is time - direct lookup
-            //                if (xChannelName == "Time")
-            //                {
-            //                    endPt.X = curData.Key;
-            //                    endPt.Y = curData.Value.PointValue;
-            //                }
-            //                // x axis is not time - find nearest time in axis channel, 
-            //                else
-            //                {
-            //                    DataPoint tst = logger.runData[curChanInfo.Value.RunIndex].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
-            //                    if(tst == null)
-            //                    {
-            //                        continue;
-            //                    }
-            //                    endPt.X = tst.PointValue;
-            //                    endPt.Y = curData.Value.PointValue;
-            //                }
-            //                //
-            //                // at this point, the value is already offset on the X axis by any user defined time shift
-            //                // just need to offset by the stripchart panned position (H scrollbar)
-            //                //
-            //                endPt = ScaleDataToDisplay(endPt,                                                                                     // point
-            //                                                         displayScale[0],                                                             // scale X
-            //                                                         displayScale[1],                                                             // scale Y
-            //                                                         -1 * chartAxes[xChannelName].AxisDisplayRange[0] +
-            //                                                             chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
-            //                                                         yAxis.Value.AxisDisplayRange[0] +
-            //                                                             chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1],  // offset Y
-            //                                                         chartBounds);                                                                // graphics area boundary
-            //                try
-            //                {
-            //                    if /*(*/(initialValue) //&& (startPt.X < chartBounds.Width) && (endPt.X > 0))
-            //                    {
-            //                        chartGraphics.DrawLine(drawPen, startPt, endPt);
-            //                    }
-            //                }
-            //                catch { }
-            //                startPt.X = endPt.X;
-            //                startPt.Y = endPt.Y;
-            //                initialValue = true;
-            //            }
-            //        }
-            //    }
-            //}
         }
         /// <summary>
         /// 
@@ -788,7 +733,6 @@ namespace YamuraLog
             #region move cursor(s)
             // position in event args is data - need to scale to screen
             float[] displayScale = new float[] { 1.0F, 1.0F };
-            displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
             PointF endPt = new PointF();
             int axisIdx = 0;
             string axisFullName = "";
@@ -804,7 +748,19 @@ namespace YamuraLog
                         continue;
                     }
                     axisFullName = axisIdx.ToString() + "-" + yAxis.Key;
+                    displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
                     displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
+                    if(EqualScale)
+                    {
+                        if(displayScale[0] < displayScale[1])
+                        {
+                            displayScale[1] = displayScale[0];
+                        }
+                        else
+                        {
+                            displayScale[0] = displayScale[1];
+                        }
+                    }
                     // check each associated channel
                     foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
                     {
