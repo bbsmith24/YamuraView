@@ -18,7 +18,7 @@ namespace YamuraLog
     public delegate void AxisOffsetUpdate(object sender, AxisOffsetUpdateEventArgs e);
     public delegate void ClearGraphicsPath(object sender, EventArgs e);
 
-    public partial class ChartControl :  WeifenLuo.WinFormsUI.Docking.DockContent//UserControl
+    public partial class ChartControl :  WeifenLuo.WinFormsUI.Docking.DockContent
     {
         DataLogger logger;
         public DataLogger Logger

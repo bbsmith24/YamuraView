@@ -29,7 +29,7 @@ namespace YamuraLog
         int initialRunCount = 0;
 
         ChartControl stripChart = new ChartControl();
-        ChartControl tractionCircle = new ChartControl();
+        TractionCircleControl tractionCircle = new TractionCircleControl();
         ChartControl trackMap = new ChartControl();
         #endregion
         #region constructors
