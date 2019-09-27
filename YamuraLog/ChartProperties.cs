@@ -242,6 +242,12 @@ namespace YamuraLog
                 ChartAxes[nodeName].AxisValueRange[0] = Convert.ToSingle(channelsContext.Items["txtAxisMinValue"].Text);
                 ChartAxes[nodeName].AxisValueRange[1] = Convert.ToSingle(channelsContext.Items["txtAxisMaxValue"].Text);
                 ChartAxes[nodeName].AxisValueRange[2] = ChartAxes[nodeName].AxisValueRange[1] - ChartAxes[nodeName].AxisValueRange[0];
+                foreach(KeyValuePair<string, ChannelInfo> channelInfo in ChartAxes[nodeName].AssociatedChannels)
+                {
+                    channelInfo.Value.AxisRange[0] = Convert.ToSingle(channelsContext.Items["txtAxisMinValue"].Text);
+                    channelInfo.Value.AxisRange[1] = Convert.ToSingle(channelsContext.Items["txtAxisMaxValue"].Text);
+                    channelInfo.Value.AxisRange[2] = ChartAxes[nodeName].AxisValueRange[1] - ChartAxes[nodeName].AxisValueRange[0];
+                }
             }
         }
         /// <summary>
@@ -266,9 +272,9 @@ namespace YamuraLog
                 string channelName = axisChannelTree.SelectedNode.Text;
                 int runIdx = Convert.ToInt32(channelName.Substring(0, channelName.IndexOf('-')));
                 channelName = channelName.Substring(channelName.IndexOf('-') + 1);
-                foreach (KeyValuePair<float, DataPoint>kvp in logger.runData[runIdx].channels[channelName].DataPoints)
+                foreach (KeyValuePair<float, DataPoint>kvp in Logger.runData[runIdx].channels[channelName].DataPoints)
                 {
-                    logger.runData[runIdx].channels[channelName].DataPoints[kvp.Key].PointValue = logger.runData[runIdx].channels[channelName].DataRange[1] - kvp.Value.PointValue + logger.runData[runIdx].channels[channelName].DataRange[0];
+                    Logger.runData[runIdx].channels[channelName].DataPoints[kvp.Key].PointValue = Logger.runData[runIdx].channels[channelName].DataRange[1] - kvp.Value.PointValue + Logger.runData[runIdx].channels[channelName].DataRange[0];
                 }
                 ClearGraphicsPathEvent(this, new EventArgs());
             }
@@ -276,11 +282,11 @@ namespace YamuraLog
             else
             {
                 string channelName = axisChannelTree.SelectedNode.Text;
-                for (int runIdx = 0; runIdx < logger.runData.Count; runIdx++)
+                for (int runIdx = 0; runIdx < Logger.runData.Count; runIdx++)
                 {
-                    foreach (KeyValuePair<float, DataPoint> kvp in logger.runData[runIdx].channels[channelName].DataPoints)
+                    foreach (KeyValuePair<float, DataPoint> kvp in Logger.runData[runIdx].channels[channelName].DataPoints)
                     {
-                        logger.runData[runIdx].channels[channelName].DataPoints[kvp.Key].PointValue = logger.runData[runIdx].channels[channelName].DataRange[1] - kvp.Value.PointValue + logger.runData[runIdx].channels[channelName].DataRange[0];
+                        Logger.runData[runIdx].channels[channelName].DataPoints[kvp.Key].PointValue = Logger.runData[runIdx].channels[channelName].DataRange[1] - kvp.Value.PointValue + Logger.runData[runIdx].channels[channelName].DataRange[0];
                     }
                 }
                 ClearGraphicsPathEvent(this, new EventArgs());
@@ -301,7 +307,7 @@ namespace YamuraLog
         {
             List<float> launchPoints = new List<float>();
             int runCount = 0;
-            foreach (RunData curRun in logger.runData)
+            foreach (RunData curRun in Logger.runData)
             {
                 foreach (KeyValuePair<float, DataPoint> curPoint in curRun.channels[alignAxis].DataPoints)
                 {

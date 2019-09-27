@@ -218,7 +218,7 @@ namespace YamuraLog
             }
             #endregion
             // nothing to display yet
-            if ((chartAxes == null) || (chartAxes.Count == 0))
+            if ((chartAxes == null) || (chartAxes.Count == 0) || (Logger == null))
             {
                 return;
             }
@@ -250,7 +250,7 @@ namespace YamuraLog
                     #region build unscaled path
                     if ((curChanInfo.Value.ChannelPath == null) || (curChanInfo.Value.ChannelPath.PointCount == 0))
                     {
-                        DataChannel curChannel = logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
+                        DataChannel curChannel = Logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
                         initialValue = true;
                         foreach (KeyValuePair<float, DataPoint> curData in curChannel.DataPoints)
                         {
@@ -262,7 +262,7 @@ namespace YamuraLog
                             // x axis is not time - find nearest time in axis channel, 
                             else
                             {
-                                DataPoint tst = logger.runData[curChanInfo.Value.RunIndex].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+                                DataPoint tst = Logger.runData[curChanInfo.Value.RunIndex].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
                                 if (tst == null)
                                 {
                                     continue;
@@ -778,7 +778,7 @@ namespace YamuraLog
                             chartStartCursorPos.Add(new Point(0, 0));
                             chartLastCursorPos.Add(new Point(0, 0));
                         }
-                        DataChannel curChannel = logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
+                        DataChannel curChannel = Logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
 
                         // x axis is time - direct lookup
                         if (axisFullName == (axisIdx.ToString() + "-Time"))
@@ -789,7 +789,7 @@ namespace YamuraLog
                         // x axis is not time - find nearest time in axis channel, 
                         else
                         {
-                            DataPoint tst = logger.runData[curChanInfo.Value.RunIndex].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= e.XAxisValues[curChanInfo.Value.RunIndex.ToString() + "-Time"]).Value;
+                            DataPoint tst = Logger.runData[curChanInfo.Value.RunIndex].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= e.XAxisValues[curChanInfo.Value.RunIndex.ToString() + "-Time"]).Value;
                             if (tst == null)
                             {
                                 continue;

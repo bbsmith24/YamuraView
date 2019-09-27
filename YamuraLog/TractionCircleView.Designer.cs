@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.hScrollBar = new System.Windows.Forms.HScrollBar();
-            this.vScrollBar = new System.Windows.Forms.VScrollBar();
-            this.chartPanel = new System.Windows.Forms.Panel();
+            //this.hScrollBar = new System.Windows.Forms.HScrollBar();
+            //this.vScrollBar = new System.Windows.Forms.VScrollBar();
+            //this.chartPanel = new System.Windows.Forms.Panel();
             this.SuspendLayout();
             // 
             // hScrollBar
@@ -67,8 +67,8 @@
             this.Controls.Add(this.chartPanel);
             this.Controls.Add(this.vScrollBar);
             this.Controls.Add(this.hScrollBar);
-            this.Name = "ChartView";
-            this.Text = "ChartView";
+            this.Name = "TractionCircleView";
+            this.Text = "TractionCircleView";
             this.Resize += new System.EventHandler(this.ChartView_Resize);
             this.ResumeLayout(false);
 

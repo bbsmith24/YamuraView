@@ -51,11 +51,10 @@ namespace YamuraLog
         //    }
         //}
 
-        Rectangle chartBounds = new Rectangle(0, 0, 0, 0);
+        //Rectangle chartBounds = new Rectangle(0, 0, 0, 0);
 
         // panel forms
         new public TractionCircleView chartViewForm = new TractionCircleView();
-        //public ChartProperties chartPropertiesForm = new ChartProperties();
 
         /// <summary>
         /// 
@@ -71,14 +70,15 @@ namespace YamuraLog
             dockPanel1.BringToFront();
 
             chartViewForm.ShowHint = DockState.Document;
-            chartViewForm.Text = "Stripchart";
+            chartViewForm.Text = "Traction Circle";
             chartViewForm.Show(dockPanel1);
 
             chartPropertiesForm.ShowHint = DockState.Document;
-            chartPropertiesForm.Text = "Stripchart Channels Setup";
+            chartPropertiesForm.Text = "Traction Circle Channels Setup";
             chartPropertiesForm.Show(dockPanel1);
 
             chartPropertiesForm.AxisOffsetUpdateEvent += chartViewForm.OnAxisOffsetUpdate;
+            
         }
         private void zoomAllMenuItem_Click(object sender, EventArgs e)
         {
