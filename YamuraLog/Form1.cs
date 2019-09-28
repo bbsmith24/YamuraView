@@ -716,6 +716,10 @@ namespace YamuraLog
                     channelIdx = 0;
                     foreach (KeyValuePair<String, DataChannel> curChannel in curRun.channels)
                     {
+                        if(curChannel.Value.DataRange[0] == curChannel.Value.DataRange[1])
+                        {
+                            curChannel.Value.DataRange[1] += 1;
+                        }
                         String axisName = curChannel.Key;
                         #region strip chart control axes create/update
                         if (stripChart.ChartAxes.ContainsKey(axisName))

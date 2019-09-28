@@ -31,11 +31,12 @@
             this.components = new System.ComponentModel.Container();
             this.axisChannelTree = new System.Windows.Forms.TreeView();
             this.channelsContext = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.invertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblAxisMin = new System.Windows.Forms.ToolStripTextBox();
             this.txtAxisMinValue = new System.Windows.Forms.ToolStripTextBox();
             this.lblAxisMax = new System.Windows.Forms.ToolStripTextBox();
             this.txtAxisMaxValue = new System.Windows.Forms.ToolStripTextBox();
+            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cmbXAxis = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -49,7 +50,6 @@
             this.label4 = new System.Windows.Forms.Label();
             this.txtAutoThreshold = new System.Windows.Forms.TextBox();
             this.btnDoAutoAlign = new System.Windows.Forms.Button();
-            this.invertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.channelsContext.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axisOffsetsGrid)).BeginInit();
             this.SuspendLayout();
@@ -81,12 +81,12 @@
             this.channelsContext.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler(this.channelsContext_Closed);
             this.channelsContext.Opening += new System.ComponentModel.CancelEventHandler(this.channelsContext_Opening);
             // 
-            // closeToolStripMenuItem
+            // invertToolStripMenuItem
             // 
-            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
-            this.closeToolStripMenuItem.Text = "Close";
-            this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
+            this.invertToolStripMenuItem.Name = "invertToolStripMenuItem";
+            this.invertToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.invertToolStripMenuItem.Text = "Invert";
+            this.invertToolStripMenuItem.Click += new System.EventHandler(this.invertToolStripMenuItem_Click);
             // 
             // lblAxisMin
             // 
@@ -109,6 +109,13 @@
             // 
             this.txtAxisMaxValue.Name = "txtAxisMaxValue";
             this.txtAxisMaxValue.Size = new System.Drawing.Size(100, 23);
+            // 
+            // closeToolStripMenuItem
+            // 
+            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.closeToolStripMenuItem.Text = "Close";
+            this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
             // cmbXAxis
             // 
@@ -235,13 +242,6 @@
             this.btnDoAutoAlign.Text = "Go";
             this.btnDoAutoAlign.UseVisualStyleBackColor = true;
             this.btnDoAutoAlign.Click += new System.EventHandler(this.btnDoAutoAlign_Click);
-            // 
-            // invertToolStripMenuItem
-            // 
-            this.invertToolStripMenuItem.Name = "invertToolStripMenuItem";
-            this.invertToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
-            this.invertToolStripMenuItem.Text = "Invert";
-            this.invertToolStripMenuItem.Click += new System.EventHandler(this.invertToolStripMenuItem_Click);
             // 
             // ChartProperties
             // 
