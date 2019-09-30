@@ -896,13 +896,16 @@ namespace YamuraLog
             {
                 return;
             }
-            if (openLogFile.FileName.EndsWith("TXT", StringComparison.CurrentCultureIgnoreCase))
+            foreach (String fileName in openLogFile.FileNames)
             {
-                ReadTXTFile(openLogFile.FileName);
-            }
-            else if (openLogFile.FileName.EndsWith("YLG", StringComparison.CurrentCultureIgnoreCase))
-            {
-                ReadYLGFile(openLogFile.FileName);
+                if (fileName.EndsWith("TXT", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    ReadTXTFile(fileName);
+                }
+                else if (fileName.EndsWith("YLG", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    ReadYLGFile(fileName);
+                }
             }
             stripChart.Invalidate();
             tractionCircle.Invalidate();
@@ -942,7 +945,7 @@ namespace YamuraLog
 
         }
         #endregion
-
+        #region run data context
         private void exportFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // export to TSV file
@@ -977,5 +980,126 @@ namespace YamuraLog
             // do export here...
             //
         }
+        private void fileInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            List<StringBuilder> summaryStrings = new List<StringBuilder>();
+            int rowIdx = runDataGrid.SelectedCells[0].RowIndex;
+            summaryStrings.Add(new StringBuilder());
+            #region channel
+            int maxLen = 0;
+            int curChannel = 1;
+            summaryStrings[0].Append("Channel ");
+            maxLen = summaryStrings[0].Length;
+            foreach (KeyValuePair<string, DataChannel> channel in dataLogger.runData[rowIdx].channels)
+            {
+                summaryStrings.Add(new StringBuilder());
+                summaryStrings[curChannel].AppendFormat("{0}", channel.Key);
+                maxLen = summaryStrings[curChannel].Length > maxLen ? summaryStrings[curChannel].Length : maxLen;
+                curChannel++;
+            }
+            maxLen += 2;
+            for (int stringIdx = 0; stringIdx < summaryStrings.Count; stringIdx++)
+            {
+                summaryStrings[stringIdx].Append(new String(' ', maxLen - summaryStrings[stringIdx].Length));
+            }
+            #endregion
+            #region description
+            maxLen = 0;
+            curChannel = 1;
+            summaryStrings[0].Append("Description ");
+            maxLen = summaryStrings[0].Length;
+            foreach (KeyValuePair<string, DataChannel> channel in dataLogger.runData[rowIdx].channels)
+            {
+                summaryStrings[curChannel].AppendFormat("{0}", channel.Value.ChannelDescription);
+                maxLen = summaryStrings[curChannel].Length > maxLen ? summaryStrings[curChannel].Length : maxLen;
+                curChannel++;
+            }
+            maxLen += 2;
+            for (int stringIdx = 0; stringIdx < summaryStrings.Count; stringIdx++)
+            {
+                summaryStrings[stringIdx].Append(new String(' ', maxLen - summaryStrings[stringIdx].Length));
+            }
+            #endregion
+            #region points
+            maxLen = 0;
+            curChannel = 1;
+            summaryStrings[0].Append("Points ");
+            maxLen = summaryStrings[0].Length;
+            foreach (KeyValuePair<string, DataChannel> channel in dataLogger.runData[rowIdx].channels)
+            {
+                summaryStrings[curChannel].AppendFormat("{0}", channel.Value.dataPoints.Count);
+                maxLen = summaryStrings[curChannel].Length > maxLen ? summaryStrings[curChannel].Length : maxLen;
+                curChannel++;
+            }
+            maxLen += 2;
+            for (int stringIdx = 0; stringIdx < summaryStrings.Count; stringIdx++)
+            {
+                summaryStrings[stringIdx].Append(new String(' ', maxLen - summaryStrings[stringIdx].Length));
+            }
+            #endregion
+            #region min value
+            maxLen = 0;
+            curChannel = 1;
+            summaryStrings[0].Append("Minimum ");
+            maxLen = summaryStrings[0].Length;
+            foreach (KeyValuePair<string, DataChannel> channel in dataLogger.runData[rowIdx].channels)
+            {
+                summaryStrings[curChannel].AppendFormat("{0}", channel.Value.DataRange[0]);
+                maxLen = summaryStrings[curChannel].Length > maxLen ? summaryStrings[curChannel].Length : maxLen;
+                curChannel++;
+            }
+            maxLen += 2;
+            for (int stringIdx =0; stringIdx < summaryStrings.Count; stringIdx++)
+            {
+                summaryStrings[stringIdx].Append(new String(' ', maxLen - summaryStrings[stringIdx].Length));
+            }
+            #endregion
+            #region max value
+            maxLen = 0;
+            curChannel = 1;
+            summaryStrings[0].Append("Maximum ");
+            maxLen = summaryStrings[0].Length;
+            foreach (KeyValuePair<string, DataChannel> channel in dataLogger.runData[rowIdx].channels)
+            {
+                summaryStrings[curChannel].AppendFormat("{0}", channel.Value.DataRange[1]);
+                maxLen = summaryStrings[curChannel].Length > maxLen ? summaryStrings[curChannel].Length : maxLen;
+                curChannel++;
+            }
+            maxLen += 2;
+            for (int stringIdx = 0; stringIdx < summaryStrings.Count; stringIdx++)
+            {
+                summaryStrings[stringIdx].Append(new String(' ', maxLen - summaryStrings[stringIdx].Length));
+            }
+            #endregion
+            #region range
+            maxLen = 0;
+            curChannel = 1;
+            summaryStrings[0].Append("Range ");
+            maxLen = summaryStrings[0].Length;
+            foreach (KeyValuePair<string, DataChannel> channel in dataLogger.runData[rowIdx].channels)
+            {
+                summaryStrings[curChannel].AppendFormat("{0}", channel.Value.DataRange[1] - channel.Value.DataRange[0]);
+                curChannel++;
+            }
+            #endregion
+            #region newlines
+            // newlines
+            for (int stringIdx = 0; stringIdx < summaryStrings.Count; stringIdx++)
+            {
+                summaryStrings[stringIdx].Append(System.Environment.NewLine);
+            }
+            #endregion
+            #region send to dialog
+            FileInfo showFileInfo = new FileInfo();
+            StringBuilder allStrings = new StringBuilder();
+            for (int stringIdx = 0; stringIdx < summaryStrings.Count; stringIdx++)
+            {
+                allStrings.Append(summaryStrings[stringIdx]);
+            }
+            showFileInfo.FileInfoText = allStrings.ToString();
+            #endregion
+            showFileInfo.ShowDialog();
+        }
+        #endregion
     }
 }

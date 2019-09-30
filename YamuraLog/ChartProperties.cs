@@ -284,6 +284,10 @@ namespace YamuraLog
                 string channelName = axisChannelTree.SelectedNode.Text;
                 for (int runIdx = 0; runIdx < Logger.runData.Count; runIdx++)
                 {
+                    if(!Logger.runData[runIdx].channels.ContainsKey(channelName))
+                    {
+                        continue;
+                    }
                     foreach (KeyValuePair<float, DataPoint> kvp in Logger.runData[runIdx].channels[channelName].DataPoints)
                     {
                         Logger.runData[runIdx].channels[channelName].DataPoints[kvp.Key].PointValue = Logger.runData[runIdx].channels[channelName].DataRange[1] - kvp.Value.PointValue + Logger.runData[runIdx].channels[channelName].DataRange[0];
@@ -323,6 +327,10 @@ namespace YamuraLog
             for (int launchIdx = 0; launchIdx < launchPoints.Count; launchIdx++)
             {
                 launchPoints[launchIdx] -= minPoint;
+                if(axisOffsetsGrid.Rows.Count <= launchIdx)
+                {
+                    axisOffsetsGrid.Rows.Add();
+                }
                 axisOffsetsGrid.Rows[launchIdx].Cells["axisOffset"].Value = (-1 * launchPoints[launchIdx]).ToString();
                 AxisOffsetUpdateEventArgs updateArgs = new AxisOffsetUpdateEventArgs("Time", launchIdx, 0, -1* launchPoints[launchIdx]);
                 AxisOffsetUpdateEvent(this, updateArgs);

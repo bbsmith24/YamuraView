@@ -56,10 +56,15 @@
             this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.runDataContext = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.exportFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fileInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.runDataContext.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // openLogFile
+            // 
+            this.openLogFile.Multiselect = true;
             // 
             // runDataGrid
             // 
@@ -247,16 +252,24 @@
             // runDataContext
             // 
             this.runDataContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileInfoToolStripMenuItem,
             this.exportFileToolStripMenuItem});
             this.runDataContext.Name = "runDataContext";
-            this.runDataContext.Size = new System.Drawing.Size(153, 48);
+            this.runDataContext.Size = new System.Drawing.Size(153, 70);
             // 
             // exportFileToolStripMenuItem
             // 
             this.exportFileToolStripMenuItem.Name = "exportFileToolStripMenuItem";
-            this.exportFileToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exportFileToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.exportFileToolStripMenuItem.Text = "Export File";
             this.exportFileToolStripMenuItem.Click += new System.EventHandler(this.exportFileToolStripMenuItem_Click);
+            // 
+            // fileInfoToolStripMenuItem
+            // 
+            this.fileInfoToolStripMenuItem.Name = "fileInfoToolStripMenuItem";
+            this.fileInfoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.fileInfoToolStripMenuItem.Text = "File Info";
+            this.fileInfoToolStripMenuItem.Click += new System.EventHandler(this.fileInfoToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -307,6 +320,7 @@
         private System.Windows.Forms.ToolStripMenuItem exitMenuItem;
         private System.Windows.Forms.ContextMenuStrip runDataContext;
         private System.Windows.Forms.ToolStripMenuItem exportFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem fileInfoToolStripMenuItem;
     }
 }
 
