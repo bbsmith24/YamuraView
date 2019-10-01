@@ -13,46 +13,8 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace YamuraLog
 {
-    //public delegate void ChartMouseMove(object sender, ChartControlMouseMoveEventArgs e);
-    //public delegate void ChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e);
-    //public delegate void AxisOffsetUpdate(object sender, AxisOffsetUpdateEventArgs e);
-    //public delegate void ClearGraphicsPath(object sender, EventArgs e);
-
     public partial class TractionCircleControl : ChartControl 
     {
-        //DataLogger logger;
-        //public DataLogger Logger
-        //{
-        //    get { return logger; }
-        //    set { logger = value; }
-        //}
-
-        //Dictionary<string, Axis> chartAxes = new Dictionary<string, Axis>();
-        //public Dictionary<string, Axis> ChartAxes
-        //{
-        //    get { return chartAxes; }
-        //    set
-        //    {
-        //        chartAxes = value;
-        //        chartViewForm.ChartAxes = chartAxes;
-        //        chartPropertiesForm.ChartAxes = chartAxes;
-        //    }
-        //}
-
-        //string chartName = "Chart";
-        //public string ChartName
-        //{
-        //    get { return chartName; }
-        //    set
-        //    {
-        //        chartName = value;
-        //        chartViewForm.ChartName = value;
-        //        chartPropertiesForm.Text = value + " setup";
-        //    }
-        //}
-
-        //Rectangle chartBounds = new Rectangle(0, 0, 0, 0);
-
         // panel forms
         new public TractionCircleView chartViewForm = new TractionCircleView();
 
@@ -94,29 +56,4 @@ namespace YamuraLog
             chartViewForm.chartPanel.Invalidate();
         }
     }
-    //public class ChartControlMouseMoveEventArgs : EventArgs
-    //{
-    //    Dictionary<string, float> xAxisValues = new Dictionary<string, float>();
-    //    public Dictionary<string, float> XAxisValues
-    //    {
-    //        get { return xAxisValues; }
-    //        set { xAxisValues = value; }
-    //    }
-    //    Dictionary<string, float> yAxisValues = new Dictionary<string, float>();
-    //    public Dictionary<string, float> YAxisValues
-    //    {
-    //        get { return yAxisValues; }
-    //        set { yAxisValues = value; }
-    //    }
-
-    //}
-    //public class ChartControlXAxisChangeEventArgs : EventArgs
-    //{
-    //    string xAxisName;
-    //    public string XAxisName
-    //    {
-    //        get { return xAxisName; }
-    //        set { xAxisName = value; }
-    //    }
-    //}
 }

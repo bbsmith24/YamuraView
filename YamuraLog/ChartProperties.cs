@@ -15,16 +15,26 @@ namespace YamuraLog
         public event AxisOffsetUpdate AxisOffsetUpdateEvent;
         public event ClearGraphicsPath ClearGraphicsPathEvent;
 
-        DataLogger logger;
+        //DataLogger logger;
+        //public DataLogger Logger
+        //{
+        //    get { return logger; }
+        //    set
+        //    {
+        //        logger = value;
+        //    }
+        //}
         public DataLogger Logger
         {
-            get { return logger; }
-            set { logger = value; }
+            get
+            {
+                return YamuraLog.Form1.dataLogger;
+            }
         }
 
         public event ChartXAxisChange ChartXAxisChangeEvent;
 
-        Dictionary<string, Axis> chartAxes = new Dictionary<string, Axis>();
+        Dictionary<string, Axis> chartAxes;// = new Dictionary<string, Axis>();
         public Dictionary<string, Axis> ChartAxes
         {
             get { return chartAxes; }
@@ -242,7 +252,8 @@ namespace YamuraLog
                 ChartAxes[nodeName].AxisValueRange[0] = Convert.ToSingle(channelsContext.Items["txtAxisMinValue"].Text);
                 ChartAxes[nodeName].AxisValueRange[1] = Convert.ToSingle(channelsContext.Items["txtAxisMaxValue"].Text);
                 ChartAxes[nodeName].AxisValueRange[2] = ChartAxes[nodeName].AxisValueRange[1] - ChartAxes[nodeName].AxisValueRange[0];
-                foreach(KeyValuePair<string, ChannelInfo> channelInfo in ChartAxes[nodeName].AssociatedChannels)
+                ChartAxes[nodeName].AxisDisplayRange = ChartAxes[nodeName].AxisValueRange;
+                foreach (KeyValuePair<string, ChannelInfo> channelInfo in ChartAxes[nodeName].AssociatedChannels)
                 {
                     channelInfo.Value.AxisRange[0] = Convert.ToSingle(channelsContext.Items["txtAxisMinValue"].Text);
                     channelInfo.Value.AxisRange[1] = Convert.ToSingle(channelsContext.Items["txtAxisMaxValue"].Text);

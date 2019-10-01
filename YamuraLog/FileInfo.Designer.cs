@@ -52,8 +52,10 @@
             this.fileInfoText.Location = new System.Drawing.Point(12, 12);
             this.fileInfoText.Multiline = true;
             this.fileInfoText.Name = "fileInfoText";
+            this.fileInfoText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.fileInfoText.Size = new System.Drawing.Size(436, 266);
             this.fileInfoText.TabIndex = 1;
+            this.fileInfoText.WordWrap = false;
             // 
             // FileInfo
             // 

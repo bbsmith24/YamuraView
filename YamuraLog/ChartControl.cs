@@ -20,14 +20,23 @@ namespace YamuraLog
 
     public partial class ChartControl :  WeifenLuo.WinFormsUI.Docking.DockContent
     {
-        DataLogger logger;
+        //DataLogger logger;
+        //public DataLogger Logger
+        //{
+        //    get { return logger; }
+        //    set
+        //    {
+        //        logger = value;
+        //        chartPropertiesForm.Logger = logger;
+        //        chartViewForm.Logger = logger;
+        //    }
+        //}
         public DataLogger Logger
         {
-            get { return logger; }
-            set { logger = value; }
+            get { return YamuraLog.Form1.dataLogger; }
         }
 
-        Dictionary<string, Axis> chartAxes = new Dictionary<string, Axis>();
+        Dictionary<string, Axis> chartAxes;// = new Dictionary<string, Axis>();
         public Dictionary<string, Axis> ChartAxes
         {
             get { return chartAxes; }

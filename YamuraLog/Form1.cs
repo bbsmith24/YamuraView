@@ -22,7 +22,7 @@ namespace YamuraLog
         private List<Task> tasks = new List<Task>();
 
         // DataLogger contains runs, which contain channels which contain data points
-        DataLogger dataLogger = new DataLogger();
+        public static DataLogger dataLogger = new DataLogger();
 
         float gpsDist = 0.0F;
         // runs processed to logger prior to latest read (for TXT files with start/stop markers)
@@ -56,7 +56,7 @@ namespace YamuraLog
             // initialize the chart controls
             // stripchart
             stripChart.ChartName = "Stripchart";
-            stripChart.Logger = dataLogger;
+            //stripChart.Logger = dataLogger;
             stripChart.chartViewForm.CursorMode = ChartView.CursorStyle.CROSSHAIRS;
             stripChart.chartViewForm.CursorUpdateSource = true;
             stripChart.ChartAxes = new Dictionary<string, Axis>();
@@ -69,7 +69,7 @@ namespace YamuraLog
             stripChart.chartPropertiesForm.ClearGraphicsPathEvent += trackMap.chartViewForm.OnClearGraphicsPath;
             // traction circle
             tractionCircle.ChartName = "Traction Circle";
-            tractionCircle.Logger = dataLogger;
+            //tractionCircle.Logger = dataLogger;
             tractionCircle.chartViewForm.CursorMode = ChartView.CursorStyle.BOX;
             tractionCircle.chartViewForm.CursorUpdateSource = false;
             tractionCircle.ChartAxes = new Dictionary<string, Axis>();
@@ -82,7 +82,7 @@ namespace YamuraLog
             tractionCircle.chartPropertiesForm.ClearGraphicsPathEvent += trackMap.chartViewForm.OnClearGraphicsPath;
             // track map
             trackMap.ChartName = "Track Map";
-            trackMap.Logger = dataLogger;
+            //trackMap.Logger = dataLogger;
             trackMap.chartViewForm.CursorMode = ChartView.CursorStyle.BOX;
             trackMap.chartViewForm.CursorUpdateSource = false;
             trackMap.ChartAxes = new Dictionary<string, Axis>();
@@ -204,7 +204,7 @@ namespace YamuraLog
                     dataLogger.runData.Add(new RunData());
                     logRunsIdx = dataLogger.runData.Count - 1;
                     // set run file name in run data
-                    dataLogger.runData[logRunsIdx].fileName = System.IO.Path.GetFileName(fileName);
+                    dataLogger.runData[logRunsIdx].fileName = System.IO.Path.GetFullPath(fileName);
                     // add timestamp here, since it is always present
                     dataLogger.runData[logRunsIdx].AddChannel("Time", "Timestamp", "Internal", 1.0F);
                     continue;
@@ -324,6 +324,7 @@ namespace YamuraLog
             float priorLatVal = 0.0F;
             float priorLongVal = 0.0F;
             bool gpsDistanceValid = false;
+            StringBuilder errStr = new StringBuilder();
 
             initialRunCount = dataLogger.runData.Count();
             dataLogger.runData.Add(new RunData());
@@ -331,9 +332,10 @@ namespace YamuraLog
             logRunsIdx = dataLogger.runData.Count - 1;
             dataLogger.runData[logRunsIdx].AddChannel("Time", "Timestamp", "Internal", 1.0F);
 
-            dataLogger.runData[logRunsIdx].fileName = System.IO.Path.GetFileName(fileName);
+            dataLogger.runData[logRunsIdx].fileName = System.IO.Path.GetFullPath(fileName);
 
 
+            Cursor = Cursors.WaitCursor;
             using (BinaryReader inFile = new BinaryReader(File.Open(fileName, FileMode.Open)))
             {
                 // check for EOF
@@ -342,7 +344,7 @@ namespace YamuraLog
                     #region read 1 char, exception on EOF
                     try
                     {
-                        b[0] = (char)inFile.ReadByte();// inFile.ReadChar();
+                        b[0] = (char)inFile.ReadByte();
                     }
                     catch
                     {
@@ -368,8 +370,8 @@ namespace YamuraLog
                     #region get channel type chars
                     try
                     {
-                        b[1] = (char)inFile.ReadByte(); //inFile.ReadChar();
-                        b[2] = (char)inFile.ReadByte(); //inFile.ReadChar();
+                        b[1] = (char)inFile.ReadByte();
+                        b[2] = (char)inFile.ReadByte();
                     }
                     catch
                     {
@@ -394,7 +396,7 @@ namespace YamuraLog
                         int utcHr = 0;
                         int utcMin = 0;
                         Single utcSec = 0.0F;
-                        if (ParseGPS_NMEA(inFile, out date, out utcHr, out utcMin, out utcSec, out lat, out ns, out lng, out ew, out hd, out speed, out sat))
+                        if (ParseGPS_NMEA(inFile, out date, out utcHr, out utcMin, out utcSec, out lat, out ns, out lng, out ew, out hd, out speed, out sat, ref errStr))
                         {
                             dataLogger.runData[logRunsIdx].AddChannel("Latitude", "GPS Latitude", "GPS", 1.0F);
                             dataLogger.runData[logRunsIdx].AddChannel("Longitude", "GPS Longitude", "GPS", 1.0F);
@@ -471,9 +473,21 @@ namespace YamuraLog
                         dataLogger.runData[logRunsIdx].channels[channelName].AddPoint(timestampSeconds, channelValF);
 
                     }
+                    else
+                    {
+                        errStr.AppendFormat("unexpected channel type - read {0}{1}{2}", b[0], b[1], System.Environment.NewLine);
+                    }
                     #endregion
                 }
                 inFile.Close();
+            }
+            Cursor = Cursors.Default;
+
+            if (errStr.Length > 0)
+            {
+                FileInfo errInfo = new FileInfo();
+                errInfo.FileInfoText = errStr.ToString();
+                errInfo.ShowDialog();
             }
             UpdateData();
         }
@@ -503,7 +517,7 @@ namespace YamuraLog
         /// 
         /// </summary>
         /// <param name="inFile"></param>
-        public bool ParseGPS_NMEA(BinaryReader inFile, out String date, out int hr, out int min, out float sec, out float lat, out String ns, out float lng, out String ew, out float hd, out float speed, out int sat)
+        public bool ParseGPS_NMEA(BinaryReader inFile, out String date, out int hr, out int min, out float sec, out float lat, out String ns, out float lng, out String ew, out float hd, out float speed, out int sat, ref StringBuilder errStr)
         {
             bool rVal = false;
             int utcHour = -1;
@@ -556,6 +570,7 @@ namespace YamuraLog
                 // malformed, no * 
                 if (dataSentence.IndexOf('*') < 0)
                 {
+                    errStr.AppendFormat("malformed NMEA sentance - missing '*' {0}{1}", dataSentence, System.Environment.NewLine);
                     continue;
                 }
                 int receivedChecksum = 0;
@@ -566,6 +581,7 @@ namespace YamuraLog
                 }
                 catch
                 {
+                    errStr.AppendFormat("error reading checksum from NMEA sentance {0}{1}", dataSentence, System.Environment.NewLine);
                     continue;
                 }
                 // calculate checksum for characters between $ and *
@@ -579,6 +595,7 @@ namespace YamuraLog
                 // bad checksum - skip this sentence
                 if(calculatedChecksum != receivedChecksum)
                 {
+                    errStr.AppendFormat("checksum mismatch read 0x{0:X} calculated 0x{1:X} for NMEA sentance {2}{3}", receivedChecksum, calculatedChecksum, dataSentence, System.Environment.NewLine);
                     continue;
                 }
                 #endregion
@@ -666,11 +683,15 @@ namespace YamuraLog
                     #endregion
                     #region SKIP unknown/deformed sentances - ignore
                     else
-                    { }
+                    {
+                        errStr.AppendFormat("ignored unknown/deformed NMEA sentance {2}{3}", receivedChecksum, calculatedChecksum, dataSentence, System.Environment.NewLine);
+                    }
                     #endregion
                 }
-                catch
-                { }
+                catch (Exception e)
+                {
+                    errStr.AppendFormat("ParseNMEA error reading sentence from {0} error: {1}{2}", dataSentence, e.Message, System.Environment.NewLine);
+                }
             }
             if(latDeg == -1)
             {
@@ -681,6 +702,7 @@ namespace YamuraLog
                 rVal = true;
                 if (dateStr.Length < 6)
                 {
+                    errStr.AppendFormat("ParseNMEA bad date string {0}{1}", dateStr, System.Environment.NewLine);
                     date = "xx/xx/xxxx";
                 }
                 else
@@ -809,17 +831,17 @@ namespace YamuraLog
                     trackMap.chartViewForm.ChartAxes = trackMap.ChartAxes;
                     trackMap.chartPropertiesForm.ChartAxes = trackMap.ChartAxes;
 
-                    stripChart.Logger = dataLogger;
-                    stripChart.chartViewForm.Logger = dataLogger;
-                    stripChart.chartPropertiesForm.Logger = dataLogger;
+                    //stripChart.Logger = dataLogger;
+                    //stripChart.chartViewForm.Logger = dataLogger;
+                    //stripChart.chartPropertiesForm.Logger = dataLogger;
 
-                    tractionCircle.Logger = dataLogger;
-                    tractionCircle.chartViewForm.Logger = dataLogger;
-                    tractionCircle.chartPropertiesForm.Logger = dataLogger;
+                    //tractionCircle.Logger = dataLogger;
+                    //tractionCircle.chartViewForm.Logger = dataLogger;
+                    //tractionCircle.chartPropertiesForm.Logger = dataLogger;
 
-                    trackMap.Logger = dataLogger;
-                    trackMap.chartViewForm.Logger = dataLogger;
-                    trackMap.chartPropertiesForm.Logger = dataLogger;
+                    //trackMap.Logger = dataLogger;
+                    //trackMap.chartViewForm.Logger = dataLogger;
+                    //trackMap.chartPropertiesForm.Logger = dataLogger;
                 }
             }
             #endregion
@@ -953,32 +975,33 @@ namespace YamuraLog
             String exportTo = runDataGrid.Rows[rowIdx].Cells["colSourceFile"].Value.ToString();
             exportTo = exportTo.Replace("YLG", "TSV");
 
-            foreach (KeyValuePair<string, DataChannel> channel in dataLogger.runData[rowIdx].channels)
-            {
-                System.Diagnostics.Debug.Print(channel.Key);
-                System.Diagnostics.Debug.Print("\t");
-            }
-            System.Diagnostics.Debug.Print(System.Environment.NewLine);
-            foreach (KeyValuePair<float, DataPoint> timeStamp in dataLogger.runData[rowIdx].channels["Time"].DataPoints)
-            {
-                foreach(KeyValuePair<string, DataChannel> channel in dataLogger.runData[rowIdx].channels)
-                {
-                    if(channel.Value.dataPoints.ContainsKey(timeStamp.Key))
-                    {
-                        System.Diagnostics.Debug.Print(channel.Value.dataPoints[timeStamp.Key].PointValue.ToString());
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.Print("\t");
-                    }
-                    System.Diagnostics.Debug.Print("\t");
-                }
-                System.Diagnostics.Debug.Print(System.Environment.NewLine);
-            }
 
-            //
-            // do export here...
-            //
+            using (StreamWriter writeExport = new StreamWriter(exportTo, false))
+            {
+                foreach (KeyValuePair<string, DataChannel> channel in dataLogger.runData[rowIdx].channels)
+                {
+                    writeExport.Write(channel.Key);
+                    writeExport.Write("\t");
+                }
+                writeExport.WriteLine();
+                foreach (KeyValuePair<float, DataPoint> timeStamp in dataLogger.runData[rowIdx].channels["Time"].DataPoints)
+                {
+                    foreach (KeyValuePair<string, DataChannel> channel in dataLogger.runData[rowIdx].channels)
+                    {
+                        if (channel.Value.dataPoints.ContainsKey(timeStamp.Key))
+                        {
+                            writeExport.Write(channel.Value.dataPoints[timeStamp.Key].PointValue.ToString());
+                        }
+                        else
+                        {
+                            writeExport.Write("\t");
+                        }
+                        writeExport.Write("\t");
+                    }
+                    writeExport.WriteLine();
+                }
+                writeExport.Close();
+            }
         }
         private void fileInfoToolStripMenuItem_Click(object sender, EventArgs e)
         {

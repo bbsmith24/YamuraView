@@ -116,6 +116,7 @@ namespace YamuraLog
 
             txtFileInfo.Text = "Start";
 
+            Cursor = Cursors.WaitCursor;
             serialPort.Open();
             while (true)
             {
@@ -164,6 +165,7 @@ namespace YamuraLog
                 }
             }
             serialPort.Close();
+            Cursor = Cursors.Default;
             rStr.Insert(0, "Done" + System.Environment.NewLine);
             txtFileInfo.Text = rStr.ToString();
         }

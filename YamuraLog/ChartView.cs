@@ -14,7 +14,7 @@ using System.Drawing.Drawing2D;
 
 namespace YamuraLog
 {
-    public partial class ChartView :  WeifenLuo.WinFormsUI.Docking.DockContent
+    public partial class ChartView : WeifenLuo.WinFormsUI.Docking.DockContent
     {
         public event ChartMouseMove ChartMouseMoveEvent;
 
@@ -48,14 +48,27 @@ namespace YamuraLog
             CIRCLE
         }
 
-        DataLogger logger;
+        //private DataLogger logger;
+        //protected DataLogger Logger
+        //{
+        //    get
+        //    {
+        //        return logger;
+        //    }
+        //    set
+        //    {
+        //        logger = value;
+        //    }
+        //}
         public DataLogger Logger
         {
-            get { return logger; }
-            set { logger = value; }
+            get
+            {
+                return YamuraLog.Form1.dataLogger;
+            }
         }
 
-        Dictionary<string, Axis> chartAxes = new Dictionary<string, Axis>();
+        Dictionary<string, Axis> chartAxes;// = new Dictionary<string, Axis>();
         public Dictionary<string, Axis> ChartAxes
         {
             get { return chartAxes; }
@@ -73,15 +86,13 @@ namespace YamuraLog
             }
         }
 
-        int dragZoomPenWidth = 1;
-        int chartBorder = 10;
-        Rectangle chartBounds = new Rectangle(0, 0, 0, 0);
-        List<bool> startMouseDrag = new List<bool>();
-        List<bool> startMouseMove = new List<bool>();
-        //Point chartLastCursorPos = new Point(0, 0);
-        //Point chartStartCursorPos = new Point(0, 0);
-        List<Point> chartLastCursorPos = new List<Point>();
-        List<Point> chartStartCursorPos = new List<Point>();
+        protected int dragZoomPenWidth = 1;
+        protected int chartBorder = 10;
+        protected Rectangle chartBounds = new Rectangle(0, 0, 0, 0);
+        protected List<bool> startMouseDrag = new List<bool>();
+        protected List<bool> startMouseMove = new List<bool>();
+        protected List<Point> chartLastCursorPos = new List<Point>();
+        protected List<Point> chartStartCursorPos = new List<Point>();
 
         string xChannelName;
         public string XChannelName
@@ -194,7 +205,7 @@ namespace YamuraLog
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ChartView_Resize(object sender, EventArgs e)
+        internal void ChartView_Resize(object sender, EventArgs e)
         {
             UpdateElementPositions();
         }
@@ -206,7 +217,7 @@ namespace YamuraLog
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public virtual  void chartPanel_Paint(object sender, PaintEventArgs e)
+        internal virtual void chartPanel_Paint(object sender, PaintEventArgs e)
         {
             #region initialize mouse/cursor moves
             for (int moveIdx = 0; moveIdx < startMouseMove.Count; moveIdx++)
@@ -324,7 +335,7 @@ namespace YamuraLog
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void chartPanel_Resize(object sender, EventArgs e)
+        internal void chartPanel_Resize(object sender, EventArgs e)
         {
             // update the paintable area
             chartBounds.X = chartBorder;
@@ -339,7 +350,7 @@ namespace YamuraLog
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void chartPanel_MouseMove(object sender, MouseEventArgs e)
+        internal void chartPanel_MouseMove(object sender, MouseEventArgs e)
         {
             if (CursorUpdateSource == false)
             {
@@ -470,7 +481,7 @@ namespace YamuraLog
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void chartPanel_MouseUp(object sender, MouseEventArgs e)
+        internal void chartPanel_MouseUp(object sender, MouseEventArgs e)
         {
             if ((startMouseDrag[0]) && AllowDrag)
             {
@@ -509,7 +520,7 @@ namespace YamuraLog
         #endregion
 
         #region scollbar message handlers
-        private void HScrollBar_Scroll(object sender, ScrollEventArgs e)
+        internal void HScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
             // original scaling
             float[] displayScale = new float[] { 1.0F, 1.0F };
@@ -550,7 +561,7 @@ namespace YamuraLog
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        void DrawCursorAt(int x, int y)
+        internal void DrawCursorAt(int x, int y)
         {
             Rectangle locationBox = new Rectangle(0, 0, 0, 0);
             IntPtr lpPoint = new IntPtr();
@@ -624,7 +635,7 @@ namespace YamuraLog
         /// <param name="fromY"></param>
         /// <param name="toX"></param>
         /// <param name="toY"></param>
-        void DrawSelectArea(int fromX, int fromY, int toX, int toY)
+        internal void DrawSelectArea(int fromX, int fromY, int toX, int toY)
         {
             using (Graphics drawGraphics = chartPanel.CreateGraphics())
             {
@@ -661,7 +672,7 @@ namespace YamuraLog
         /// <param name="offsetY"></param>
         /// <param name="bounds"></param>
         /// <returns></returns>
-        private PointF ScaleDataToDisplay(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
+        internal PointF ScaleDataToDisplay(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
         {
             PointF rPt = new PointF(sourcePt.X, sourcePt.Y);
             rPt.X = (rPt.X + offsetX) * scaleX + bounds.X;
@@ -678,7 +689,7 @@ namespace YamuraLog
         /// <param name="offsetY"></param>
         /// <param name="bounds"></param>
         /// <returns></returns>
-        private PointF ScaleDisplayToData(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
+        internal PointF ScaleDisplayToData(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
         {
             PointF rPt = new PointF(sourcePt.X, sourcePt.Y);
             rPt.X = (rPt.X / scaleX) - offsetX;
@@ -728,7 +739,7 @@ namespace YamuraLog
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void OnChartMouseMove(object sender, ChartControlMouseMoveEventArgs e)
+        public virtual void OnChartMouseMove(object sender, ChartControlMouseMoveEventArgs e)
         {
             #region move cursor(s)
             // position in event args is data - need to scale to screen
