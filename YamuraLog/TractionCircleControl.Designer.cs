@@ -1,4 +1,4 @@
-﻿namespace YamuraLog
+﻿namespace YamuraView
 {
     public partial class TractionCircleControl
     {

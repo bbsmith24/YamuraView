@@ -8,27 +8,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace YamuraLog
+namespace YamuraView
 {
     public partial class ChartProperties : WeifenLuo.WinFormsUI.Docking.DockContent
     {
         public event AxisOffsetUpdate AxisOffsetUpdateEvent;
         public event ClearGraphicsPath ClearGraphicsPathEvent;
 
-        //DataLogger logger;
-        //public DataLogger Logger
-        //{
-        //    get { return logger; }
-        //    set
-        //    {
-        //        logger = value;
-        //    }
-        //}
         public DataLogger Logger
         {
             get
             {
-                return YamuraLog.Form1.dataLogger;
+                return YamuraView.Form1.dataLogger;
             }
         }
 
@@ -156,7 +147,6 @@ namespace YamuraLog
             // channel
             else
             {
-                e.Node.Parent.Checked = e.Node.Checked;
                 ChartAxes[e.Node.Parent.Name].AssociatedChannels[e.Node.Text].ShowChannel = e.Node.Checked;
                 ChartAxes[e.Node.Parent.Name].ShowAxis = e.Node.Checked == true ? true : ChartAxes[e.Node.Parent.Name].ShowAxis;
             }
@@ -341,6 +331,9 @@ namespace YamuraLog
                 if(axisOffsetsGrid.Rows.Count <= launchIdx)
                 {
                     axisOffsetsGrid.Rows.Add();
+                    axisOffsetsGrid.Rows[launchIdx].Cells["axisChannel"].Value = launchIdx.ToString() + "-" + Logger.runData[launchIdx].channels[XAxisName].ChannelName;
+                    axisOffsetsGrid.Rows[launchIdx].Cells["axisStart"].Value = Logger.runData[launchIdx].channels[XAxisName].DataRange[0];
+                    axisOffsetsGrid.Rows[launchIdx].Cells["axisEnd"].Value = Logger.runData[launchIdx].channels[XAxisName].DataRange[1];
                 }
                 axisOffsetsGrid.Rows[launchIdx].Cells["axisOffset"].Value = (-1 * launchPoints[launchIdx]).ToString();
                 AxisOffsetUpdateEventArgs updateArgs = new AxisOffsetUpdateEventArgs("Time", launchIdx, 0, -1* launchPoints[launchIdx]);

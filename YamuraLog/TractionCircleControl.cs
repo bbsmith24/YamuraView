@@ -11,7 +11,7 @@ using GDI;
 using Win32Interop.Methods;
 using WeifenLuo.WinFormsUI.Docking;
 
-namespace YamuraLog
+namespace YamuraView
 {
     public partial class TractionCircleControl : ChartControl 
     {

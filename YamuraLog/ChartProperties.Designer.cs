@@ -1,4 +1,4 @@
-﻿namespace YamuraLog
+﻿namespace YamuraView
 {
     partial class ChartProperties
     {
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.axisChannelTree = new System.Windows.Forms.TreeView();
+            this.axisChannelTree = new YamuraView.TriStateTreeView();
             this.channelsContext = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.invertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblAxisMin = new System.Windows.Forms.ToolStripTextBox();
@@ -59,12 +59,12 @@
             this.axisChannelTree.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.axisChannelTree.CheckBoxes = true;
             this.axisChannelTree.ContextMenuStrip = this.channelsContext;
             this.axisChannelTree.Location = new System.Drawing.Point(12, 175);
             this.axisChannelTree.Name = "axisChannelTree";
             this.axisChannelTree.Size = new System.Drawing.Size(348, 209);
             this.axisChannelTree.TabIndex = 30;
+            this.axisChannelTree.TriStateStyleProperty = YamuraView.TriStateTreeView.TriStateStyles.Standard;
             this.axisChannelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.axisChannelTree_AfterCheck);
             // 
             // channelsContext
@@ -77,7 +77,7 @@
             this.txtAxisMaxValue,
             this.closeToolStripMenuItem});
             this.channelsContext.Name = "channelsContext";
-            this.channelsContext.Size = new System.Drawing.Size(161, 170);
+            this.channelsContext.Size = new System.Drawing.Size(161, 148);
             this.channelsContext.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler(this.channelsContext_Closed);
             this.channelsContext.Opening += new System.ComponentModel.CancelEventHandler(this.channelsContext_Opening);
             // 
@@ -119,8 +119,6 @@
             // 
             // cmbXAxis
             // 
-            this.cmbXAxis.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbXAxis.FormattingEnabled = true;
             this.cmbXAxis.Location = new System.Drawing.Point(63, 12);
             this.cmbXAxis.Name = "cmbXAxis";
@@ -151,6 +149,8 @@
             this.axisOffsetsGrid.AllowUserToAddRows = false;
             this.axisOffsetsGrid.AllowUserToDeleteRows = false;
             this.axisOffsetsGrid.AllowUserToOrderColumns = true;
+            this.axisOffsetsGrid.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.axisOffsetsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.axisOffsetsGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.axisChannel,
@@ -160,7 +160,6 @@
             this.axisOffsetsGrid.Location = new System.Drawing.Point(15, 72);
             this.axisOffsetsGrid.Name = "axisOffsetsGrid";
             this.axisOffsetsGrid.RowHeadersVisible = false;
-            this.axisOffsetsGrid.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.axisOffsetsGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.axisOffsetsGrid.Size = new System.Drawing.Size(345, 84);
             this.axisOffsetsGrid.TabIndex = 34;
@@ -271,7 +270,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TreeView axisChannelTree;
+        private YamuraView.TriStateTreeView axisChannelTree;
         private System.Windows.Forms.ComboBox cmbXAxis;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;

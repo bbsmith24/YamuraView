@@ -12,7 +12,7 @@ using Win32Interop.Methods;
 using WeifenLuo.WinFormsUI.Docking;
 using System.Drawing.Drawing2D;
 
-namespace YamuraLog
+namespace YamuraView
 {
     public partial class TractionCircleView : ChartView 
     {

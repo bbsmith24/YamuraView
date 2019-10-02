@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace YamuraLog
+namespace YamuraView
 {
     /// <summary>
     /// run header - one per run, contains global data for run

@@ -151,6 +151,9 @@
     <Compile Include="ChartControl.Designer.cs">
       <DependentUpon>ChartControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="TriStateTreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="UploadFiles.cs">
       <SubType>Form</SubType>
     </Compile>

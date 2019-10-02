@@ -11,7 +11,7 @@ using GDI;
 using Win32Interop.Methods;
 using WeifenLuo.WinFormsUI.Docking;
 
-namespace YamuraLog
+namespace YamuraView
 {
     public delegate void ChartMouseMove(object sender, ChartControlMouseMoveEventArgs e);
     public delegate void ChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e);
@@ -33,7 +33,7 @@ namespace YamuraLog
         //}
         public DataLogger Logger
         {
-            get { return YamuraLog.Form1.dataLogger; }
+            get { return YamuraView.Form1.dataLogger; }
         }
 
         Dictionary<string, Axis> chartAxes;// = new Dictionary<string, Axis>();

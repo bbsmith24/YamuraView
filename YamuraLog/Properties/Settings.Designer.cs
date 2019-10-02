@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace YamuraLog.Properties
+namespace YamuraView.Properties
 {
 
 

@@ -1,4 +1,4 @@
-﻿namespace YamuraLog
+﻿namespace YamuraView
 {
     partial class FileInfo
     {

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace YamuraLog
+namespace YamuraView
 {
     public delegate void ColorSelect(object sender, ColorSelectEventArgs e);
 

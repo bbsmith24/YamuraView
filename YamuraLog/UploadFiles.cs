@@ -5,7 +5,7 @@ using System.IO.Ports;
 using System.Windows.Forms;
 using System.Collections.Generic;
 
-namespace YamuraLog
+namespace YamuraView
 {
     public partial class UploadFiles : Form
     {

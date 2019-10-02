@@ -12,7 +12,7 @@ using Win32Interop.Methods;
 using WeifenLuo.WinFormsUI.Docking;
 using System.Drawing.Drawing2D;
 
-namespace YamuraLog
+namespace YamuraView
 {
     public partial class ChartView : WeifenLuo.WinFormsUI.Docking.DockContent
     {
@@ -64,7 +64,7 @@ namespace YamuraLog
         {
             get
             {
-                return YamuraLog.Form1.dataLogger;
+                return YamuraView.Form1.dataLogger;
             }
         }
 
