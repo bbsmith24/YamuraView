@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.openLogFile = new System.Windows.Forms.OpenFileDialog();
             this.runDataGrid = new System.Windows.Forms.DataGridView();
             this.colRunNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -55,8 +56,8 @@
             this.exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.runDataContext = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.exportFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fileInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.runDataContext.SuspendLayout();
@@ -89,6 +90,7 @@
             this.colRunNumber.HeaderText = "Run";
             this.colRunNumber.Name = "colRunNumber";
             this.colRunNumber.ReadOnly = true;
+            this.colRunNumber.Width = 52;
             // 
             // colDate
             // 
@@ -96,6 +98,7 @@
             this.colDate.HeaderText = "Date/Time";
             this.colDate.Name = "colDate";
             this.colDate.ReadOnly = true;
+            this.colDate.Width = 83;
             // 
             // colMinTime
             // 
@@ -103,6 +106,7 @@
             this.colMinTime.HeaderText = "Start";
             this.colMinTime.Name = "colMinTime";
             this.colMinTime.ReadOnly = true;
+            this.colMinTime.Width = 54;
             // 
             // colMaxTime
             // 
@@ -110,6 +114,7 @@
             this.colMaxTime.HeaderText = "End";
             this.colMaxTime.Name = "colMaxTime";
             this.colMaxTime.ReadOnly = true;
+            this.colMaxTime.Width = 51;
             // 
             // colSourceFile
             // 
@@ -255,7 +260,14 @@
             this.fileInfoToolStripMenuItem,
             this.exportFileToolStripMenuItem});
             this.runDataContext.Name = "runDataContext";
-            this.runDataContext.Size = new System.Drawing.Size(153, 70);
+            this.runDataContext.Size = new System.Drawing.Size(130, 48);
+            // 
+            // fileInfoToolStripMenuItem
+            // 
+            this.fileInfoToolStripMenuItem.Name = "fileInfoToolStripMenuItem";
+            this.fileInfoToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.fileInfoToolStripMenuItem.Text = "File Info";
+            this.fileInfoToolStripMenuItem.Click += new System.EventHandler(this.fileInfoToolStripMenuItem_Click);
             // 
             // exportFileToolStripMenuItem
             // 
@@ -263,13 +275,6 @@
             this.exportFileToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.exportFileToolStripMenuItem.Text = "Export File";
             this.exportFileToolStripMenuItem.Click += new System.EventHandler(this.exportFileToolStripMenuItem_Click);
-            // 
-            // fileInfoToolStripMenuItem
-            // 
-            this.fileInfoToolStripMenuItem.Name = "fileInfoToolStripMenuItem";
-            this.fileInfoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.fileInfoToolStripMenuItem.Text = "File Info";
-            this.fileInfoToolStripMenuItem.Click += new System.EventHandler(this.fileInfoToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -280,9 +285,10 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtCursorPos);
             this.Controls.Add(this.menuStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
-            this.Text = "Team Yamura data logger viewer";
+            this.Text = "Team Yamura Data Viewer";
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
