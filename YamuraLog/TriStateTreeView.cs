@@ -1,5 +1,5 @@
-// Copyright (CPOL) 2011 RikTheVeggie - see http://www.codeproject.com/info/cpol10.aspx
-// Tri-State Tree View http://www.codeproject.com/script/Articles/ViewDownloads.aspx?aid=202435
+// Copyright (CPOL) 2011 RikTheVeggie - 
+// Tri-State Tree View
 
 namespace YamuraView
 {
@@ -55,7 +55,6 @@ namespace YamuraView
 			for (int i = 0; i < 3; i++)
 			{
 				// Create a bitmap which holds the relevent check box style
-				// see http://msdn.microsoft.com/en-us/library/ms404307.aspx and http://msdn.microsoft.com/en-us/library/system.windows.forms.checkboxrenderer.aspx
 
 				System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(16, 16);
 				System.Drawing.Graphics chkGraphics = System.Drawing.Graphics.FromImage(bmp);
