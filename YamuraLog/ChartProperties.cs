@@ -19,7 +19,7 @@ namespace YamuraView
         {
             get
             {
-                return YamuraView.Form1.dataLogger;
+                return YamuraView.YamuraViewMain.dataLogger;
             }
         }
 

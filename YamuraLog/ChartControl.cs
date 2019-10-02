@@ -33,7 +33,7 @@ namespace YamuraView
         //}
         public DataLogger Logger
         {
-            get { return YamuraView.Form1.dataLogger; }
+            get { return YamuraView.YamuraViewMain.dataLogger; }
         }
 
         Dictionary<string, Axis> chartAxes;// = new Dictionary<string, Axis>();
