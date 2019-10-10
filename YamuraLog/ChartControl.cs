@@ -43,8 +43,45 @@ namespace YamuraView
             set
             {
                 chartAxes = value;
-                chartViewForm.ChartAxes = chartAxes;
-                chartPropertiesForm.ChartAxes = chartAxes;
+                if (chartAxes == null)
+                {
+                    return;
+                }
+                chartPropertiesForm.AxisChannelTree.Nodes.Clear();
+                chartPropertiesForm.CmbXAxis.Items.Clear();
+                chartPropertiesForm.CmbAlignAxis.Items.Clear();
+                chartPropertiesForm.TxtAutoThreshold.Text = "0.0";
+                foreach (KeyValuePair<String, Axis> curAxis in chartAxes)
+                {
+                    chartPropertiesForm.CmbXAxis.Items.Add(curAxis.Key);
+                    chartPropertiesForm.CmbAlignAxis.Items.Add(curAxis.Key);
+
+                    bool axisFound = false;
+                    foreach (TreeNode axisItem in chartPropertiesForm.AxisChannelTree.Nodes)
+                    {
+                        axisFound = false;
+                        if (axisItem.Name == curAxis.Key)
+                        {
+                            axisFound = true;
+                            break;
+                        }
+                    }
+                    if (!axisFound)
+                    {
+                        chartPropertiesForm.AxisChannelTree.Nodes.Add(curAxis.Key, curAxis.Key, 0);
+                        chartPropertiesForm.AxisChannelTree.Nodes[curAxis.Key].Checked = curAxis.Value.ShowAxis;
+                    }
+                    foreach (KeyValuePair<String, ChannelInfo> associatedChannel in curAxis.Value.AssociatedChannels)
+                    {
+                        if (chartPropertiesForm.AxisChannelTree.Nodes[curAxis.Key].Nodes.ContainsKey(associatedChannel.Key))
+                        {
+                            continue;
+                        }
+                        chartPropertiesForm.AxisChannelTree.Nodes[curAxis.Key].Nodes.Add(associatedChannel.Key, associatedChannel.Key, 1);
+                        chartPropertiesForm.AxisChannelTree.Nodes[curAxis.Key].Nodes[associatedChannel.Key].Checked = associatedChannel.Value.ShowChannel;
+
+                    }
+                }
             }
         }
 
@@ -88,6 +125,9 @@ namespace YamuraView
             chartPropertiesForm.Show(dockPanel1);
 
             chartPropertiesForm.AxisOffsetUpdateEvent += chartViewForm.OnAxisOffsetUpdate;
+
+            chartPropertiesForm.ChartOwner = this;
+            chartViewForm.ChartOwner = this;
         }
         private void zoomAllMenuItem_Click(object sender, EventArgs e)
         {

@@ -824,12 +824,12 @@ namespace YamuraView
                         #endregion
                         channelIdx++;
                     }
-                    stripChart.chartViewForm.ChartAxes = stripChart.ChartAxes;
-                    stripChart.chartPropertiesForm.ChartAxes = stripChart.ChartAxes;
-                    tractionCircle.chartViewForm.ChartAxes = tractionCircle.ChartAxes;
-                    tractionCircle.chartPropertiesForm.ChartAxes = tractionCircle.ChartAxes;
-                    trackMap.chartViewForm.ChartAxes = trackMap.ChartAxes;
-                    trackMap.chartPropertiesForm.ChartAxes = trackMap.ChartAxes;
+                    stripChart.chartViewForm.ChartOwner.ChartAxes = stripChart.ChartAxes;
+                    stripChart.chartPropertiesForm.ChartOwner.ChartAxes = stripChart.ChartAxes;
+                    tractionCircle.chartViewForm.ChartOwner.ChartAxes = tractionCircle.ChartAxes;
+                    tractionCircle.chartPropertiesForm.ChartOwner.ChartAxes = tractionCircle.ChartAxes;
+                    trackMap.chartViewForm.ChartOwner.ChartAxes = trackMap.ChartAxes;
+                    trackMap.chartPropertiesForm.ChartOwner.ChartAxes = trackMap.ChartAxes;
 
                     //stripChart.Logger = dataLogger;
                     //stripChart.chartViewForm.Logger = dataLogger;

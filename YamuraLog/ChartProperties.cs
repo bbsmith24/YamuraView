@@ -25,54 +25,81 @@ namespace YamuraView
 
         public event ChartXAxisChange ChartXAxisChangeEvent;
 
-        Dictionary<string, Axis> chartAxes;// = new Dictionary<string, Axis>();
-        public Dictionary<string, Axis> ChartAxes
+        ChartControl chartOwner;
+        public ChartControl ChartOwner
         {
-            get { return chartAxes; }
-            set
-            {
-                chartAxes = value;
-                if (chartAxes == null)
-                {
-                    return;
-                }
-                axisChannelTree.Nodes.Clear();
-                cmbXAxis.Items.Clear();
-                cmbAlignAxis.Items.Clear();
-                txtAutoThreshold.Text = "0.0";
-                foreach (KeyValuePair<String, Axis> curAxis in chartAxes)
-                {
-                    cmbXAxis.Items.Add(curAxis.Key);
-                    cmbAlignAxis.Items.Add(curAxis.Key);
-
-                    bool axisFound = false;
-                    foreach (TreeNode axisItem in axisChannelTree.Nodes)
-                    {
-                        axisFound = false;
-                        if (axisItem.Name == curAxis.Key)
-                        {
-                            axisFound = true;
-                            break;
-                        }
-                    }
-                    if (!axisFound)
-                    {
-                        axisChannelTree.Nodes.Add(curAxis.Key, curAxis.Key, 0);
-                        axisChannelTree.Nodes[curAxis.Key].Checked = curAxis.Value.ShowAxis;
-                    }
-                    foreach (KeyValuePair<String, ChannelInfo> associatedChannel in curAxis.Value.AssociatedChannels)
-                    {
-                        if (axisChannelTree.Nodes[curAxis.Key].Nodes.ContainsKey(associatedChannel.Key))
-                        {
-                            continue;
-                        }
-                        axisChannelTree.Nodes[curAxis.Key].Nodes.Add(associatedChannel.Key, associatedChannel.Key, 1);
-                        axisChannelTree.Nodes[curAxis.Key].Nodes[associatedChannel.Key].Checked = associatedChannel.Value.ShowChannel;
-
-                    }
-                }
-            }
+            get { return chartOwner; }
+            set { chartOwner = value; }
         }
+
+        public TriStateTreeView AxisChannelTree
+        {
+            get { return axisChannelTree; }
+            set { axisChannelTree = value; }
+        }
+        public ComboBox CmbXAxis
+        {
+            get { return cmbXAxis; }
+            set { cmbXAxis = value; }
+        }
+        public ComboBox CmbAlignAxis
+        {
+            get { return cmbAlignAxis; }
+            set { cmbAlignAxis = value; }
+        }
+        public TextBox TxtAutoThreshold
+        {
+            get { return txtAutoThreshold; }
+            set { txtAutoThreshold = value; }
+        }
+        //Dictionary<string, Axis> chartAxes;// = new Dictionary<string, Axis>();
+        //public Dictionary<string, Axis> ChartAxes
+        //{
+        //    get { return chartAxes; }
+        //    set
+        //    {
+        //        chartAxes = value;
+        //        if (chartAxes == null)
+        //        {
+        //            return;
+        //        }
+        //        axisChannelTree.Nodes.Clear();
+        //        cmbXAxis.Items.Clear();
+        //        cmbAlignAxis.Items.Clear();
+        //        txtAutoThreshold.Text = "0.0";
+        //        foreach (KeyValuePair<String, Axis> curAxis in chartAxes)
+        //        {
+        //            cmbXAxis.Items.Add(curAxis.Key);
+        //            cmbAlignAxis.Items.Add(curAxis.Key);
+
+        //            bool axisFound = false;
+        //            foreach (TreeNode axisItem in axisChannelTree.Nodes)
+        //            {
+        //                axisFound = false;
+        //                if (axisItem.Name == curAxis.Key)
+        //                {
+        //                    axisFound = true;
+        //                    break;
+        //                }
+        //            }
+        //            if (!axisFound)
+        //            {
+        //                axisChannelTree.Nodes.Add(curAxis.Key, curAxis.Key, 0);
+        //                axisChannelTree.Nodes[curAxis.Key].Checked = curAxis.Value.ShowAxis;
+        //            }
+        //            foreach (KeyValuePair<String, ChannelInfo> associatedChannel in curAxis.Value.AssociatedChannels)
+        //            {
+        //                if (axisChannelTree.Nodes[curAxis.Key].Nodes.ContainsKey(associatedChannel.Key))
+        //                {
+        //                    continue;
+        //                }
+        //                axisChannelTree.Nodes[curAxis.Key].Nodes.Add(associatedChannel.Key, associatedChannel.Key, 1);
+        //                axisChannelTree.Nodes[curAxis.Key].Nodes[associatedChannel.Key].Checked = associatedChannel.Value.ShowChannel;
+
+        //            }
+        //        }
+        //    }
+        //}
         /// <summary>
         /// 
         /// </summary>
@@ -130,7 +157,7 @@ namespace YamuraView
         {
             String axisName = axisChannelTree.SelectedNode.Parent.Text;
             String channelName = axisChannelTree.SelectedNode.Text;
-            ChartAxes[axisName].AssociatedChannels[channelName].ChannelColor = e.SelectedColor;
+            ChartOwner.ChartAxes[axisName].AssociatedChannels[channelName].ChannelColor = e.SelectedColor;
         }
         /// <summary>
         /// 
@@ -142,13 +169,13 @@ namespace YamuraView
             // axis
             if (e.Node.Parent == null)
             {
-                ChartAxes[e.Node.Name].ShowAxis = e.Node.Checked;
+                ChartOwner.ChartAxes[e.Node.Name].ShowAxis = e.Node.Checked;
             }
             // channel
             else
             {
-                ChartAxes[e.Node.Parent.Name].AssociatedChannels[e.Node.Text].ShowChannel = e.Node.Checked;
-                ChartAxes[e.Node.Parent.Name].ShowAxis = e.Node.Checked == true ? true : ChartAxes[e.Node.Parent.Name].ShowAxis;
+                ChartOwner.ChartAxes[e.Node.Parent.Name].AssociatedChannels[e.Node.Text].ShowChannel = e.Node.Checked;
+                ChartOwner.ChartAxes[e.Node.Parent.Name].ShowAxis = e.Node.Checked == true ? true : ChartOwner.ChartAxes[e.Node.Parent.Name].ShowAxis;
             }
         }
         /// <summary>
@@ -175,8 +202,8 @@ namespace YamuraView
 
                 String axisName = axisChannelTree.SelectedNode.Text;
 
-                channelsContext.Items["txtAxisMinValue"].Text = ChartAxes[axisName].AxisValueRange[0].ToString();
-                channelsContext.Items["txtAxisMaxValue"].Text = ChartAxes[axisName].AxisValueRange[1].ToString();
+                channelsContext.Items["txtAxisMinValue"].Text = ChartOwner.ChartAxes[axisName].AxisValueRange[0].ToString();
+                channelsContext.Items["txtAxisMaxValue"].Text = ChartOwner.ChartAxes[axisName].AxisValueRange[1].ToString();
 
             }
             else
@@ -219,7 +246,7 @@ namespace YamuraView
             }
 
             axisOffsetsGrid.Rows.Clear();
-            foreach(KeyValuePair<string, ChannelInfo> kvp in chartAxes[cmbXAxis.Text].AssociatedChannels)
+            foreach(KeyValuePair<string, ChannelInfo> kvp in ChartOwner.ChartAxes[cmbXAxis.Text].AssociatedChannels)
             {
                 axisOffsetsGrid.Rows.Add();
                 axisOffsetsGrid.Rows[axisOffsetsGrid.Rows.Count - 1].Cells["axisChannel"].Value = kvp.Key;
@@ -239,15 +266,15 @@ namespace YamuraView
 
             if (axisChannelTree.SelectedNode.Parent == null)
             {
-                ChartAxes[nodeName].AxisValueRange[0] = Convert.ToSingle(channelsContext.Items["txtAxisMinValue"].Text);
-                ChartAxes[nodeName].AxisValueRange[1] = Convert.ToSingle(channelsContext.Items["txtAxisMaxValue"].Text);
-                ChartAxes[nodeName].AxisValueRange[2] = ChartAxes[nodeName].AxisValueRange[1] - ChartAxes[nodeName].AxisValueRange[0];
-                ChartAxes[nodeName].AxisDisplayRange = ChartAxes[nodeName].AxisValueRange;
-                foreach (KeyValuePair<string, ChannelInfo> channelInfo in ChartAxes[nodeName].AssociatedChannels)
+                ChartOwner.ChartAxes[nodeName].AxisValueRange[0] = Convert.ToSingle(channelsContext.Items["txtAxisMinValue"].Text);
+                ChartOwner.ChartAxes[nodeName].AxisValueRange[1] = Convert.ToSingle(channelsContext.Items["txtAxisMaxValue"].Text);
+                ChartOwner.ChartAxes[nodeName].AxisValueRange[2] = ChartOwner.ChartAxes[nodeName].AxisValueRange[1] - ChartOwner.ChartAxes[nodeName].AxisValueRange[0];
+                ChartOwner.ChartAxes[nodeName].AxisDisplayRange = ChartOwner.ChartAxes[nodeName].AxisValueRange;
+                foreach (KeyValuePair<string, ChannelInfo> channelInfo in ChartOwner.ChartAxes[nodeName].AssociatedChannels)
                 {
                     channelInfo.Value.AxisRange[0] = Convert.ToSingle(channelsContext.Items["txtAxisMinValue"].Text);
                     channelInfo.Value.AxisRange[1] = Convert.ToSingle(channelsContext.Items["txtAxisMaxValue"].Text);
-                    channelInfo.Value.AxisRange[2] = ChartAxes[nodeName].AxisValueRange[1] - ChartAxes[nodeName].AxisValueRange[0];
+                    channelInfo.Value.AxisRange[2] = ChartOwner.ChartAxes[nodeName].AxisValueRange[1] - ChartOwner.ChartAxes[nodeName].AxisValueRange[0];
                 }
             }
         }

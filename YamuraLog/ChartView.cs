@@ -48,18 +48,6 @@ namespace YamuraView
             CIRCLE
         }
 
-        //private DataLogger logger;
-        //protected DataLogger Logger
-        //{
-        //    get
-        //    {
-        //        return logger;
-        //    }
-        //    set
-        //    {
-        //        logger = value;
-        //    }
-        //}
         public DataLogger Logger
         {
             get
@@ -68,12 +56,19 @@ namespace YamuraView
             }
         }
 
-        Dictionary<string, Axis> chartAxes;// = new Dictionary<string, Axis>();
-        public Dictionary<string, Axis> ChartAxes
+        ChartControl chartOwner;
+        public ChartControl ChartOwner
         {
-            get { return chartAxes; }
-            set { chartAxes = value; }
+            get { return chartOwner; }
+            set { chartOwner = value; }
         }
+
+        //Dictionary<string, Axis> chartAxes;// = new Dictionary<string, Axis>();
+        //public Dictionary<string, Axis> ChartAxes
+        //{
+        //    get { return chartAxes; }
+        //    set { chartAxes = value; }
+        //}
 
         string chartName = "Chart";
         public string ChartName
@@ -229,7 +224,7 @@ namespace YamuraView
             }
             #endregion
             // nothing to display yet
-            if ((chartAxes == null) || (chartAxes.Count == 0) || (Logger == null))
+            if ((ChartOwner.ChartAxes == null) || (ChartOwner.ChartAxes.Count == 0) || (Logger == null))
             {
                 return;
             }
@@ -241,7 +236,7 @@ namespace YamuraView
             Pen pathPen = new Pen(Color.Red);
 
             // process each axis
-            foreach (KeyValuePair<string, Axis> yAxis in chartAxes)
+            foreach (KeyValuePair<string, Axis> yAxis in ChartOwner.ChartAxes)
             {
                 #region skip axis if not displayed
                 if (!yAxis.Value.ShowAxis)
@@ -295,7 +290,7 @@ namespace YamuraView
                     pathPen = new Pen(curChanInfo.Value.ChannelColor);
                     using (Graphics chartGraphics = chartPanel.CreateGraphics())
                     {
-                        displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
+                        displayScale[0] = (float)chartBounds.Width / ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
                         displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
                         if(EqualScale)
                         {
@@ -315,10 +310,10 @@ namespace YamuraView
                         // scale to display range in X and Y
                         chartGraphics.ScaleTransform(displayScale[0], displayScale[1]);
                         // translate by -1 * minimum display range + axis offset (scrolling)
-                        chartGraphics.TranslateTransform(-1 * chartAxes[xChannelName].AxisDisplayRange[0] +
-                                                         chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
+                        chartGraphics.TranslateTransform(-1 * ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0] +
+                                                         ChartOwner.ChartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
                                                          -1* yAxis.Value.AxisDisplayRange[0] +
-                                                         chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1]);  // offset Y
+                                                         ChartOwner.ChartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1]);  // offset Y
                         // set pen width to 0 (1 pixel)
                         pathPen.Width = 0;
                         // draw the path
@@ -419,7 +414,7 @@ namespace YamuraView
             }
             #endregion
             // up to now, dealing in screen units. convert current position to X axis value and active Y axis values and raise message
-            if (chartAxes.Count == 0)
+            if (ChartOwner.ChartAxes.Count == 0)
             {
                 return;
             }
@@ -429,9 +424,9 @@ namespace YamuraView
             PointF axisPoint = new PointF();
             // x and y scale
             float[] displayScale = new float[] { 1.0F, 1.0F };
-            displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
+            displayScale[0] = (float)chartBounds.Width / ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
 
-            foreach (KeyValuePair<string, ChannelInfo> channel in chartAxes[xChannelName].AssociatedChannels)
+            foreach (KeyValuePair<string, ChannelInfo> channel in ChartOwner.ChartAxes[xChannelName].AssociatedChannels)
             {
                 displayScale[1] = 1.0F;
 
@@ -444,12 +439,12 @@ namespace YamuraView
                                    0.0F,
                                    0.0F,
                                    chartBounds);
-                axisPoint.X -= (-1 * chartAxes[xChannelName].AxisDisplayRange[0] +
-                                       chartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0]);  // offset X
+                axisPoint.X -= (-1 * ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0] +
+                                       ChartOwner.ChartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0]);  // offset X
 
                 moveEventArgs.XAxisValues.Add(channel.Value.RunIndex.ToString() + "-" + channel.Value.ChannelName, axisPoint.X);
             }
-            foreach (KeyValuePair<string, Axis> axis in chartAxes)
+            foreach (KeyValuePair<string, Axis> axis in ChartOwner.ChartAxes)
             {
                 if (!axis.Value.ShowAxis)
                 {
@@ -469,7 +464,7 @@ namespace YamuraView
                                        chartBounds);
 
                     axisPoint.Y -= (channel.Value.AxisRange[0] +
-                                       chartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1]);
+                                       ChartOwner.ChartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1]);
 
                     moveEventArgs.YAxisValues.Add(channel.Value.RunIndex.ToString() + "-" + channel.Value.ChannelName, axisPoint.Y);
                 }
@@ -487,7 +482,7 @@ namespace YamuraView
             {
                 // original scaling
                 float[] displayScale = new float[] { 1.0F, 1.0F };
-                displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
+                displayScale[0] = (float)chartBounds.Width / ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
 
                 PointF scaledStart = chartStartCursorPos[0];
                 PointF scaledEnd = chartLastCursorPos[0];
@@ -504,15 +499,15 @@ namespace YamuraView
                                    0.0F,
                                    chartBounds);
 
-                chartAxes[xChannelName].AxisDisplayRange[0] = scaledStart.X < scaledEnd.X ? scaledStart.X : scaledEnd.X;
-                chartAxes[xChannelName].AxisDisplayRange[1] = scaledStart.X < scaledEnd.X ? scaledEnd.X : scaledStart.X;
-                chartAxes[xChannelName].AxisDisplayRange[2] = chartAxes[xChannelName].AxisDisplayRange[1] - chartAxes[xChannelName].AxisDisplayRange[0];
+                ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0] = scaledStart.X < scaledEnd.X ? scaledStart.X : scaledEnd.X;
+                ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[1] = scaledStart.X < scaledEnd.X ? scaledEnd.X : scaledStart.X;
+                ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2] = ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[1] - ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0];
 
 
-                hScrollBar.Minimum = (int)chartAxes[xChannelName].AxisValueRange[0];
-                hScrollBar.Maximum = (int)chartAxes[xChannelName].AxisValueRange[1];
-                hScrollBar.Value = (int)chartAxes[xChannelName].AxisDisplayRange[0];
-                hScrollBar.LargeChange = (int)chartAxes[xChannelName].AxisDisplayRange[2];
+                hScrollBar.Minimum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[0];
+                hScrollBar.Maximum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[1];
+                hScrollBar.Value = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0];
+                hScrollBar.LargeChange = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
                 startMouseDrag[0] = false;
                 chartPanel.Invalidate();
             }
@@ -524,11 +519,11 @@ namespace YamuraView
         {
             // original scaling
             float[] displayScale = new float[] { 1.0F, 1.0F };
-            displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
+            displayScale[0] = (float)chartBounds.Width / ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
 
             PointF scaledStart = new PointF(e.NewValue, 0);
-            chartAxes[xChannelName].AxisDisplayRange[0] = scaledStart.X;
-            chartAxes[xChannelName].AxisDisplayRange[1] = scaledStart.X + chartAxes[xChannelName].AxisDisplayRange[2];
+            ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0] = scaledStart.X;
+            ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[1] = scaledStart.X + ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
             chartPanel.Invalidate();
 
         }
@@ -751,7 +746,7 @@ namespace YamuraView
             if (CursorMode != CursorStyle.NONE)
             {
                 // check each Y axis
-                foreach (KeyValuePair<string, Axis> yAxis in chartAxes)
+                foreach (KeyValuePair<string, Axis> yAxis in ChartOwner.ChartAxes)
                 {
                     // skip if axis is not displayed
                     if (!yAxis.Value.ShowAxis)
@@ -759,7 +754,7 @@ namespace YamuraView
                         continue;
                     }
                     axisFullName = axisIdx.ToString() + "-" + yAxis.Key;
-                    displayScale[0] = (float)chartBounds.Width / chartAxes[xChannelName].AxisDisplayRange[2];
+                    displayScale[0] = (float)chartBounds.Width / ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
                     displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
                     if(EqualScale)
                     {
@@ -816,10 +811,10 @@ namespace YamuraView
                         endPt = ScaleDataToDisplay(endPt,                                                      // point
                                                    displayScale[0],                              // scale X
                                                    displayScale[1],                              // scale Y
-                                                   -1 * chartAxes[xChannelName].AxisDisplayRange[0] +
-                                                               chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
+                                                   -1 * ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0] +
+                                                               ChartOwner.ChartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
                                                    yAxis.Value.AxisDisplayRange[0] +
-                                                               chartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1],  // offset Y
+                                                               ChartOwner.ChartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1],  // offset Y
                                                    chartBounds);                                 // graphics area boundary
 
 
@@ -862,15 +857,15 @@ namespace YamuraView
         public void OnChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e)
         {
             xChannelName = e.XAxisName;
-            hScrollBar.Minimum = (int)chartAxes[xChannelName].AxisValueRange[0];
-            hScrollBar.Maximum = (int)chartAxes[xChannelName].AxisValueRange[1];
-            hScrollBar.Value = (int)chartAxes[xChannelName].AxisDisplayRange[0];
-            hScrollBar.LargeChange = (int)chartAxes[xChannelName].AxisDisplayRange[2];
+            hScrollBar.Minimum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[0];
+            hScrollBar.Maximum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[1];
+            hScrollBar.Value = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0];
+            hScrollBar.LargeChange = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
             chartPanel.Invalidate();
         }
         public void OnClearGraphicsPath(object sender, EventArgs e)
         {
-            foreach (KeyValuePair<string, Axis> yAxis in chartAxes)
+            foreach (KeyValuePair<string, Axis> yAxis in ChartOwner.ChartAxes)
             {
                 foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
                 {
@@ -890,7 +885,7 @@ namespace YamuraView
             string associatedAxisName = e.RunIdx.ToString() + "-" + e.ChannelName;
             if(e.AxisIdx == 0)
             {
-                chartAxes[e.ChannelName].AssociatedChannels[associatedAxisName].AxisOffset[0] = e.OffsetVal;
+                ChartOwner.ChartAxes[e.ChannelName].AssociatedChannels[associatedAxisName].AxisOffset[0] = e.OffsetVal;
             }
             chartPanel.Invalidate();
         }

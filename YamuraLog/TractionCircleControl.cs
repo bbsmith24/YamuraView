@@ -40,7 +40,9 @@ namespace YamuraView
             chartPropertiesForm.Show(dockPanel1);
 
             chartPropertiesForm.AxisOffsetUpdateEvent += chartViewForm.OnAxisOffsetUpdate;
-            
+
+            chartPropertiesForm.ChartOwner = this;
+            chartViewForm.ChartOwner = this;
         }
         private void zoomAllMenuItem_Click(object sender, EventArgs e)
         {
