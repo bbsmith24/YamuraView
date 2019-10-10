@@ -113,18 +113,6 @@
     <Compile Include="FileInfo.Designer.cs">
       <DependentUpon>FileInfo.cs</DependentUpon>
     </Compile>
-    <Compile Include="TractionCircleView.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TractionCircleView.Designer.cs">
-      <DependentUpon>TractionCircleView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TractionCircleControl.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TractionCircleControl.Designer.cs">
-      <DependentUpon>TractionCircleControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="ChartProperties.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -175,12 +163,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FileInfo.resx">
       <DependentUpon>FileInfo.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TractionCircleView.resx">
-      <DependentUpon>TractionCircleView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TractionCircleControl.resx">
-      <DependentUpon>TractionCircleControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ChartProperties.resx">
       <DependentUpon>ChartProperties.cs</DependentUpon>

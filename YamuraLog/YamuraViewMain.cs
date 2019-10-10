@@ -28,9 +28,9 @@ namespace YamuraView
         // runs processed to logger prior to latest read (for TXT files with start/stop markers)
         int initialRunCount = 0;
 
-        ChartControl stripChart = new ChartControl();
-        TractionCircleControl tractionCircle = new TractionCircleControl();
-        ChartControl trackMap = new ChartControl();
+        ChartControl stripChart = new ChartControl(ChartControl.ChartControlType.Stripchart);
+        ChartControl tractionCircle = new ChartControl(ChartControl.ChartControlType.TractionCirle);
+        ChartControl trackMap = new ChartControl(ChartControl.ChartControlType.Stripchart);
         #endregion
         #region constructors
         public YamuraViewMain()

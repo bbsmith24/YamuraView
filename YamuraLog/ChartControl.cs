@@ -20,6 +20,18 @@ namespace YamuraView
 
     public partial class ChartControl :  WeifenLuo.WinFormsUI.Docking.DockContent
     {
+        public enum ChartControlType
+        {
+            Stripchart,     // generic X/Y plot
+            TractionCirle,  // X/Y plot with 'target' drawn
+            Histogram       // histogram chart for selected channel
+        }
+        ChartControlType chartType;
+        public ChartControlType ChartType
+        {
+            get { return chartType; }
+            set { chartType = value; }
+        }
         //DataLogger logger;
         //public DataLogger Logger
         //{
@@ -106,9 +118,10 @@ namespace YamuraView
         /// <summary>
         /// 
         /// </summary>
-        public ChartControl()
+        public ChartControl(ChartControlType typeOfChart)
         {
             InitializeComponent();
+            ChartType = typeOfChart;
             chartViewForm.XChannelName = "Time";
             chartViewForm.CursorUpdateSource = true;
 

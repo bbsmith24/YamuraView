@@ -214,8 +214,19 @@ namespace YamuraView
         /// <param name="e"></param>
         internal virtual void chartPanel_Paint(object sender, PaintEventArgs e)
         {
+            if (ChartOwner.ChartType == ChartControl.ChartControlType.Stripchart)
+            {
+                DrawStripChart();
+            }
+            else if (ChartOwner.ChartType == ChartControl.ChartControlType.TractionCirle)
+            {
+                DrawTractionCircle();
+            }
+        }
+        void DrawStripChart()
+        { 
             #region initialize mouse/cursor moves
-            for (int moveIdx = 0; moveIdx < startMouseMove.Count; moveIdx++)
+                for (int moveIdx = 0; moveIdx < startMouseMove.Count; moveIdx++)
             {
                 startMouseMove[moveIdx] = false;
                 startMouseDrag[moveIdx] = false;
@@ -318,6 +329,120 @@ namespace YamuraView
                         pathPen.Width = 0;
                         // draw the path
                         chartGraphics.DrawPath(pathPen, curChanInfo.Value.ChannelPath);
+                        // reset to original orientation
+                        chartGraphics.ResetTransform();
+                    }
+                    #endregion
+                }
+            }
+        }
+        void DrawTractionCircle()
+        {
+            #region initialize mouse/cursor moves
+            for (int moveIdx = 0; moveIdx < startMouseMove.Count; moveIdx++)
+            {
+                startMouseMove[moveIdx] = false;
+                startMouseDrag[moveIdx] = false;
+                chartStartCursorPos[moveIdx] = new Point(0, 0);
+                chartLastCursorPos[moveIdx] = new Point(0, 0);
+            }
+            #endregion
+            // nothing to display yet
+            if ((ChartOwner.ChartAxes == null) || (ChartOwner.ChartAxes.Count == 0))
+            {
+                return;
+            }
+            // x and y scale
+            float[] displayScale = new float[] { 1.0F, 1.0F };
+
+            PointF[] points = new PointF[] { new PointF(), new PointF() };
+            Pen pathPen = new Pen(Color.Red);
+
+            // process each axis
+            foreach (KeyValuePair<string, Axis> yAxis in ChartOwner.ChartAxes)
+            {
+                #region skip axis if not displayed
+                if (!yAxis.Value.ShowAxis)
+                {
+                    continue;
+                }
+                #endregion
+                // process each associated channel
+                foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
+                {
+                    #region skip if channel is not displayed
+                    if (!curChanInfo.Value.ShowChannel)
+                    {
+                        continue;
+                    }
+                    #endregion
+                    //        #region build unscaled path
+                    //        if ((curChanInfo.Value.ChannelPath == null) || (curChanInfo.Value.ChannelPath.PointCount == 0))
+                    //        {
+                    //            DataChannel curChannel = Logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
+                    //            initialValue = true;
+                    //            foreach (KeyValuePair<float, DataPoint> curData in curChannel.DataPoints)
+                    //            {
+                    //                // x axis is time - direct lookup
+                    //                if (XChannelName == "Time")
+                    //                {
+                    //                    points[1] = new PointF (curData.Key, curData.Value.PointValue);
+                    //                }
+                    //                // x axis is not time - find nearest time in axis channel, 
+                    //                else
+                    //                {
+                    //                    DataPoint tst = Logger.runData[curChanInfo.Value.RunIndex].channels[XChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+                    //                    if (tst == null)
+                    //                    {
+                    //                        continue;
+                    //                    }
+                    //                    points[1] = new PointF(tst.PointValue, curData.Value.PointValue);
+                    //                }
+                    //                if (initialValue)
+                    //                {
+                    //                    initialValue = false;
+                    //                    points[0] = new PointF(points[1].X, points[1].Y);
+                    //                    continue;
+                    //                }
+                    //                curChanInfo.Value.ChannelPath.AddLine(points[0], points[1]);
+                    //                points[0] = new PointF(points[1].X, points[1].Y);
+                    //            }
+                    //        }
+                    //        #endregion
+                    #region draw to transformed graphic context
+                    pathPen = new Pen(Color.Black);
+                    using (Graphics chartGraphics = chartPanel.CreateGraphics())
+                    {
+                        displayScale[0] = (float)chartBounds.Width / ChartOwner.ChartAxes[XChannelName].AxisDisplayRange[2];
+                        displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
+                        if (EqualScale)
+                        {
+                            if (displayScale[0] < displayScale[1])
+                            {
+                                displayScale[1] = displayScale[0];
+                            }
+                            else
+                            {
+                                displayScale[0] = displayScale[1];
+                            }
+                        }
+                        displayScale[1] *= -1.0F;
+
+                        // translate to lower left corner of display area
+                        chartGraphics.TranslateTransform(chartBorder, (float)chartBounds.Height + chartBorder);
+                        // scale to display range in X and Y
+                        chartGraphics.ScaleTransform(displayScale[0], displayScale[1]);
+                        // translate by -1 * minimum display range + axis offset (scrolling)
+                        chartGraphics.TranslateTransform(-1 * ChartOwner.ChartAxes[XChannelName].AxisDisplayRange[0] +
+                                                         ChartOwner.ChartAxes[XChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + XChannelName].AxisOffset[0],  // offset X
+                                                         -1 * yAxis.Value.AxisDisplayRange[0] +
+                                                         ChartOwner.ChartAxes[XChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + XChannelName].AxisOffset[1]);  // offset Y
+                        // set pen width to 0 (1 pixel)
+                        pathPen.Width = 0;
+                        // draw the path
+                        chartGraphics.DrawLine(pathPen, -2, 0, 2, 0);
+                        chartGraphics.DrawLine(pathPen, 0, -2, 0, 2);
+                        chartGraphics.DrawEllipse(pathPen, -2, -2, 4, 4);
                         // reset to original orientation
                         chartGraphics.ResetTransform();
                     }
