@@ -58,6 +58,10 @@
             this.runDataContext = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.fileInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addStripchart = new System.Windows.Forms.ToolStripMenuItem();
+            this.addTractionCircle = new System.Windows.Forms.ToolStripMenuItem();
+            this.addTrackMap = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.runDataContext.SuspendLayout();
@@ -90,7 +94,6 @@
             this.colRunNumber.HeaderText = "Run";
             this.colRunNumber.Name = "colRunNumber";
             this.colRunNumber.ReadOnly = true;
-            this.colRunNumber.Width = 52;
             // 
             // colDate
             // 
@@ -98,7 +101,6 @@
             this.colDate.HeaderText = "Date/Time";
             this.colDate.Name = "colDate";
             this.colDate.ReadOnly = true;
-            this.colDate.Width = 83;
             // 
             // colMinTime
             // 
@@ -106,7 +108,6 @@
             this.colMinTime.HeaderText = "Start";
             this.colMinTime.Name = "colMinTime";
             this.colMinTime.ReadOnly = true;
-            this.colMinTime.Width = 54;
             // 
             // colMaxTime
             // 
@@ -114,7 +115,6 @@
             this.colMaxTime.HeaderText = "End";
             this.colMaxTime.Name = "colMaxTime";
             this.colMaxTime.ReadOnly = true;
-            this.colMaxTime.Width = 51;
             // 
             // colSourceFile
             // 
@@ -183,7 +183,8 @@
             this.saveWorkspaceToolStripMenuItem,
             this.toolStripSeparator3,
             this.settingsToolStripMenuItem,
-            this.exitMenuItem});
+            this.exitMenuItem,
+            this.addChartToolStripMenuItem});
             this.filesToolStripMenuItem.Name = "filesToolStripMenuItem";
             this.filesToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.filesToolStripMenuItem.Text = "File";
@@ -260,23 +261,54 @@
             this.fileInfoToolStripMenuItem,
             this.exportFileToolStripMenuItem});
             this.runDataContext.Name = "runDataContext";
-            this.runDataContext.Size = new System.Drawing.Size(130, 48);
+            this.runDataContext.Size = new System.Drawing.Size(129, 48);
             // 
             // fileInfoToolStripMenuItem
             // 
             this.fileInfoToolStripMenuItem.Name = "fileInfoToolStripMenuItem";
-            this.fileInfoToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.fileInfoToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
             this.fileInfoToolStripMenuItem.Text = "File Info";
             this.fileInfoToolStripMenuItem.Click += new System.EventHandler(this.fileInfoToolStripMenuItem_Click);
             // 
             // exportFileToolStripMenuItem
             // 
             this.exportFileToolStripMenuItem.Name = "exportFileToolStripMenuItem";
-            this.exportFileToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.exportFileToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
             this.exportFileToolStripMenuItem.Text = "Export File";
             this.exportFileToolStripMenuItem.Click += new System.EventHandler(this.exportFileToolStripMenuItem_Click);
             // 
-            // Form1
+            // addChartToolStripMenuItem
+            // 
+            this.addChartToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addStripchart,
+            this.addTractionCircle,
+            this.addTrackMap});
+            this.addChartToolStripMenuItem.Name = "addChartToolStripMenuItem";
+            this.addChartToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.addChartToolStripMenuItem.Text = "Add Chart";
+            // 
+            // addStripchart
+            // 
+            this.addStripchart.Name = "addStripchart";
+            this.addStripchart.Size = new System.Drawing.Size(152, 22);
+            this.addStripchart.Text = "Stripchart";
+            this.addStripchart.Click += new System.EventHandler(this.addStripchart_Click);
+            // 
+            // addTractionCircle
+            // 
+            this.addTractionCircle.Name = "addTractionCircle";
+            this.addTractionCircle.Size = new System.Drawing.Size(152, 22);
+            this.addTractionCircle.Text = "Traction Circle";
+            this.addTractionCircle.Click += new System.EventHandler(this.addTractionCircle_Click);
+            // 
+            // addTrackMap
+            // 
+            this.addTrackMap.Name = "addTrackMap";
+            this.addTrackMap.Size = new System.Drawing.Size(152, 22);
+            this.addTrackMap.Text = "Track Map";
+            this.addTrackMap.Click += new System.EventHandler(this.addTrackMap_Click);
+            // 
+            // YamuraViewMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -287,7 +319,7 @@
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "Form1";
+            this.Name = "YamuraViewMain";
             this.Text = "Team Yamura Data Viewer";
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).EndInit();
             this.menuStrip1.ResumeLayout(false);
@@ -327,6 +359,10 @@
         private System.Windows.Forms.ContextMenuStrip runDataContext;
         private System.Windows.Forms.ToolStripMenuItem exportFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem fileInfoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addChartToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addStripchart;
+        private System.Windows.Forms.ToolStripMenuItem addTractionCircle;
+        private System.Windows.Forms.ToolStripMenuItem addTrackMap;
     }
 }
 

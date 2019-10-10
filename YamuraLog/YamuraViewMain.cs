@@ -28,9 +28,8 @@ namespace YamuraView
         // runs processed to logger prior to latest read (for TXT files with start/stop markers)
         int initialRunCount = 0;
 
-        ChartControl stripChart = new ChartControl(ChartControl.ChartControlType.Stripchart);
-        ChartControl tractionCircle = new ChartControl(ChartControl.ChartControlType.TractionCirle);
-        ChartControl trackMap = new ChartControl(ChartControl.ChartControlType.Stripchart);
+        List<ChartControl> chartControls = new List<ChartControl>();
+
         #endregion
         #region constructors
         public YamuraViewMain()
@@ -53,72 +52,84 @@ namespace YamuraView
             colorButton.Text = "Generate Report";
             colorButton.Dock = DockStyle.Top;
 
-            // initialize the chart controls
-            // stripchart
-            stripChart.ChartName = "Stripchart";
-            //stripChart.Logger = dataLogger;
-            stripChart.chartViewForm.CursorMode = ChartView.CursorStyle.CROSSHAIRS;
-            stripChart.chartViewForm.CursorUpdateSource = true;
-            stripChart.ChartAxes = new Dictionary<string, Axis>();
-            stripChart.chartViewForm.ShowHScroll = true;
-            stripChart.chartViewForm.ShowVScroll = false;
-            stripChart.chartViewForm.EqualScale = false;
-            stripChart.chartPropertiesForm.ChartXAxisChangeEvent += stripChart.chartViewForm.OnChartXAxisChange;
-            stripChart.chartPropertiesForm.ClearGraphicsPathEvent += stripChart.chartViewForm.OnClearGraphicsPath;
-            stripChart.chartPropertiesForm.ClearGraphicsPathEvent += tractionCircle.chartViewForm.OnClearGraphicsPath;
-            stripChart.chartPropertiesForm.ClearGraphicsPathEvent += trackMap.chartViewForm.OnClearGraphicsPath;
-            // traction circle
-            tractionCircle.ChartName = "Traction Circle";
-            //tractionCircle.Logger = dataLogger;
-            tractionCircle.chartViewForm.CursorMode = ChartView.CursorStyle.BOX;
-            tractionCircle.chartViewForm.CursorUpdateSource = false;
-            tractionCircle.ChartAxes = new Dictionary<string, Axis>();
-            tractionCircle.chartViewForm.ShowHScroll = false;
-            tractionCircle.chartViewForm.ShowVScroll = false;
-            tractionCircle.chartViewForm.EqualScale = true;
-            tractionCircle.chartPropertiesForm.ChartXAxisChangeEvent += tractionCircle.chartViewForm.OnChartXAxisChange;
-            tractionCircle.chartPropertiesForm.ClearGraphicsPathEvent += stripChart.chartViewForm.OnClearGraphicsPath;
-            tractionCircle.chartPropertiesForm.ClearGraphicsPathEvent += tractionCircle.chartViewForm.OnClearGraphicsPath;
-            tractionCircle.chartPropertiesForm.ClearGraphicsPathEvent += trackMap.chartViewForm.OnClearGraphicsPath;
-            // track map
-            trackMap.ChartName = "Track Map";
-            //trackMap.Logger = dataLogger;
-            trackMap.chartViewForm.CursorMode = ChartView.CursorStyle.BOX;
-            trackMap.chartViewForm.CursorUpdateSource = false;
-            trackMap.ChartAxes = new Dictionary<string, Axis>();
-            trackMap.chartViewForm.ShowHScroll = false;
-            trackMap.chartViewForm.ShowVScroll = false;
-            trackMap.chartViewForm.EqualScale = true;
-            trackMap.chartPropertiesForm.ChartXAxisChangeEvent += trackMap.chartViewForm.OnChartXAxisChange;
-            trackMap.chartPropertiesForm.ClearGraphicsPathEvent += stripChart.chartViewForm.OnClearGraphicsPath;
-            trackMap.chartPropertiesForm.ClearGraphicsPathEvent += tractionCircle.chartViewForm.OnClearGraphicsPath;
-            trackMap.chartPropertiesForm.ClearGraphicsPathEvent += trackMap.chartViewForm.OnClearGraphicsPath;
-            // stripchart mouse move event handlers
-            stripChart.chartViewForm.ChartMouseMoveEvent += OnChartMouseMove;// new ChartMouseMove(OnChartMouseMove);
-            stripChart.chartViewForm.ChartMouseMoveEvent += tractionCircle.chartViewForm.OnChartMouseMove;
-            stripChart.chartViewForm.ChartMouseMoveEvent += trackMap.chartViewForm.OnChartMouseMove;
-
+            #region set up dock panel
             dockPanel1.Dock = DockStyle.None;
             dockPanel1.BackColor = Color.White;
             dockPanel1.Anchor = AnchorStyles.Bottom | AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             dockPanel1.Dock = DockStyle.Fill;
             dockPanel1.BringToFront();
-            // add charts to dock panel
-            stripChart.ShowHint = DockState.Document;
-            stripChart.Text = "Stripchart";
-            stripChart.Show(dockPanel1);
-            stripChart.DockState = DockState.Document;
+            #endregion
 
-            tractionCircle.ShowHint = DockState.Document;
-            tractionCircle.Text = "Traction Circle";
-            tractionCircle.Show(dockPanel1);
-            tractionCircle.DockState = DockState.DockRightAutoHide;
+            #region create and initialize default chart controls
+            chartControls.Add(new ChartControl(ChartControl.ChartControlType.Stripchart));
+            chartControls.Add(new ChartControl(ChartControl.ChartControlType.TractionCirle));
+            chartControls.Add(new ChartControl(ChartControl.ChartControlType.Stripchart));
+            // stripchart
+            chartControls[0].ChartName = "Stripchart";
+            chartControls[0].chartViewForm.CursorMode = ChartView.CursorStyle.CROSSHAIRS;
+            chartControls[0].chartViewForm.CursorUpdateSource = true;
+            chartControls[0].ChartAxes = new Dictionary<string, Axis>();
+            chartControls[0].chartViewForm.ShowHScroll = true;
+            chartControls[0].chartViewForm.ShowVScroll = false;
+            chartControls[0].chartViewForm.EqualScale = false;
+            // traction circle
+            chartControls[1].ChartName = "Traction Circle";
+            chartControls[1].chartViewForm.CursorMode = ChartView.CursorStyle.BOX;
+            chartControls[1].chartViewForm.CursorUpdateSource = false;
+            chartControls[1].ChartAxes = new Dictionary<string, Axis>();
+            chartControls[1].chartViewForm.ShowHScroll = false;
+            chartControls[1].chartViewForm.ShowVScroll = false;
+            chartControls[1].chartViewForm.EqualScale = true;
+            // track map
+            chartControls[2].ChartName = "Track Map";
+            chartControls[2].chartViewForm.CursorMode = ChartView.CursorStyle.BOX;
+            chartControls[2].chartViewForm.CursorUpdateSource = false;
+            chartControls[2].ChartAxes = new Dictionary<string, Axis>();
+            chartControls[2].chartViewForm.ShowHScroll = false;
+            chartControls[2].chartViewForm.ShowVScroll = false;
+            chartControls[2].chartViewForm.EqualScale = true;
+            #endregion 
 
-            trackMap.ShowHint = DockState.Document;
-            trackMap.Text = "Track Map";
-            trackMap.Show(dockPanel1);
-            trackMap.DockState = DockState.DockRightAutoHide;
-            // add new content pane, add runDataGrid control to new content pane
+            #region chart control event handlers
+            chartControls[0].chartPropertiesForm.ChartXAxisChangeEvent += chartControls[0].chartViewForm.OnChartXAxisChange;
+            chartControls[0].chartPropertiesForm.ClearGraphicsPathEvent += chartControls[0].chartViewForm.OnClearGraphicsPath;
+            chartControls[0].chartPropertiesForm.ClearGraphicsPathEvent += chartControls[1].chartViewForm.OnClearGraphicsPath;
+            chartControls[0].chartPropertiesForm.ClearGraphicsPathEvent += chartControls[2].chartViewForm.OnClearGraphicsPath;
+
+            chartControls[1].chartPropertiesForm.ChartXAxisChangeEvent += chartControls[1].chartViewForm.OnChartXAxisChange;
+            chartControls[1].chartPropertiesForm.ClearGraphicsPathEvent += chartControls[0].chartViewForm.OnClearGraphicsPath;
+            chartControls[1].chartPropertiesForm.ClearGraphicsPathEvent += chartControls[1].chartViewForm.OnClearGraphicsPath;
+            chartControls[1].chartPropertiesForm.ClearGraphicsPathEvent += chartControls[2].chartViewForm.OnClearGraphicsPath;
+
+            chartControls[2].chartPropertiesForm.ChartXAxisChangeEvent += chartControls[2].chartViewForm.OnChartXAxisChange;
+            chartControls[2].chartPropertiesForm.ClearGraphicsPathEvent += chartControls[0].chartViewForm.OnClearGraphicsPath;
+            chartControls[2].chartPropertiesForm.ClearGraphicsPathEvent += chartControls[1].chartViewForm.OnClearGraphicsPath;
+            chartControls[2].chartPropertiesForm.ClearGraphicsPathEvent += chartControls[2].chartViewForm.OnClearGraphicsPath;
+            // stripchart mouse move event handlers
+            chartControls[0].chartViewForm.ChartMouseMoveEvent += OnChartMouseMove;// new ChartMouseMove(OnChartMouseMove);
+            chartControls[0].chartViewForm.ChartMouseMoveEvent += chartControls[1].chartViewForm.OnChartMouseMove;
+            chartControls[0].chartViewForm.ChartMouseMoveEvent += chartControls[2].chartViewForm.OnChartMouseMove;
+            #endregion
+
+            #region add charts to dock panel
+            chartControls[0].ShowHint = DockState.Document;
+            chartControls[0].Text = "Stripchart";
+            chartControls[0].Show(dockPanel1);
+            chartControls[0].DockState = DockState.Document;
+
+            chartControls[1].ShowHint = DockState.Document;
+            chartControls[1].Text = "Traction Circle";
+            chartControls[1].Show(dockPanel1);
+            chartControls[1].DockState = DockState.DockRightAutoHide;
+
+            chartControls[2].ShowHint = DockState.Document;
+            chartControls[2].Text = "Track Map";
+            chartControls[2].Show(dockPanel1);
+            chartControls[2].DockState = DockState.DockRightAutoHide;
+            #endregion
+
+            #region add data grid directly to a dock pane
+            // add new content pane, add runDataGrid (DataGridView) control directly to new content pane
             runDataGrid.ContextMenuStrip = this.runDataContext;
             runDataGrid.Dock = DockStyle.Fill;
             DockContent dockpanel2 = new DockContent();
@@ -127,6 +138,7 @@ namespace YamuraView
             dockpanel2.Text = "Run Info";
             dockpanel2.Show(dockPanel1);
             dockpanel2.DockState = DockState.DockRightAutoHide;
+            #endregion
         }
         #endregion
         #region event handlers       
@@ -743,105 +755,138 @@ namespace YamuraView
                             curChannel.Value.DataRange[1] += 1;
                         }
                         String axisName = curChannel.Key;
-                        #region strip chart control axes create/update
-                        if (stripChart.ChartAxes.ContainsKey(axisName))
+                        for(int chartIdx = 0; chartIdx < chartControls.Count; chartIdx++)
                         {
-                            stripChart.ChartAxes[axisName].AxisValueRange[0] = stripChart.ChartAxes[axisName].AxisValueRange[0] < curChannel.Value.DataRange[0] ? stripChart.ChartAxes[axisName].AxisValueRange[0] : curChannel.Value.DataRange[0];
-                            stripChart.ChartAxes[axisName].AxisValueRange[1] = stripChart.ChartAxes[axisName].AxisValueRange[1] > curChannel.Value.DataRange[1] ? stripChart.ChartAxes[axisName].AxisValueRange[1] : curChannel.Value.DataRange[1];
-                        }
-                        else
-                        {
-                            stripChart.ChartAxes.Add(axisName, new Axis());
-                            stripChart.ChartAxes[axisName].AxisValueRange[0] = curChannel.Value.DataRange[0];
-                            stripChart.ChartAxes[axisName].AxisValueRange[1] = curChannel.Value.DataRange[1];
-                        }
-                        stripChart.ChartAxes[axisName].AxisName = axisName;
-                        stripChart.ChartAxes[axisName].AxisValueRange[2] = stripChart.ChartAxes[axisName].AxisValueRange[1] - stripChart.ChartAxes[axisName].AxisValueRange[0];
-                        stripChart.ChartAxes[axisName].AxisDisplayRange[0] = stripChart.ChartAxes[axisName].AxisValueRange[0];
-                        stripChart.ChartAxes[axisName].AxisDisplayRange[1] = stripChart.ChartAxes[axisName].AxisValueRange[1];
-                        stripChart.ChartAxes[axisName].AxisDisplayRange[2] = stripChart.ChartAxes[axisName].AxisValueRange[2];
+                            if (chartControls[chartIdx].ChartAxes.ContainsKey(axisName))
+                            {
+                                chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[0] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[0] < curChannel.Value.DataRange[0] ? chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[0] : curChannel.Value.DataRange[0];
+                                chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[1] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[1] > curChannel.Value.DataRange[1] ? chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[1] : curChannel.Value.DataRange[1];
+                            }
+                            else
+                            {
+                                chartControls[chartIdx].ChartAxes.Add(axisName, new Axis());
+                                chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[0] = curChannel.Value.DataRange[0];
+                                chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[1] = curChannel.Value.DataRange[1];
+                            }
+                            chartControls[chartIdx].ChartAxes[axisName].AxisName = axisName;
+                            chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[2] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[1] - chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[0];
+                            chartControls[chartIdx].ChartAxes[axisName].AxisDisplayRange[0] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[0];
+                            chartControls[chartIdx].ChartAxes[axisName].AxisDisplayRange[1] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[1];
+                            chartControls[chartIdx].ChartAxes[axisName].AxisDisplayRange[2] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[2];
 
-                        stripChart.ChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, curChannel.Key));
-                        stripChart.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
-                        stripChart.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[0] = 0.0F;
-                        stripChart.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[1] = 0.0F;
-                        stripChart.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[0] = stripChart.ChartAxes[axisName].AxisValueRange[0];
-                        stripChart.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[1] = stripChart.ChartAxes[axisName].AxisValueRange[1];
-                        stripChart.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[2] = stripChart.ChartAxes[axisName].AxisValueRange[2];
+                            chartControls[chartIdx].ChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, curChannel.Key));
+                            chartControls[chartIdx].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
+                            chartControls[chartIdx].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[0] = 0.0F;
+                            chartControls[chartIdx].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[1] = 0.0F;
+                            chartControls[chartIdx].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[0] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[0];
+                            chartControls[chartIdx].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[1] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[1];
+                            chartControls[chartIdx].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[2] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[2];
+
+                        }
+                        #region strip chart control axes create/update
+                        //if (chartControls[0].ChartAxes.ContainsKey(axisName))
+                        //{
+                        //    chartControls[0].ChartAxes[axisName].AxisValueRange[0] = chartControls[0].ChartAxes[axisName].AxisValueRange[0] < curChannel.Value.DataRange[0] ? chartControls[0].ChartAxes[axisName].AxisValueRange[0] : curChannel.Value.DataRange[0];
+                        //    chartControls[0].ChartAxes[axisName].AxisValueRange[1] = chartControls[0].ChartAxes[axisName].AxisValueRange[1] > curChannel.Value.DataRange[1] ? chartControls[0].ChartAxes[axisName].AxisValueRange[1] : curChannel.Value.DataRange[1];
+                        //}
+                        //else
+                        //{
+                        //    chartControls[0].ChartAxes.Add(axisName, new Axis());
+                        //    chartControls[0].ChartAxes[axisName].AxisValueRange[0] = curChannel.Value.DataRange[0];
+                        //    chartControls[0].ChartAxes[axisName].AxisValueRange[1] = curChannel.Value.DataRange[1];
+                        //}
+                        //chartControls[0].ChartAxes[axisName].AxisName = axisName;
+                        //chartControls[0].ChartAxes[axisName].AxisValueRange[2] = chartControls[0].ChartAxes[axisName].AxisValueRange[1] - chartControls[0].ChartAxes[axisName].AxisValueRange[0];
+                        //chartControls[0].ChartAxes[axisName].AxisDisplayRange[0] = chartControls[0].ChartAxes[axisName].AxisValueRange[0];
+                        //chartControls[0].ChartAxes[axisName].AxisDisplayRange[1] = chartControls[0].ChartAxes[axisName].AxisValueRange[1];
+                        //chartControls[0].ChartAxes[axisName].AxisDisplayRange[2] = chartControls[0].ChartAxes[axisName].AxisValueRange[2];
+
+                        //chartControls[0].ChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, curChannel.Key));
+                        //chartControls[0].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
+                        //chartControls[0].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[0] = 0.0F;
+                        //chartControls[0].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[1] = 0.0F;
+                        //chartControls[0].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[0] = chartControls[0].ChartAxes[axisName].AxisValueRange[0];
+                        //chartControls[0].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[1] = chartControls[0].ChartAxes[axisName].AxisValueRange[1];
+                        //chartControls[0].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[2] = chartControls[0].ChartAxes[axisName].AxisValueRange[2];
                         #endregion
                         #region traction circle control axes create/update
-                        if (tractionCircle.ChartAxes.ContainsKey(axisName))
-                        {
-                            tractionCircle.ChartAxes[axisName].AxisValueRange[0] = tractionCircle.ChartAxes[axisName].AxisValueRange[0] < curChannel.Value.DataRange[0] ? tractionCircle.ChartAxes[axisName].AxisValueRange[0] : curChannel.Value.DataRange[0];
-                            tractionCircle.ChartAxes[axisName].AxisValueRange[1] = tractionCircle.ChartAxes[axisName].AxisValueRange[1] > curChannel.Value.DataRange[1] ? tractionCircle.ChartAxes[axisName].AxisValueRange[1] : curChannel.Value.DataRange[1];
-                        }
-                        else
-                        {
-                            tractionCircle.ChartAxes.Add(axisName, new Axis());
-                            tractionCircle.ChartAxes[axisName].AxisValueRange[0] = curChannel.Value.DataRange[0];
-                            tractionCircle.ChartAxes[axisName].AxisValueRange[1] = curChannel.Value.DataRange[1];
-                        }
-                        tractionCircle.ChartAxes[axisName].AxisName = axisName;
-                        tractionCircle.ChartAxes[axisName].AxisValueRange[2] = tractionCircle.ChartAxes[axisName].AxisValueRange[1] - tractionCircle.ChartAxes[axisName].AxisValueRange[0];
-                        tractionCircle.ChartAxes[axisName].AxisDisplayRange[0] = tractionCircle.ChartAxes[axisName].AxisValueRange[0];
-                        tractionCircle.ChartAxes[axisName].AxisDisplayRange[1] = tractionCircle.ChartAxes[axisName].AxisValueRange[1];
-                        tractionCircle.ChartAxes[axisName].AxisDisplayRange[2] = tractionCircle.ChartAxes[axisName].AxisValueRange[2];
+                        //if (chartControls[1].ChartAxes.ContainsKey(axisName))
+                        //{
+                        //    chartControls[1].ChartAxes[axisName].AxisValueRange[0] = chartControls[1].ChartAxes[axisName].AxisValueRange[0] < curChannel.Value.DataRange[0] ? chartControls[1].ChartAxes[axisName].AxisValueRange[0] : curChannel.Value.DataRange[0];
+                        //    chartControls[1].ChartAxes[axisName].AxisValueRange[1] = chartControls[1].ChartAxes[axisName].AxisValueRange[1] > curChannel.Value.DataRange[1] ? chartControls[1].ChartAxes[axisName].AxisValueRange[1] : curChannel.Value.DataRange[1];
+                        //}
+                        //else
+                        //{
+                        //    chartControls[1].ChartAxes.Add(axisName, new Axis());
+                        //    chartControls[1].ChartAxes[axisName].AxisValueRange[0] = curChannel.Value.DataRange[0];
+                        //    chartControls[1].ChartAxes[axisName].AxisValueRange[1] = curChannel.Value.DataRange[1];
+                        //}
+                        //chartControls[1].ChartAxes[axisName].AxisName = axisName;
+                        //chartControls[1].ChartAxes[axisName].AxisValueRange[2] = chartControls[1].ChartAxes[axisName].AxisValueRange[1] - chartControls[1].ChartAxes[axisName].AxisValueRange[0];
+                        //chartControls[1].ChartAxes[axisName].AxisDisplayRange[0] = chartControls[1].ChartAxes[axisName].AxisValueRange[0];
+                        //chartControls[1].ChartAxes[axisName].AxisDisplayRange[1] = chartControls[1].ChartAxes[axisName].AxisValueRange[1];
+                        //chartControls[1].ChartAxes[axisName].AxisDisplayRange[2] = chartControls[1].ChartAxes[axisName].AxisValueRange[2];
 
-                        tractionCircle.ChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, curChannel.Key));
-                        tractionCircle.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
-                        tractionCircle.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[0] = 0.0F;
-                        tractionCircle.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[1] = 0.0F;
-                        tractionCircle.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[0] = tractionCircle.ChartAxes[axisName].AxisValueRange[0];
-                        tractionCircle.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[1] = tractionCircle.ChartAxes[axisName].AxisValueRange[1];
-                        tractionCircle.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[2] = tractionCircle.ChartAxes[axisName].AxisValueRange[2];
+                        //chartControls[1].ChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, curChannel.Key));
+                        //chartControls[1].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
+                        //chartControls[1].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[0] = 0.0F;
+                        //chartControls[1].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[1] = 0.0F;
+                        //chartControls[1].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[0] = chartControls[1].ChartAxes[axisName].AxisValueRange[0];
+                        //chartControls[1].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[1] = chartControls[1].ChartAxes[axisName].AxisValueRange[1];
+                        //chartControls[1].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[2] = chartControls[1].ChartAxes[axisName].AxisValueRange[2];
                         #endregion
                         #region track map control axes create/update
-                        if (trackMap.ChartAxes.ContainsKey(axisName))
-                        {
-                            trackMap.ChartAxes[axisName].AxisValueRange[0] = trackMap.ChartAxes[axisName].AxisValueRange[0] < curChannel.Value.DataRange[0] ? trackMap.ChartAxes[axisName].AxisValueRange[0] : curChannel.Value.DataRange[0];
-                            trackMap.ChartAxes[axisName].AxisValueRange[1] = trackMap.ChartAxes[axisName].AxisValueRange[1] > curChannel.Value.DataRange[1] ? trackMap.ChartAxes[axisName].AxisValueRange[1] : curChannel.Value.DataRange[1];
-                        }
-                        else
-                        {
-                            trackMap.ChartAxes.Add(axisName, new Axis());
-                            trackMap.ChartAxes[axisName].AxisValueRange[0] = curChannel.Value.DataRange[0];
-                            trackMap.ChartAxes[axisName].AxisValueRange[1] = curChannel.Value.DataRange[1];
-                        }
-                        trackMap.ChartAxes[axisName].AxisName = axisName;
-                        trackMap.ChartAxes[axisName].AxisValueRange[2] = trackMap.ChartAxes[axisName].AxisValueRange[1] - trackMap.ChartAxes[axisName].AxisValueRange[0];
+                        //if (chartControls[2].ChartAxes.ContainsKey(axisName))
+                        //{
+                        //    chartControls[2].ChartAxes[axisName].AxisValueRange[0] = chartControls[2].ChartAxes[axisName].AxisValueRange[0] < curChannel.Value.DataRange[0] ? chartControls[2].ChartAxes[axisName].AxisValueRange[0] : curChannel.Value.DataRange[0];
+                        //    chartControls[2].ChartAxes[axisName].AxisValueRange[1] = chartControls[2].ChartAxes[axisName].AxisValueRange[1] > curChannel.Value.DataRange[1] ? chartControls[2].ChartAxes[axisName].AxisValueRange[1] : curChannel.Value.DataRange[1];
+                        //}
+                        //else
+                        //{
+                        //    chartControls[2].ChartAxes.Add(axisName, new Axis());
+                        //    chartControls[2].ChartAxes[axisName].AxisValueRange[0] = curChannel.Value.DataRange[0];
+                        //    chartControls[2].ChartAxes[axisName].AxisValueRange[1] = curChannel.Value.DataRange[1];
+                        //}
+                        //chartControls[2].ChartAxes[axisName].AxisName = axisName;
+                        //chartControls[2].ChartAxes[axisName].AxisValueRange[2] = chartControls[2].ChartAxes[axisName].AxisValueRange[1] - chartControls[2].ChartAxes[axisName].AxisValueRange[0];
 
-                        trackMap.ChartAxes[axisName].AxisDisplayRange[0] = trackMap.ChartAxes[axisName].AxisValueRange[0];
-                        trackMap.ChartAxes[axisName].AxisDisplayRange[1] = trackMap.ChartAxes[axisName].AxisValueRange[1];
-                        trackMap.ChartAxes[axisName].AxisDisplayRange[2] = trackMap.ChartAxes[axisName].AxisValueRange[2];
+                        //chartControls[2].ChartAxes[axisName].AxisDisplayRange[0] = chartControls[2].ChartAxes[axisName].AxisValueRange[0];
+                        //chartControls[2].ChartAxes[axisName].AxisDisplayRange[1] = chartControls[2].ChartAxes[axisName].AxisValueRange[1];
+                        //chartControls[2].ChartAxes[axisName].AxisDisplayRange[2] = chartControls[2].ChartAxes[axisName].AxisValueRange[2];
 
-                        trackMap.ChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, curChannel.Key));
-                        trackMap.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
-                        trackMap.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[0] = 0.0F;
-                        trackMap.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[1] = 0.0F;
-                        trackMap.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[0] = trackMap.ChartAxes[axisName].AxisValueRange[0];
-                        trackMap.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[1] = trackMap.ChartAxes[axisName].AxisValueRange[1];
-                        trackMap.ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[2] = trackMap.ChartAxes[axisName].AxisValueRange[2];
+                        //chartControls[2].ChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, curChannel.Key));
+                        //chartControls[2].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
+                        //chartControls[2].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[0] = 0.0F;
+                        //chartControls[2].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[1] = 0.0F;
+                        //chartControls[2].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[0] = chartControls[2].ChartAxes[axisName].AxisValueRange[0];
+                        //chartControls[2].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[1] = chartControls[2].ChartAxes[axisName].AxisValueRange[1];
+                        //chartControls[2].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[2] = chartControls[2].ChartAxes[axisName].AxisValueRange[2];
                         #endregion
                         channelIdx++;
                     }
-                    stripChart.chartViewForm.ChartOwner.ChartAxes = stripChart.ChartAxes;
-                    stripChart.chartPropertiesForm.ChartOwner.ChartAxes = stripChart.ChartAxes;
-                    tractionCircle.chartViewForm.ChartOwner.ChartAxes = tractionCircle.ChartAxes;
-                    tractionCircle.chartPropertiesForm.ChartOwner.ChartAxes = tractionCircle.ChartAxes;
-                    trackMap.chartViewForm.ChartOwner.ChartAxes = trackMap.ChartAxes;
-                    trackMap.chartPropertiesForm.ChartOwner.ChartAxes = trackMap.ChartAxes;
+                    for(int chartIdx = 0; chartIdx < chartControls.Count; chartIdx++)
+                    {
+                        chartControls[chartIdx].chartViewForm.ChartOwner.ChartAxes = chartControls[chartIdx].ChartAxes;
+                        chartControls[chartIdx].chartPropertiesForm.ChartOwner.ChartAxes = chartControls[chartIdx].ChartAxes;
+                    }
+                    //chartControls[0].chartViewForm.ChartOwner.ChartAxes = chartControls[0].ChartAxes;
+                    //chartControls[0].chartPropertiesForm.ChartOwner.ChartAxes = chartControls[0].ChartAxes;
+                    //chartControls[1].chartViewForm.ChartOwner.ChartAxes = chartControls[1].ChartAxes;
+                    //chartControls[1].chartPropertiesForm.ChartOwner.ChartAxes = chartControls[1].ChartAxes;
+                    //chartControls[2].chartViewForm.ChartOwner.ChartAxes = chartControls[2].ChartAxes;
+                    //chartControls[2].chartPropertiesForm.ChartOwner.ChartAxes = chartControls[2].ChartAxes;
 
-                    //stripChart.Logger = dataLogger;
-                    //stripChart.chartViewForm.Logger = dataLogger;
-                    //stripChart.chartPropertiesForm.Logger = dataLogger;
+                    //chartControls[0].Logger = dataLogger;
+                    //chartControls[0].chartViewForm.Logger = dataLogger;
+                    //chartControls[0].chartPropertiesForm.Logger = dataLogger;
 
-                    //tractionCircle.Logger = dataLogger;
-                    //tractionCircle.chartViewForm.Logger = dataLogger;
-                    //tractionCircle.chartPropertiesForm.Logger = dataLogger;
+                    //chartControls[1].Logger = dataLogger;
+                    //chartControls[1].chartViewForm.Logger = dataLogger;
+                    //chartControls[1].chartPropertiesForm.Logger = dataLogger;
 
-                    //trackMap.Logger = dataLogger;
-                    //trackMap.chartViewForm.Logger = dataLogger;
-                    //trackMap.chartPropertiesForm.Logger = dataLogger;
+                    //chartControls[2].Logger = dataLogger;
+                    //chartControls[2].chartViewForm.Logger = dataLogger;
+                    //chartControls[2].chartPropertiesForm.Logger = dataLogger;
                 }
             }
             #endregion
@@ -929,9 +974,13 @@ namespace YamuraView
                     ReadYLGFile(fileName);
                 }
             }
-            stripChart.Invalidate();
-            tractionCircle.Invalidate();
-            trackMap.Invalidate();
+            for (int chartIdx = 0; chartIdx < chartControls.Count; chartIdx++)
+            {
+                chartControls[chartIdx].Invalidate();
+            }
+            //chartControls[0].Invalidate();
+            //chartControls[1].Invalidate();
+            //chartControls[2].Invalidate();
 
         }
         /// <summary>
@@ -944,11 +993,13 @@ namespace YamuraView
             runDataGrid.Rows.Clear();
             dataLogger.Reset();
 
-
-            stripChart.Invalidate();
-            tractionCircle.Invalidate();
-            trackMap.Invalidate();
-
+            for (int chartIdx = 0; chartIdx < chartControls.Count; chartIdx++)
+            {
+                chartControls[chartIdx].Invalidate();
+            }
+            //chartControls[0].Invalidate();
+            //chartControls[1].Invalidate();
+            //chartControls[2].Invalidate();
         }
         /// <summary>
         /// 
@@ -1124,5 +1175,61 @@ namespace YamuraView
             showFileInfo.ShowDialog();
         }
         #endregion
+
+        private void addStripchart_Click(object sender, EventArgs e)
+        {
+            chartControls.Add(new ChartControl(ChartControl.ChartControlType.Stripchart));
+            int chartIdx = chartControls.Count - 1;
+            // stripchart
+            chartControls[chartIdx].ChartName = "Stripchart";
+            chartControls[chartIdx].chartViewForm.CursorMode = ChartView.CursorStyle.CROSSHAIRS;
+            chartControls[chartIdx].chartViewForm.CursorUpdateSource = true;
+            chartControls[chartIdx].ChartAxes = new Dictionary<string, Axis>();
+            chartControls[chartIdx].chartViewForm.ShowHScroll = true;
+            chartControls[chartIdx].chartViewForm.ShowVScroll = false;
+            chartControls[chartIdx].chartViewForm.EqualScale = false;
+
+            chartControls[chartIdx].ShowHint = DockState.Document;
+            chartControls[chartIdx].Text = "Stripchart";
+            chartControls[chartIdx].Show(dockPanel1);
+            chartControls[chartIdx].DockState = DockState.DockRightAutoHide;
+        }
+        private void addTractionCircle_Click(object sender, EventArgs e)
+        {
+            chartControls.Add(new ChartControl(ChartControl.ChartControlType.TractionCirle));
+            int chartIdx = chartControls.Count - 1;
+            // stripchart
+            chartControls[chartIdx].ChartName = "Traction Circle";
+            chartControls[chartIdx].chartViewForm.CursorMode = ChartView.CursorStyle.CROSSHAIRS;
+            chartControls[chartIdx].chartViewForm.CursorUpdateSource = true;
+            chartControls[chartIdx].ChartAxes = new Dictionary<string, Axis>();
+            chartControls[chartIdx].chartViewForm.ShowHScroll = true;
+            chartControls[chartIdx].chartViewForm.ShowVScroll = false;
+            chartControls[chartIdx].chartViewForm.EqualScale = false;
+
+            chartControls[chartIdx].ShowHint = DockState.Document;
+            chartControls[chartIdx].Text = "Traction Circle";
+            chartControls[chartIdx].Show(dockPanel1);
+            chartControls[chartIdx].DockState = DockState.DockRightAutoHide;
+
+        }
+        private void addTrackMap_Click(object sender, EventArgs e)
+        {
+            chartControls.Add(new ChartControl(ChartControl.ChartControlType.Stripchart));
+            int chartIdx = chartControls.Count - 1;
+            // stripchart
+            chartControls[chartIdx].ChartName = "Track Map";
+            chartControls[chartIdx].chartViewForm.CursorMode = ChartView.CursorStyle.CROSSHAIRS;
+            chartControls[chartIdx].chartViewForm.CursorUpdateSource = true;
+            chartControls[chartIdx].ChartAxes = new Dictionary<string, Axis>();
+            chartControls[chartIdx].chartViewForm.ShowHScroll = true;
+            chartControls[chartIdx].chartViewForm.ShowVScroll = false;
+            chartControls[chartIdx].chartViewForm.EqualScale = false;
+
+            chartControls[chartIdx].ShowHint = DockState.Document;
+            chartControls[chartIdx].Text = "Track Map";
+            chartControls[chartIdx].Show(dockPanel1);
+            chartControls[chartIdx].DockState = DockState.DockRightAutoHide;
+        }
     }
 }
