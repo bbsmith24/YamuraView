@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.axisChannelTree = new YamuraView.TriStateTreeView();
+            this.axisChannelTree = new YamuraView.UserControls.TriStateTreeView();
             this.channelsContext = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.invertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblAxisMin = new System.Windows.Forms.ToolStripTextBox();
@@ -64,7 +64,7 @@
             this.axisChannelTree.Name = "axisChannelTree";
             this.axisChannelTree.Size = new System.Drawing.Size(348, 209);
             this.axisChannelTree.TabIndex = 30;
-            this.axisChannelTree.TriStateStyleProperty = YamuraView.TriStateTreeView.TriStateStyles.Standard;
+            this.axisChannelTree.TriStateStyleProperty = YamuraView.UserControls.TriStateTreeView.TriStateStyles.Standard;
             this.axisChannelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.axisChannelTree_AfterCheck);
             // 
             // channelsContext
@@ -270,7 +270,7 @@
 
         #endregion
 
-        private YamuraView.TriStateTreeView axisChannelTree;
+        private YamuraView.UserControls.TriStateTreeView axisChannelTree;
         private System.Windows.Forms.ComboBox cmbXAxis;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;

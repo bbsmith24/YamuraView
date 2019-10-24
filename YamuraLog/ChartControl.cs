@@ -148,10 +148,10 @@ namespace YamuraView
             ChartAxes[chartViewForm.XChannelName].AxisDisplayRange[1] = ChartAxes[chartViewForm.XChannelName].AxisValueRange[1];
             ChartAxes[chartViewForm.XChannelName].AxisDisplayRange[2] = ChartAxes[chartViewForm.XChannelName].AxisValueRange[2];
 
-            chartViewForm.hScrollBar.Minimum = (int)chartAxes[chartViewForm.XChannelName].AxisValueRange[0];
-            chartViewForm.hScrollBar.Maximum = (int)chartAxes[chartViewForm.XChannelName].AxisValueRange[1];
-            chartViewForm.hScrollBar.Value = (int)chartAxes[chartViewForm.XChannelName].AxisDisplayRange[0];
-            chartViewForm.hScrollBar.LargeChange = (int)chartAxes[chartViewForm.XChannelName].AxisDisplayRange[2];
+            chartViewForm.xAxis1.Minimum = (int)chartAxes[chartViewForm.XChannelName].AxisValueRange[0];
+            chartViewForm.xAxis1.Maximum = (int)chartAxes[chartViewForm.XChannelName].AxisValueRange[1];
+            chartViewForm.xAxis1.Value = (int)chartAxes[chartViewForm.XChannelName].AxisDisplayRange[0];
+            chartViewForm.xAxis1.LargeChange = (int)chartAxes[chartViewForm.XChannelName].AxisDisplayRange[2];
 
             chartViewForm.chartPanel.Invalidate();
         }

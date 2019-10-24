@@ -1,7 +1,7 @@
 // Copyright (CPOL) 2011 RikTheVeggie - 
 // Tri-State Tree View
 
-namespace YamuraView
+namespace YamuraView.UserControls
 {
 	// <summary>
 	// A Tri-State TreeView designed for on-demand populating of the tree

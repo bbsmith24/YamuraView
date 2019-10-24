@@ -63,13 +63,6 @@ namespace YamuraView
             set { chartOwner = value; }
         }
 
-        //Dictionary<string, Axis> chartAxes;// = new Dictionary<string, Axis>();
-        //public Dictionary<string, Axis> ChartAxes
-        //{
-        //    get { return chartAxes; }
-        //    set { chartAxes = value; }
-        //}
-
         string chartName = "Chart";
         public string ChartName
         {
@@ -88,6 +81,7 @@ namespace YamuraView
         protected List<bool> startMouseMove = new List<bool>();
         protected List<Point> chartLastCursorPos = new List<Point>();
         protected List<Point> chartStartCursorPos = new List<Point>();
+        protected int axisThickness = 56;
 
         string xChannelName;
         public string XChannelName
@@ -192,7 +186,7 @@ namespace YamuraView
             chartStartCursorPos.Add(new Point(0, 0));
             startMouseMove.Add(false);
             startMouseDrag.Add(false);
-            hScrollBar.Scroll += HScrollBar_Scroll;
+            xAxis1.axisScroll.Scroll += HScrollBar_Scroll;
         }
         #region control message handlers
         /// <summary>
@@ -629,10 +623,10 @@ namespace YamuraView
                 ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2] = ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[1] - ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0];
 
 
-                hScrollBar.Minimum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[0];
-                hScrollBar.Maximum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[1];
-                hScrollBar.Value = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0];
-                hScrollBar.LargeChange = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
+                xAxis1.Minimum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[0];
+                xAxis1.Maximum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[1];
+                xAxis1.Value = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0];
+                xAxis1.LargeChange = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
                 startMouseDrag[0] = false;
                 chartPanel.Invalidate();
             }
@@ -825,27 +819,27 @@ namespace YamuraView
         {
             Rectangle chartRect = new Rectangle();
             // default shown positions
-            hScrollBar.Height = 17;
-            hScrollBar.Width = Width - 17;
-            hScrollBar.Location = new Point(17, Height - 17);
+            xAxis1.Height = axisThickness;
+            xAxis1.Width = Width - axisThickness;
+            xAxis1.Location = new Point(axisThickness, Height - axisThickness);
 
-            vScrollBar.Height = Height - 17;
-            vScrollBar.Width = 17;
-            vScrollBar.Location = new Point(0, 0);
+            yAxis1.Height = Height - axisThickness;
+            yAxis1.Width = axisThickness;
+            yAxis1.Location = new Point(0, 0);
 
-            chartRect.X = 17;
+            chartRect.X = axisThickness;
             chartRect.Y = 0;
-            chartRect.Width = Width - 17;
-            chartRect.Height = Height - 17;
+            chartRect.Width = Width - axisThickness;
+            chartRect.Height = Height - axisThickness;
 
             if (!showHScroll)
             {
-                hScrollBar.Visible = false;
+                xAxis1.Visible = false;
                 chartRect.Height = Height;
             }
             if (!showVScroll)
             {
-                vScrollBar.Visible = false;
+                yAxis1.Visible = false;
                 chartRect.X = 0;
                 chartRect.Width = Width;
             }
@@ -982,10 +976,10 @@ namespace YamuraView
         public void OnChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e)
         {
             xChannelName = e.XAxisName;
-            hScrollBar.Minimum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[0];
-            hScrollBar.Maximum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[1];
-            hScrollBar.Value = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0];
-            hScrollBar.LargeChange = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
+            xAxis1.Minimum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[0];
+            xAxis1.Maximum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[1];
+            xAxis1.Value = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0];
+            xAxis1.LargeChange = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
             chartPanel.Invalidate();
         }
         public void OnClearGraphicsPath(object sender, EventArgs e)

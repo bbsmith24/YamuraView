@@ -32,7 +32,7 @@ namespace YamuraView
             set { chartOwner = value; }
         }
 
-        public TriStateTreeView AxisChannelTree
+        public YamuraView.UserControls.TriStateTreeView AxisChannelTree
         {
             get { return axisChannelTree; }
             set { axisChannelTree = value; }

@@ -70,7 +70,7 @@ namespace YamuraView
             chartControls[0].chartViewForm.CursorUpdateSource = true;
             chartControls[0].ChartAxes = new Dictionary<string, Axis>();
             chartControls[0].chartViewForm.ShowHScroll = true;
-            chartControls[0].chartViewForm.ShowVScroll = false;
+            chartControls[0].chartViewForm.ShowVScroll = true;
             chartControls[0].chartViewForm.EqualScale = false;
             // traction circle
             chartControls[1].ChartName = "Traction Circle";
