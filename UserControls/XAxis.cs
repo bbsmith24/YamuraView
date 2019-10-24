@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing.Drawing2D;
 
 namespace YamuraView.UserControls
 {
@@ -15,27 +16,94 @@ namespace YamuraView.UserControls
         public int Minimum
         {
             get { return axisScroll.Minimum; }
-            set { axisScroll.Minimum = value; }
+            set
+            {
+                axisScroll.Minimum = value;
+                int range = axisScroll.Maximum - axisScroll.Minimum;
+                majorTicks = (int)Math.Log10((double)range) - 1;
+                minorTicks = (int)Math.Log10((double)range) - 2;
+            }
         }
         public int Maximum
         {
             get { return axisScroll.Maximum; }
-            set { axisScroll.Maximum = value; }
+            set
+            {
+                axisScroll.Maximum = value;
+                int range = axisScroll.Maximum - axisScroll.Minimum;
+                majorTicks = (int)Math.Log10((double)range) - 1;
+                minorTicks = (int)Math.Log10((double)range) - 2;
+            }
         }
         public int Value
         {
             get { return axisScroll.Value; }
-            set { axisScroll.Value = value; }
+            set
+            {
+                axisScroll.Value = value;
+                axisScale.Invalidate();
+            }
         }
         public int LargeChange
         {
             get { return axisScroll.LargeChange; }
             set { axisScroll.LargeChange = value; }
         }
+
+        // power of 10 of ticks
+        float majorTicks = 1;
+        float minorTicks = 0;
         public XAxis()
         {
             InitializeComponent();
         }
 
+        private void axisScale_Paint(object sender, PaintEventArgs e)
+        {
+            GraphicsPath axisPath = new GraphicsPath();
+            axisPath.AddLine(Minimum, 5, Maximum, 5);
+            // major ticks
+            float xVal = Minimum;
+            while (true)
+            {
+                GraphicsPath seg = new GraphicsPath();
+                seg.AddLine(xVal, 5.0F, xVal, 15.0F);
+                axisPath.AddPath(seg, false);
+                xVal += (float)Math.Pow(10, (double)majorTicks);
+                if (xVal > Maximum)
+                {
+                    break;
+                }
+            }
+            // minor ticks
+            xVal = Minimum;
+            while (true)
+            {
+                GraphicsPath seg = new GraphicsPath();
+                seg.AddLine(xVal, 5.0F, xVal, 10.0F);
+                axisPath.AddPath(seg, false);
+                xVal += (float)Math.Pow(10, (double)minorTicks);
+                if (xVal > Maximum)
+                {
+                    break;
+                }
+            }
+            float displayScale = 1;
+            Pen pathPen = new Pen(Color.Black);
+            using (Graphics axisGraphics = axisScale.CreateGraphics())
+            {
+                displayScale = (float)Width / (Maximum - Minimum);
+
+                // scale to display range in X and Y
+                axisGraphics.ScaleTransform(displayScale, 1);
+                // translate by -1 * minimum display range + axis offset (scrolling)
+                //axisGraphics.TranslateTransform(-1 * ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0] +
+                //                                 ChartOwner.ChartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
+                //                                 -1 * yAxis.Value.AxisDisplayRange[0] +
+                //                                 ChartOwner.ChartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1]);  // offset Y
+                axisGraphics.DrawPath(pathPen, axisPath);
+                axisGraphics.ResetTransform();
+            }
+        }
     }
 }

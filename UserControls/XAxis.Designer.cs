@@ -42,6 +42,7 @@
             this.axisScale.Name = "axisScale";
             this.axisScale.Size = new System.Drawing.Size(150, 39);
             this.axisScale.TabIndex = 1;
+            this.axisScale.Paint += new System.Windows.Forms.PaintEventHandler(this.axisScale_Paint);
             // 
             // axisScroll
             // 
