@@ -44,6 +44,16 @@ namespace YamuraView.UserControls
                 axisScale.Invalidate();
             }
         }
+        public int[] ViewRange
+        {
+            get
+            {
+                int[] viewRange = new int[] { 0, 0 };
+                viewRange[0] = axisScroll.Value;
+                viewRange[1] = axisScroll.Value + axisScroll.LargeChange;
+                return viewRange;
+            }
+        }
         public int LargeChange
         {
             get { return axisScroll.LargeChange; }
@@ -89,21 +99,24 @@ namespace YamuraView.UserControls
                 }
             }
             float displayScale = 1;
-            Pen pathPen = new Pen(Color.Black);
+            Pen pathPen = new Pen(Color.Black, 0);
             using (Graphics axisGraphics = axisScale.CreateGraphics())
             {
-                displayScale = (float)Width / (Maximum - Minimum);
+                displayScale = (float)Width / (float)(ViewRange[1] - ViewRange[0]);
 
                 // scale to display range in X and Y
                 axisGraphics.ScaleTransform(displayScale, 1);
                 // translate by -1 * minimum display range + axis offset (scrolling)
-                //axisGraphics.TranslateTransform(-1 * ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0] +
-                //                                 ChartOwner.ChartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
-                //                                 -1 * yAxis.Value.AxisDisplayRange[0] +
-                //                                 ChartOwner.ChartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1]);  // offset Y
+                axisGraphics.TranslateTransform(-1 * ViewRange[0] + Minimum,  // offset X
+                                                 0);  // offset Y
                 axisGraphics.DrawPath(pathPen, axisPath);
                 axisGraphics.ResetTransform();
             }
+        }
+
+        private void axisScroll_Scroll(object sender, ScrollEventArgs e)
+        {
+            axisScale.Invalidate();
         }
     }
 }

@@ -52,6 +52,7 @@
             this.axisScroll.Name = "axisScroll";
             this.axisScroll.Size = new System.Drawing.Size(150, 17);
             this.axisScroll.TabIndex = 0;
+            this.axisScroll.Scroll += new System.Windows.Forms.ScrollEventHandler(this.axisScroll_Scroll);
             // 
             // XAxis
             // 
