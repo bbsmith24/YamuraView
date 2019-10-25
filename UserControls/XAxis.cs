@@ -60,6 +60,12 @@ namespace YamuraView.UserControls
             set { axisScroll.LargeChange = value; }
         }
 
+        string title = "X axis";
+        public string Title
+        {
+            get { return title; }
+            set { title = value; }
+        }
         // power of 10 of ticks
         float majorTicks = 1;
         float minorTicks = 0;
@@ -111,6 +117,8 @@ namespace YamuraView.UserControls
                                                  0);  // offset Y
                 axisGraphics.DrawPath(pathPen, axisPath);
                 axisGraphics.ResetTransform();
+
+                axisGraphics.DrawString(Title, new Font(FontFamily.GenericMonospace, 8), new SolidBrush(Color.Black), Width / 2, Height / 3);
             }
         }
 
