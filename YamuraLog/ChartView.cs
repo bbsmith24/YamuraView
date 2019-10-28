@@ -47,7 +47,6 @@ namespace YamuraView
             BOX,
             CIRCLE
         }
-
         public DataLogger Logger
         {
             get
@@ -55,14 +54,12 @@ namespace YamuraView
                 return YamuraView.YamuraViewMain.dataLogger;
             }
         }
-
         ChartControl chartOwner;
         public ChartControl ChartOwner
         {
             get { return chartOwner; }
             set { chartOwner = value; }
         }
-
         string chartName = "Chart";
         public string ChartName
         {
@@ -73,7 +70,6 @@ namespace YamuraView
                 Text = chartName;
             }
         }
-
         protected int dragZoomPenWidth = 1;
         protected int chartBorder = 10;
         protected Rectangle chartBounds = new Rectangle(0, 0, 0, 0);

@@ -32,17 +32,6 @@ namespace YamuraView
             get { return chartType; }
             set { chartType = value; }
         }
-        //DataLogger logger;
-        //public DataLogger Logger
-        //{
-        //    get { return logger; }
-        //    set
-        //    {
-        //        logger = value;
-        //        chartPropertiesForm.Logger = logger;
-        //        chartViewForm.Logger = logger;
-        //    }
-        //}
         public DataLogger Logger
         {
             get { return YamuraView.YamuraViewMain.dataLogger; }
@@ -170,7 +159,6 @@ namespace YamuraView
             get { return yAxisValues; }
             set { yAxisValues = value; }
         }
-
     }
     public class ChartControlXAxisChangeEventArgs : EventArgs
     {
