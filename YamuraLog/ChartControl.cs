@@ -17,6 +17,7 @@ namespace YamuraView
     public delegate void ChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e);
     public delegate void AxisOffsetUpdate(object sender, AxisOffsetUpdateEventArgs e);
     public delegate void ClearGraphicsPath(object sender, EventArgs e);
+    public delegate void AxisMouseMove(object sender, YamuraView.UserControls.AxisControlMouseMoveEventArgs e);
 
     public partial class ChartControl :  WeifenLuo.WinFormsUI.Docking.DockContent
     {

@@ -8,12 +8,22 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
-using YamuraView;
+using YamuraControls.GDI;
+using Win32Interop.Methods;
 
 namespace YamuraView.UserControls
 {
     public partial class XAxis : UserControl
     {
+        public enum CursorStyle
+        {
+            NONE,
+            CROSSHAIRS,
+            VERTICAL,
+            HORIZONTAL,
+            BOX,
+            CIRCLE
+        }
         public int Minimum
         {
             get { return axisScroll.Minimum; }
@@ -61,10 +71,13 @@ namespace YamuraView.UserControls
             set { axisScroll.LargeChange = value; }
         }
 
-        bool startMouseDrag = false;
+        //bool startMouseDrag = false;
         bool startMouseMove = false;
-        Point chartLastCursorPos = new Point();
-        Point chartStartCursorPos = new Point();
+        Point axisLastCursorPos = new Point();
+        Point axisStartCursorPos = new Point();
+        protected Rectangle axisBounds = new Rectangle(0, 0, 0, 0);
+        protected int axisBorder = 10;
+        protected int dragZoomPenWidth = 1;
 
         string title = "X axis";
         public string Title
@@ -75,6 +88,28 @@ namespace YamuraView.UserControls
         // power of 10 of ticks
         float majorTicks = 1;
         float minorTicks = 0;
+
+        // crosshairs, box, circle work
+        // horizontal and vertical look weird
+        CursorStyle cursorMode = CursorStyle.VERTICAL;
+        /// <summary>
+        /// type of mouse move cursor - CROSSHAIRS, HORIZONTAL, VERTICAL, BOX, CIRCLE
+        /// </summary>
+        public CursorStyle CursorMode
+        {
+            get { return cursorMode; }
+            set { cursorMode = value; }
+        }
+        int cursorBoxSize = 10;
+        /// <summary>
+        /// size of box and circle cursor
+        /// </summary>
+        public int CursorBoxSize
+        {
+            get { return cursorBoxSize; }
+            set { cursorBoxSize = value; }
+        }
+
         public XAxis()
         {
             InitializeComponent();
@@ -117,13 +152,13 @@ namespace YamuraView.UserControls
             using (Graphics axisGraphics = axisScale.CreateGraphics())
             {
                 displayScale = (float)Width / (float)(ViewRange[1] - ViewRange[0]);
-                
+
                 // scale to display range in X and Y
                 axisGraphics.ScaleTransform(displayScale, 1);
                 // translate by -1 * minimum display range + axis offset (scrolling)
                 axisGraphics.TranslateTransform(-1 * ViewRange[0] + Minimum,  // offset X
                                                  0);  // offset Y
-            
+
                 axisGraphics.DrawPath(pathPen, axisPath);
 
                 axisGraphics.ResetTransform();
@@ -140,82 +175,294 @@ namespace YamuraView.UserControls
                     labelSize = axisGraphics.MeasureString(labelVal.ToString(), labelFont);
                     axisGraphics.DrawString(labelVal.ToString(), labelFont,
                                             labelBrush,
-                                            ((labelVal - ViewRange[0]) * displayScale) - labelSize.Width/2,
+                                            ((labelVal - ViewRange[0]) * displayScale) - labelSize.Width / 2,
                                              15);
                 }
                 labelSize = axisGraphics.MeasureString(Title, labelFont);
-                axisGraphics.DrawString(Title, labelFont, labelBrush, Width/2, Height - (2.25F * labelSize.Height));
+                axisGraphics.DrawString(Title, labelFont, labelBrush, Width / 2, Height - (2.25F * labelSize.Height));
             }
         }
         private void axisScroll_Scroll(object sender, ScrollEventArgs e)
         {
             axisScale.Invalidate();
         }
-        //public virtual void OnChartMouseMove(object sender, AxisControlMouseMoveEventArgs e)
-        //{
-        //    #region move cursor(s)
-        //    // position in event args is data - need to scale to screen
-        //    float[] displayScale = new float[] { 1.0F, 1.0F };
-        //    PointF endPt = new PointF();
-        //    int axisIdx = 0;
-        //    string axisFullName = "";
-        //    int cursorIdx = -1;
-        //    axisFullName = axisIdx.ToString() + "-" + yAxis.Key;
-        //    displayScale[0] = (float)chartBounds.Width / ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
-        //    displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
-        //    if (EqualScale)
-        //    {
-        //        if (displayScale[0] < displayScale[1])
-        //        {
-        //            displayScale[1] = displayScale[0];
-        //        }
-        //        else
-        //        {
-        //            displayScale[0] = displayScale[1];
-        //        }
-        //    }
-        //    // x axis is time - direct lookup
-        //    if (axisFullName == (axisIdx.ToString() + "-Time"))
-        //    {
-        //        endPt.X = e.XAxisValues[xChannelName];// curChannel.DataPoints[].PointValue;
-        //        endPt.Y = curChannel.DataPoints[endPt.X].PointValue;
-        //    }
-        //    endPt = ScaleDataToDisplay(endPt,                                                      // point
-        //                               displayScale[0],                              // scale X
-        //                               displayScale[1],                              // scale Y
-        //                               -1 * ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0] +
-        //                                           ChartOwner.ChartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
-        //                               yAxis.Value.AxisDisplayRange[0] +
-        //                                           ChartOwner.ChartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1],  // offset Y
-        //                               chartBounds);                                 // graphics area boundary
+        public virtual void OnChartMouseMove(object sender, AxisControlMouseMoveEventArgs e)
+        {
+            // position in event args is data - need to scale to screen
+            float[] displayScale = new float[] { 1.0F, 1.0F };
+            PointF endPt = new PointF(e.XAxisValues["Time"], e.YAxisValues["none"] );
 
-        //    startMouseDrag = false;
-        //    #region erase if something was drawn
-        //    if (!startMouseMove)
-        //    {
-        //        chartLastCursorPos = new Point((int)endPt.X, (int)endPt.Y);
-        //    }
-        //    else
-        //    {
-        //        DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
-        //    }
-        //    #endregion
-        //    #region draw new cursor if in chart area
-        //    if (((endPt.X >= chartBorder) && (endPt.X <= (chartPanel.Width - chartBorder))) &&
-        //        ((endPt.Y >= chartBorder) && (endPt.Y <= (chartPanel.Height - chartBorder))))
-        //    {
-        //        startMouseMove = true;
-        //        chartLastCursorPos = new Point((int)endPt.X, (int)endPt.Y);
-        //        DrawCursorAt(chartLastCursorPos.X, chartLastCursorPos.Y);
-        //    }
-        //    // outside of chart, don't draw and not started
-        //    else
-        //    {
-        //        startMouseMove = false;
-        //    }
-        //    #endregion
-        //    #endregion
-        //}
+            displayScale[0] = (float)Width / (float)(ViewRange[1] - ViewRange[0]);
+            displayScale[1] = 1.0F;
+            // x axis is time - direct lookup
+            endPt = ScaleDataToDisplay(endPt,                                                      // point
+                                       displayScale[0],                              // scale X
+                                       displayScale[1],                              // scale Y
+                                       -1 * Minimum + ViewRange[0],  // offset X
+                                       0,  // offset Y
+                                       axisBounds);                                 // graphics area boundary
+
+            #region erase if something was drawn
+            if (!startMouseMove)
+            {
+                axisLastCursorPos = new Point((int)endPt.X, (int)endPt.Y);
+            }
+            else
+            {
+                DrawCursorAt(axisLastCursorPos.X, axisLastCursorPos.Y);
+            }
+            #endregion
+            #region draw new cursor if in chart area
+            if (((endPt.X >= axisBorder) && (endPt.X <= (axisScale.Width - axisBorder))))// &&
+                //((endPt.Y >= axisBorder) && (endPt.Y <= (axisScale.Height - axisBorder))))
+            {
+                startMouseMove = true;
+                axisLastCursorPos = new Point((int)endPt.X, (int)endPt.Y);
+                DrawCursorAt(axisLastCursorPos.X, axisLastCursorPos.Y);
+            }
+            // outside of chart, don't draw and not started
+            else
+            {
+                startMouseMove = false;
+            }
+            #endregion
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        internal void DrawCursorAt(int x, int y)
+        {
+            Rectangle locationBox = new Rectangle(0, 0, 0, 0);
+            IntPtr lpPoint = new IntPtr();
+            lpPoint = IntPtr.Zero;
+            using (Graphics drawGraphics = axisScale.CreateGraphics())
+            {
+                #region create GDI objects
+                IntPtr hDC = drawGraphics.GetHdc();
+                IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
+                                                dragZoomPenWidth,
+                                                GDI32.NotRGB(Color.Black));
+                IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.BLACK_BRUSH);
+                IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
+                IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
+                Gdi32.SetROP2(hDC, (int)YamuraControls.GDI.DrawMode.R2_XORPEN);
+                #endregion
+                #region crosshairs
+                if (cursorMode == CursorStyle.CROSSHAIRS)
+                {
+                    // horizontal line
+                    Gdi32.MoveToEx(hDC, 0, y, lpPoint);
+                    Gdi32.LineTo(hDC, axisScale.Width, y);
+                    // vertical line
+                    Gdi32.MoveToEx(hDC, x, axisScale.Height, lpPoint);
+                    Gdi32.LineTo(hDC, x, 0);
+                }
+                #endregion
+                #region box
+                else if (cursorMode == CursorStyle.BOX)
+                {
+                    locationBox = new Rectangle(x - (cursorBoxSize / 2), y - (cursorBoxSize / 2), cursorBoxSize, cursorBoxSize);
+                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + cursorBoxSize, locationBox.Top + cursorBoxSize);
+                }
+                #endregion
+                #region circle
+                else if (cursorMode == CursorStyle.CIRCLE)
+                {
+                    locationBox = new Rectangle(x - (cursorBoxSize / 2), y - (cursorBoxSize / 2), cursorBoxSize, cursorBoxSize);
+                    Gdi32.Ellipse(hDC, locationBox.Left, locationBox.Top, locationBox.Left + cursorBoxSize, locationBox.Top + cursorBoxSize);
+                }
+                #endregion
+                #region horizontal line
+                else if (cursorMode == CursorStyle.HORIZONTAL)
+                {
+                    // horizontal line
+                    Gdi32.MoveToEx(hDC, 0, y, lpPoint);
+                    Gdi32.LineTo(hDC, axisScale.Width, y);
+                }
+                #endregion
+                #region vertical line
+                else if (cursorMode == CursorStyle.VERTICAL)
+                {
+                    // vertical line
+                    Gdi32.MoveToEx(hDC, x, 0, lpPoint);
+                    Gdi32.LineTo(hDC, x, axisScale.Height);
+                }
+                #endregion
+                #region clean up GDI, reset context
+                Gdi32.SelectObject(hDC, oldPen);
+                Gdi32.SelectObject(hDC, oldBrush);
+                Gdi32.DeleteObject(newPen);
+                Gdi32.DeleteObject(newBrush);
+                drawGraphics.ReleaseHdc();
+                #endregion
+            }
+        }
+        #region scaling support
+        /// <summary>
+        /// convert sourcePt from data units to display units
+        /// </summary>
+        /// <param name="sourcePt"></param>
+        /// <param name="scaleX"></param>
+        /// <param name="scaleY"></param>
+        /// <param name="offsetX"></param>
+        /// <param name="offsetY"></param>
+        /// <param name="bounds"></param>
+        /// <returns></returns>
+        internal PointF ScaleDataToDisplay(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
+        {
+            PointF rPt = new PointF(sourcePt.X, sourcePt.Y);
+            rPt.X = (rPt.X + offsetX) * scaleX + bounds.X;
+            rPt.Y = bounds.Height - ((rPt.Y - offsetY) * scaleY) + bounds.Y;
+            return rPt;
+        }
+        /// <summary>
+        /// convert sourcePt from display units to data units
+        /// </summary>
+        /// <param name="sourcePt"></param>
+        /// <param name="scaleX"></param>
+        /// <param name="scaleY"></param>
+        /// <param name="offsetX"></param>
+        /// <param name="offsetY"></param>
+        /// <param name="bounds"></param>
+        /// <returns></returns>
+        internal PointF ScaleDisplayToData(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
+        {
+            PointF rPt = new PointF(sourcePt.X, sourcePt.Y);
+            rPt.X = (rPt.X / scaleX) - offsetX;
+            rPt.Y = -1.0F * ((rPt.Y - (float)bounds.Height) / scaleY) - offsetY;
+            return rPt;
+        }
+        #endregion
+
+        private void axisScale_MouseMove(object sender, MouseEventArgs e)
+        {
+            //if (CursorUpdateSource == false)
+            //{
+            //    return;
+            //}
+            axisScale.Focus();
+            #region left mouse button down - dragging zoom region 
+            //if ((e.Button == MouseButtons.Left) && AllowDrag)
+            //{
+            //    // starting mouse drag - erase old cursor if needed, save initial start and end locations
+            //    if (!startMouseDrag[0])
+            //    {
+            //        // was moving mouse with left button up, erase cursor
+            //        if (startMouseMove[0])
+            //        {
+            //            DrawCursorAt(chartLastCursorPos[0].X, chartLastCursorPos[0].Y);
+            //        }
+            //        // save location
+            //        chartStartCursorPos[0] = new Point(e.Location.X, 0);
+            //        chartLastCursorPos[0] = new Point(e.Location.X, axisScale.Height);
+            //    }
+            //    // continue mouse drag - erase last box
+            //    else
+            //    {
+            //        DrawSelectArea(chartStartCursorPos[0].X, chartStartCursorPos[0].Y, chartLastCursorPos[0].X, chartLastCursorPos[0].Y);
+            //    }
+            //    // continue mouse drag, save current end location and draw new box
+            //    chartLastCursorPos[0] = new Point(e.Location.X, chartLastCursorPos[0].Y);
+            //    DrawSelectArea(chartStartCursorPos[0].X, chartStartCursorPos[0].Y, chartLastCursorPos[0].X, chartLastCursorPos[0].Y);
+            //    // mouse drag has started, mouse move has stopped
+            //    startMouseDrag[0] = true;
+            //    startMouseMove[0] = false;
+            //}
+            #endregion
+            #region just moving the mouse with no buttons
+            //else
+            {
+                if (CursorMode != CursorStyle.NONE)
+                {
+                    //startMouseDrag[0] = false;
+                    #region erase if something was drawn
+                    if (!startMouseMove)
+                    {
+                        axisLastCursorPos = e.Location;
+                    }
+                    else
+                    {
+                        DrawCursorAt(axisLastCursorPos.X, axisLastCursorPos.Y);
+                    }
+                    #endregion
+                    #region draw new cursor if in chart area
+                    if (((e.Location.X >= axisBorder) && (e.Location.X <= (axisScale.Width - axisBorder))) &&
+                        ((e.Location.Y >= axisBorder) && (e.Location.Y <= (axisScale.Height - axisBorder))))
+                    {
+                        startMouseMove = true;
+                        axisLastCursorPos = e.Location;
+                        DrawCursorAt(axisLastCursorPos.X, axisLastCursorPos.Y);
+                    }
+                    // outside of chart, don't draw and not started
+                    else
+                    {
+                        startMouseMove = false;
+                    }
+                    #endregion
+                }
+            }
+            #endregion
+            //// up to now, dealing in screen units. convert current position to X axis value and active Y axis values and raise message
+            //if (ChartOwner.ChartAxes.Count == 0)
+            //{
+            //    return;
+            //}
+            //// create event args
+            //ChartControlMouseMoveEventArgs moveEventArgs = new ChartControlMouseMoveEventArgs();
+
+            //PointF axisPoint = new PointF();
+            //// x and y scale
+            //float[] displayScale = new float[] { 1.0F, 1.0F };
+            //displayScale[0] = (float)chartBounds.Width / ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
+
+            //foreach (KeyValuePair<string, ChannelInfo> channel in ChartOwner.ChartAxes[xChannelName].AssociatedChannels)
+            //{
+            //    displayScale[1] = 1.0F;
+
+            //    axisPoint.X = (float)e.Location.X;
+            //    axisPoint.Y = (float)e.Location.Y;
+
+            //    axisPoint = ScaleDisplayToData(axisPoint,
+            //                       displayScale[0],
+            //                       displayScale[1],
+            //                                       0.0F,
+            //                                       0.0F,
+            //                       chartBounds);
+            //    axisPoint.X -= (-1 * ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0] +
+
+            //                           ChartOwner.ChartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0]);  // offset X
+
+            //    moveEventArgs.XAxisValues.Add(channel.Value.RunIndex.ToString() + "-" + channel.Value.ChannelName, axisPoint.X);
+            //}
+            //foreach (KeyValuePair<string, Axis> axis in ChartOwner.ChartAxes)
+            //{
+            //    if (!axis.Value.ShowAxis)
+            //    {
+            //        continue;
+            //    }
+            //    foreach (KeyValuePair<string, ChannelInfo> channel in axis.Value.AssociatedChannels)
+            //    {
+            //        displayScale[1] = (float)chartBounds.Height / axis.Value.AxisDisplayRange[2];
+            //        axisPoint.X = (float)e.Location.X;
+            //        axisPoint.Y = (float)e.Location.Y;
+
+            //        axisPoint = ScaleDisplayToData(axisPoint,
+            //                           displayScale[0],
+            //                           displayScale[1],
+            //                                               0.0F,
+            //                                               0.0F,
+            //                           chartBounds);
+
+            //        axisPoint.Y -= (channel.Value.AxisRange[0] +
+            //                                               ChartOwner.ChartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1]);
+
+            //        moveEventArgs.YAxisValues.Add(channel.Value.RunIndex.ToString() + "-" + channel.Value.ChannelName, axisPoint.Y);
+            //    }
+            //}
+            //ChartMouseMoveEvent(this, moveEventArgs);
+        }
     }
     public class AxisControlMouseMoveEventArgs : EventArgs
     {

@@ -106,9 +106,10 @@ namespace YamuraView
             chartControls[2].chartPropertiesForm.ClearGraphicsPathEvent += chartControls[1].chartViewForm.OnClearGraphicsPath;
             chartControls[2].chartPropertiesForm.ClearGraphicsPathEvent += chartControls[2].chartViewForm.OnClearGraphicsPath;
             // stripchart mouse move event handlers
-            chartControls[0].chartViewForm.ChartMouseMoveEvent += OnChartMouseMove;// new ChartMouseMove(OnChartMouseMove);
+            chartControls[0].chartViewForm.ChartMouseMoveEvent += OnChartMouseMove;
             chartControls[0].chartViewForm.ChartMouseMoveEvent += chartControls[1].chartViewForm.OnChartMouseMove;
             chartControls[0].chartViewForm.ChartMouseMoveEvent += chartControls[2].chartViewForm.OnChartMouseMove;
+            chartControls[0].chartViewForm.AxisMouseMoveEvent += chartControls[0].chartViewForm.xAxis1.OnChartMouseMove;
             #endregion
 
             #region add charts to dock panel
@@ -904,19 +905,19 @@ namespace YamuraView
             #endregion
         }
         #endregion
-        #region GDI support
-        public static uint RGB(Color color)
-        {
-            uint rgb = (uint)(color.R + (color.G << 8) + (color.B << 16));
-            return rgb;
-        }
-        public static uint NotRGB(Color color)
-        {
-            uint rgb = (uint)(color.R + (color.G << 8) + (color.B << 16));
-            rgb = ~rgb & 0xFFFFFF;
-            return rgb;
-        }
-        #endregion
+        //#region GDI support
+        //public static uint RGB(Color color)
+        //{
+        //    uint rgb = (uint)(color.R + (color.G << 8) + (color.B << 16));
+        //    return rgb;
+        //}
+        //public static uint NotRGB(Color color)
+        //{
+        //    uint rgb = (uint)(color.R + (color.G << 8) + (color.B << 16));
+        //    rgb = ~rgb & 0xFFFFFF;
+        //    return rgb;
+        //}
+        //#endregion
         #region GPS to distance
         private float GPSDistance(float lat1Deg, float long1Deg, float lat2Deg, float long2Deg )
         {

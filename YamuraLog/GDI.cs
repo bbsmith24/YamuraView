@@ -66,6 +66,26 @@ namespace GDI
         DEFAULT_PALETTE = 15,
         SYSTEM_FIXED_FONT = 16,
     }
+    public enum DrawMode
+    {
+        R2_BLACK = 1,  // Pixel is always black.
+        R2_NOTMERGEPEN = 2,  // Pixel is the inverse of the R2_MERGEPEN color (final pixel = NOT(pen OR screen pixel)).
+        R2_MASKNOTPEN = 3,  // Pixel is a combination of the colors common to both the screen and the inverse of the pen (final pixel = (NOT pen) AND screen pixel).
+        R2_NOTCOPYPEN = 4,  // Pixel is the inverse of the pen color.
+        R2_MASKPENNOT = 5,  // Pixel is a combination of the colors common to both the pen and the inverse of the screen (final pixel = (NOT screen pixel) AND pen).
+        R2_NOT = 6,  // Pixel is the inverse of the screen color.
+        R2_XORPEN = 7,  // Pixel is a combination of the colors that are in the pen or in the screen, but not in both (final pixel = pen XOR screen pixel).
+        R2_NOTMASKPEN = 8,  // Pixel is the inverse of the R2_MASKPEN color (final pixel = NOT(pen AND screen pixel)).
+        R2_MASKPEN = 9,  // Pixel is a combination of the colors common to both the pen and the screen (final pixel = pen AND screen pixel).
+        R2_NOTXORPEN = 10,  // Pixel is the inverse of the R2_XORPEN color (final pixel = NOT(pen XOR screen pixel)).
+        R2_NOP = 11,  // Pixel remains unchanged.
+        R2_MERGENOTPEN = 12,  // Pixel is a combination of the screen color and the inverse of the pen color (final pixel = (NOT pen) OR screen pixel).
+        R2_COPYPEN = 13,  // Pixel is the pen color.
+        R2_MERGEPENNOT = 14,  // Pixel is a combination of the pen color and the inverse of the screen color (final pixel = (NOT screen pixel) OR pen).
+        R2_MERGEPEN = 15,  // Pixel is a combination of the pen color and the screen color (final pixel = pen OR screen pixel).
+        R2_WHITE = 16,  // Pixel is always white.
+        R2_LAST = 16
+    }
     #endregion enumerations
     /// <summary>
     /// 
@@ -378,6 +398,19 @@ namespace GDI
             DeleteObject(gdiBrush);
             g.ReleaseHdc(hdc);
             g.Dispose();
+        }
+        #endregion
+        #region GDI support
+        public static uint RGB(Color color)
+        {
+            uint rgb = (uint)(color.R + (color.G << 8) + (color.B << 16));
+            return rgb;
+        }
+        public static uint NotRGB(Color color)
+        {
+            uint rgb = (uint)(color.R + (color.G << 8) + (color.B << 16));
+            rgb = ~rgb & 0xFFFFFF;
+            return rgb;
         }
         #endregion
     }
