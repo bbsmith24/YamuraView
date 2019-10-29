@@ -151,8 +151,9 @@ namespace YamuraView.UserControls
             SizeF labelSize;
             using (Graphics axisGraphics = axisScale.CreateGraphics())
             {
-                displayScale = (float)Width / (float)(ViewRange[1] - ViewRange[0]);
+                displayScale = (float)axisBounds.Width / (float)(ViewRange[1] - ViewRange[0]);
 
+                axisGraphics.TranslateTransform(axisBorder, (float)axisBounds.Height + axisBorder);
                 // scale to display range in X and Y
                 axisGraphics.ScaleTransform(displayScale, 1);
                 // translate by -1 * minimum display range + axis offset (scrolling)
@@ -172,14 +173,26 @@ namespace YamuraView.UserControls
                     {
                         break;
                     }
+                    PointF endPt = new PointF(labelVal, 0);
+
+                    // x axis is time - direct lookup
+                    endPt = ScaleDataToDisplay(endPt,                                        // point
+                                               displayScale,                              // scale X
+                                               1,                              // scale Y
+                                               -1 * Minimum + ViewRange[0],                  // offset X
+                                               0,                                            // offset Y
+                                               axisBounds);                                  // graphics area boundary
+
+
+
                     labelSize = axisGraphics.MeasureString(labelVal.ToString(), labelFont);
                     axisGraphics.DrawString(labelVal.ToString(), labelFont,
                                             labelBrush,
-                                            ((labelVal - ViewRange[0]) * displayScale) - labelSize.Width / 2,
-                                             15);
+                                            endPt.X,
+                                            15);
                 }
                 labelSize = axisGraphics.MeasureString(Title, labelFont);
-                axisGraphics.DrawString(Title, labelFont, labelBrush, Width / 2, Height - (2.25F * labelSize.Height));
+                axisGraphics.DrawString(Title, labelFont, labelBrush, axisBounds.Width / 2, axisBounds.Height - (2.25F * labelSize.Height));
             }
         }
         private void axisScroll_Scroll(object sender, ScrollEventArgs e)
@@ -192,15 +205,15 @@ namespace YamuraView.UserControls
             float[] displayScale = new float[] { 1.0F, 1.0F };
             PointF endPt = new PointF(e.XAxisValues["Time"], e.YAxisValues["none"] );
 
-            displayScale[0] = (float)Width / (float)(ViewRange[1] - ViewRange[0]);
+            displayScale[0] = (float)axisBounds.Width / (float)(ViewRange[1] - ViewRange[0]);
             displayScale[1] = 1.0F;
             // x axis is time - direct lookup
-            endPt = ScaleDataToDisplay(endPt,                                                      // point
+            endPt = ScaleDataToDisplay(endPt,                                        // point
                                        displayScale[0],                              // scale X
                                        displayScale[1],                              // scale Y
-                                       -1 * Minimum + ViewRange[0],  // offset X
-                                       0,  // offset Y
-                                       axisBounds);                                 // graphics area boundary
+                                       -1 * Minimum + ViewRange[0],                  // offset X
+                                       0,                                            // offset Y
+                                       axisBounds);                                  // graphics area boundary
 
             #region erase if something was drawn
             if (!startMouseMove)
@@ -462,6 +475,17 @@ namespace YamuraView.UserControls
             //    }
             //}
             //ChartMouseMoveEvent(this, moveEventArgs);
+        }
+
+        private void axisScale_Resize(object sender, EventArgs e)
+        {
+            // update the paintable area
+            axisBounds.X = axisBorder;
+            axisBounds.Y = axisBorder;
+            axisBounds.Width = axisScale.Width - (2 * axisBorder);
+            axisBounds.Height = axisScale.Height - (2 * axisBorder);
+            // redraw
+            axisScale.Invalidate();
         }
     }
     public class AxisControlMouseMoveEventArgs : EventArgs
