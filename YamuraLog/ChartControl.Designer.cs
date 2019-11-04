@@ -41,17 +41,18 @@
             this.chartControlContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.zoomAllMenuItem});
             this.chartControlContextMenu.Name = "chartControlContextMenu";
-            this.chartControlContextMenu.Size = new System.Drawing.Size(153, 48);
+            this.chartControlContextMenu.Size = new System.Drawing.Size(124, 26);
             // 
             // zoomAllMenuItem
             // 
             this.zoomAllMenuItem.Name = "zoomAllMenuItem";
-            this.zoomAllMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.zoomAllMenuItem.Size = new System.Drawing.Size(123, 22);
             this.zoomAllMenuItem.Text = "Zoom All";
             this.zoomAllMenuItem.Click += new System.EventHandler(this.zoomAllMenuItem_Click);
             // 
             // dockPanel1
             // 
+            this.dockPanel1.BackColor = System.Drawing.Color.Black;
             this.dockPanel1.ContextMenuStrip = this.chartControlContextMenu;
             this.dockPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dockPanel1.DocumentStyle = WeifenLuo.WinFormsUI.Docking.DocumentStyle.DockingWindow;

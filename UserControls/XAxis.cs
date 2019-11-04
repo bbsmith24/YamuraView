@@ -89,6 +89,8 @@ namespace YamuraView.UserControls
         float majorTicks = 1;
         float minorTicks = 0;
 
+        GraphicsPath axisPath = new GraphicsPath();
+
         // crosshairs, box, circle work
         // horizontal and vertical look weird
         CursorStyle cursorMode = CursorStyle.VERTICAL;
@@ -116,49 +118,56 @@ namespace YamuraView.UserControls
         }
         private void axisScale_Paint(object sender, PaintEventArgs e)
         {
-            GraphicsPath axisPath = new GraphicsPath();
-            axisPath.AddLine(Minimum, 5, Maximum, 5);
-            // major ticks
-            float xVal = Minimum;
-            while (true)
+            startMouseMove = false;
+            if (axisPath.PathData.Points.Count() == 0)
             {
-                GraphicsPath seg = new GraphicsPath();
-                seg.AddLine(xVal, 5.0F, xVal, 15.0F);
-                axisPath.AddPath(seg, false);
-                xVal += (float)Math.Pow(10, (double)majorTicks);
-                if (xVal > Maximum)
+                axisPath.AddLine(Minimum, 5, Maximum, 5);
+                // major ticks
+                float xVal = Minimum;
+                while (true)
                 {
-                    break;
+                    GraphicsPath seg = new GraphicsPath();
+                    seg.AddLine(xVal, 5.0F, xVal, 15.0F);
+                    axisPath.AddPath(seg, false);
+                    xVal += (float)Math.Pow(10, (double)majorTicks);
+                    if (xVal > Maximum)
+                    {
+                        break;
+                    }
                 }
-            }
-            // minor ticks
-            xVal = Minimum;
-            while (true)
-            {
-                GraphicsPath seg = new GraphicsPath();
-                seg.AddLine(xVal, 5.0F, xVal, 10.0F);
-                axisPath.AddPath(seg, false);
-                xVal += (float)Math.Pow(10, (double)minorTicks);
-                if (xVal > Maximum)
+                // minor ticks
+                xVal = Minimum;
+                while (true)
                 {
-                    break;
+                    GraphicsPath seg = new GraphicsPath();
+                    seg.AddLine(xVal, 5.0F, xVal, 10.0F);
+                    axisPath.AddPath(seg, false);
+                    xVal += (float)Math.Pow(10, (double)minorTicks);
+                    if (xVal > Maximum)
+                    {
+                        break;
+                    }
                 }
             }
             float displayScale = 1;
-            Pen pathPen = new Pen(Color.Black, 0);
-            SolidBrush labelBrush = new SolidBrush(Color.Black);
+            Pen pathPen = new Pen(Color.White, 0);
+            SolidBrush labelBrush = new SolidBrush(Color.White);
             Font labelFont = new Font(FontFamily.GenericMonospace, 8);
             SizeF labelSize;
             using (Graphics axisGraphics = axisScale.CreateGraphics())
             {
                 displayScale = (float)axisBounds.Width / (float)(ViewRange[1] - ViewRange[0]);
 
-                axisGraphics.TranslateTransform(axisBorder, (float)axisBounds.Height + axisBorder);
+                Rectangle clipRect = axisBounds;
+                clipRect.Inflate(2, axisBorder*2);
+                axisGraphics.SetClip(clipRect);
+
+                axisGraphics.TranslateTransform(axisBorder, 0);//, (float)axisBounds.Height + axisBorder);
                 // scale to display range in X and Y
                 axisGraphics.ScaleTransform(displayScale, 1);
                 // translate by -1 * minimum display range + axis offset (scrolling)
                 axisGraphics.TranslateTransform(-1 * ViewRange[0] + Minimum,  // offset X
-                                                 0);  // offset Y
+                                                 0);                          // offset Y
 
                 axisGraphics.DrawPath(pathPen, axisPath);
 
@@ -174,21 +183,18 @@ namespace YamuraView.UserControls
                         break;
                     }
                     PointF endPt = new PointF(labelVal, 0);
-
                     // x axis is time - direct lookup
                     endPt = ScaleDataToDisplay(endPt,                                        // point
-                                               displayScale,                              // scale X
-                                               1,                              // scale Y
-                                               -1 * Minimum + ViewRange[0],                  // offset X
+                                               displayScale,                                 // scale X
+                                               1,                                            // scale Y
+                                               ViewRange[0],                  // offset X
                                                0,                                            // offset Y
                                                axisBounds);                                  // graphics area boundary
-
-
 
                     labelSize = axisGraphics.MeasureString(labelVal.ToString(), labelFont);
                     axisGraphics.DrawString(labelVal.ToString(), labelFont,
                                             labelBrush,
-                                            endPt.X,
+                                            endPt.X - labelSize.Width/2,
                                             15);
                 }
                 labelSize = axisGraphics.MeasureString(Title, labelFont);
@@ -203,10 +209,22 @@ namespace YamuraView.UserControls
         {
             // position in event args is data - need to scale to screen
             float[] displayScale = new float[] { 1.0F, 1.0F };
-            PointF endPt = new PointF(e.XAxisValues["Time"], e.YAxisValues["none"] );
+
+
+
+            PointF endPt = new PointF();// = new PointF(, e.YAxisValues["none"]);
+            foreach (KeyValuePair<string, float> kvp in e.XAxisValues)
+            {
+                endPt = new PointF(kvp.Value, e.YAxisValues["none"]);
+                break;
+            }
+            System.Diagnostics.Debug.Write("Actual " + endPt.ToString());
 
             displayScale[0] = (float)axisBounds.Width / (float)(ViewRange[1] - ViewRange[0]);
             displayScale[1] = 1.0F;
+
+            System.Diagnostics.Debug.Write(" Scale " + displayScale[0].ToString() + " min " + Minimum.ToString() + " view range " + ViewRange[0].ToString() + " " + ViewRange[1].ToString());
+
             // x axis is time - direct lookup
             endPt = ScaleDataToDisplay(endPt,                                        // point
                                        displayScale[0],                              // scale X
@@ -215,6 +233,7 @@ namespace YamuraView.UserControls
                                        0,                                            // offset Y
                                        axisBounds);                                  // graphics area boundary
 
+            System.Diagnostics.Debug.WriteLine(" Scaled " + endPt.ToString());
             #region erase if something was drawn
             if (!startMouseMove)
             {
@@ -326,7 +345,7 @@ namespace YamuraView.UserControls
         internal PointF ScaleDataToDisplay(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
         {
             PointF rPt = new PointF(sourcePt.X, sourcePt.Y);
-            rPt.X = (rPt.X + offsetX) * scaleX + bounds.X;
+            rPt.X = (rPt.X - offsetX) * scaleX + bounds.X;
             rPt.Y = bounds.Height - ((rPt.Y - offsetY) * scaleY) + bounds.Y;
             return rPt;
         }
@@ -351,11 +370,9 @@ namespace YamuraView.UserControls
 
         private void axisScale_MouseMove(object sender, MouseEventArgs e)
         {
-            //if (CursorUpdateSource == false)
-            //{
-            //    return;
-            //}
             axisScale.Focus();
+            System.Diagnostics.Debug.WriteLine(e.X.ToString());
+
             #region left mouse button down - dragging zoom region 
             //if ((e.Button == MouseButtons.Left) && AllowDrag)
             //{
@@ -389,7 +406,6 @@ namespace YamuraView.UserControls
             {
                 if (CursorMode != CursorStyle.NONE)
                 {
-                    //startMouseDrag[0] = false;
                     #region erase if something was drawn
                     if (!startMouseMove)
                     {

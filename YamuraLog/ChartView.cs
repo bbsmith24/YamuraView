@@ -255,7 +255,7 @@ namespace YamuraView
                         continue;
                     }
                     #endregion
-                    #region build unscaled path
+                    #region build unscaled path if needed (initial display, values changed after load (invert, filter etc)
                     if ((curChanInfo.Value.ChannelPath == null) || (curChanInfo.Value.ChannelPath.PointCount == 0))
                     {
                         DataChannel curChannel = Logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
@@ -294,7 +294,8 @@ namespace YamuraView
                     {
                         displayScale[0] = (float)chartBounds.Width / ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
                         displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
-                        if(EqualScale)
+                        #region X and Y scales equal, take smallest
+                        if (EqualScale)
                         {
                             if(displayScale[0] < displayScale[1])
                             {
@@ -305,9 +306,12 @@ namespace YamuraView
                                 displayScale[0] = displayScale[1];
                             }
                         }
+                        #endregion
                         displayScale[1] *= -1.0F;
-
                         // translate to lower left corner of display area
+                        Rectangle clipRect = chartBounds;
+                        clipRect.Inflate(2, 2);
+                        chartGraphics.SetClip(clipRect);
                         chartGraphics.TranslateTransform(chartBorder,  (float)chartBounds.Height + chartBorder);
                         // scale to display range in X and Y
                         chartGraphics.ScaleTransform(displayScale[0], displayScale[1]);
@@ -316,7 +320,7 @@ namespace YamuraView
                                                          ChartOwner.ChartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
                                                          -1* yAxis.Value.AxisDisplayRange[0] +
                                                          ChartOwner.ChartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1]);  // offset Y
-                        // set pen width to 0 (1 pixel)
+                        // set pen width to 0 (1 pixel regardless of scaling)
                         pathPen.Width = 0;
                         // draw the path
                         chartGraphics.DrawPath(pathPen, curChanInfo.Value.ChannelPath);
@@ -552,11 +556,12 @@ namespace YamuraView
                 axisPoint = ScaleDisplayToData(axisPoint,
                                    displayScale[0],
                                    displayScale[1],
-                                   0.0F,
+                                   ChartOwner.ChartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0] +
+                                   ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0],
                                    0.0F,
                                    chartBounds);
-                axisPoint.X -= (-1 * ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0] +
-                                       ChartOwner.ChartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0]);  // offset X
+                //axisPoint.X -= (-1 * ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0] +
+                //                       ChartOwner.ChartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0]);  // offset X
 
                 moveEventArgs.XAxisValues.Add(channel.Value.RunIndex.ToString() + "-" + channel.Value.ChannelName, axisPoint.X);
             }
@@ -575,8 +580,7 @@ namespace YamuraView
                     axisPoint = ScaleDisplayToData(axisPoint,
                                        displayScale[0],
                                        displayScale[1],
-                                       0.0F,
-                                       0.0F,
+                                       ChartOwner.ChartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0] + ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0], 0.0F,
                                        chartBounds);
 
                     axisPoint.Y -= (channel.Value.AxisRange[0] +
@@ -808,7 +812,8 @@ namespace YamuraView
         internal PointF ScaleDisplayToData(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
         {
             PointF rPt = new PointF(sourcePt.X, sourcePt.Y);
-            rPt.X = (rPt.X / scaleX) - offsetX;
+            //rPt.X = (rPt.X / scaleX) - offsetX;
+            rPt.X = ((rPt.X - (float)bounds.X) / scaleX) + offsetX;
             rPt.Y = -1.0F * ((rPt.Y - (float)bounds.Height) / scaleY) - offsetY;
             return rPt;
         }

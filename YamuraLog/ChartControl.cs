@@ -98,9 +98,6 @@ namespace YamuraView
                 chartPropertiesForm.Text = value + " setup";
             }
         }
-
-        Rectangle chartBounds = new Rectangle(0, 0, 0, 0);
-
         // panel forms
         public ChartView chartViewForm = new ChartView();
         public ChartProperties chartPropertiesForm = new ChartProperties();

@@ -496,12 +496,12 @@ namespace YamuraView
             }
             Cursor = Cursors.Default;
 
-            if (errStr.Length > 0)
-            {
-                FileInfo errInfo = new FileInfo();
-                errInfo.FileInfoText = errStr.ToString();
-                errInfo.ShowDialog();
-            }
+            //if (errStr.Length > 0)
+            //{
+            //    FileInfo errInfo = new FileInfo();
+            //    errInfo.FileInfoText = errStr.ToString();
+            //    errInfo.ShowDialog();
+            //}
             UpdateData();
         }
         /// <summary>

@@ -45,7 +45,7 @@
             // 
             this.axisScale.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.axisScale.BackColor = System.Drawing.Color.White;
+            this.axisScale.BackColor = System.Drawing.Color.Black;
             this.axisScale.Location = new System.Drawing.Point(0, 0);
             this.axisScale.Name = "axisScale";
             this.axisScale.Size = new System.Drawing.Size(39, 150);

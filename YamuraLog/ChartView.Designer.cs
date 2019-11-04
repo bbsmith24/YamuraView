@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             this.chartPanel = new System.Windows.Forms.Panel();
-            this.xAxis1 = new YamuraView.UserControls.XAxis();
             this.yAxis1 = new YamuraView.UserControls.YAxis();
+            this.xAxis1 = new YamuraView.UserControls.XAxis();
             this.SuspendLayout();
             // 
             // chartPanel
             // 
-            this.chartPanel.BackColor = System.Drawing.Color.White;
+            this.chartPanel.BackColor = System.Drawing.Color.Black;
             this.chartPanel.Location = new System.Drawing.Point(82, 12);
             this.chartPanel.Name = "chartPanel";
             this.chartPanel.Size = new System.Drawing.Size(200, 100);
@@ -45,9 +45,22 @@
             this.chartPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.chartPanel_MouseUp);
             this.chartPanel.Resize += new System.EventHandler(this.chartPanel_Resize);
             // 
+            // yAxis1
+            // 
+            this.yAxis1.LargeChange = 10;
+            this.yAxis1.Location = new System.Drawing.Point(29, 9);
+            this.yAxis1.Maximum = 100;
+            this.yAxis1.Minimum = 0;
+            this.yAxis1.Name = "yAxis1";
+            this.yAxis1.Size = new System.Drawing.Size(56, 150);
+            this.yAxis1.TabIndex = 4;
+            this.yAxis1.Value = 0;
+            // 
             // xAxis1
             // 
             this.xAxis1.BackColor = System.Drawing.Color.Red;
+            this.xAxis1.CursorBoxSize = 10;
+            this.xAxis1.CursorMode = YamuraView.UserControls.XAxis.CursorStyle.VERTICAL;
             this.xAxis1.LargeChange = 10;
             this.xAxis1.Location = new System.Drawing.Point(66, 174);
             this.xAxis1.Maximum = 100;
@@ -55,19 +68,14 @@
             this.xAxis1.Name = "xAxis1";
             this.xAxis1.Size = new System.Drawing.Size(206, 56);
             this.xAxis1.TabIndex = 3;
+            this.xAxis1.Title = "X axis";
             this.xAxis1.Value = 0;
-            // 
-            // yAxis1
-            // 
-            this.yAxis1.Location = new System.Drawing.Point(29, 9);
-            this.yAxis1.Name = "yAxis1";
-            this.yAxis1.Size = new System.Drawing.Size(56, 150);
-            this.yAxis1.TabIndex = 4;
             // 
             // ChartView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(284, 261);
             this.Controls.Add(this.yAxis1);
             this.Controls.Add(this.xAxis1);
