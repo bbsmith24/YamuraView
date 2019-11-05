@@ -18,27 +18,6 @@ namespace YamuraView
     {
         public event ChartMouseMove ChartMouseMoveEvent;
         public event AxisMouseMove AxisMouseMoveEvent;
-
-        //public enum DrawMode
-        //{
-        //    R2_BLACK = 1,  // Pixel is always black.
-        //    R2_NOTMERGEPEN = 2,  // Pixel is the inverse of the R2_MERGEPEN color (final pixel = NOT(pen OR screen pixel)).
-        //    R2_MASKNOTPEN = 3,  // Pixel is a combination of the colors common to both the screen and the inverse of the pen (final pixel = (NOT pen) AND screen pixel).
-        //    R2_NOTCOPYPEN = 4,  // Pixel is the inverse of the pen color.
-        //    R2_MASKPENNOT = 5,  // Pixel is a combination of the colors common to both the pen and the inverse of the screen (final pixel = (NOT screen pixel) AND pen).
-        //    R2_NOT = 6,  // Pixel is the inverse of the screen color.
-        //    R2_XORPEN = 7,  // Pixel is a combination of the colors that are in the pen or in the screen, but not in both (final pixel = pen XOR screen pixel).
-        //    R2_NOTMASKPEN = 8,  // Pixel is the inverse of the R2_MASKPEN color (final pixel = NOT(pen AND screen pixel)).
-        //    R2_MASKPEN = 9,  // Pixel is a combination of the colors common to both the pen and the screen (final pixel = pen AND screen pixel).
-        //    R2_NOTXORPEN = 10,  // Pixel is the inverse of the R2_XORPEN color (final pixel = NOT(pen XOR screen pixel)).
-        //    R2_NOP = 11,  // Pixel remains unchanged.
-        //    R2_MERGENOTPEN = 12,  // Pixel is a combination of the screen color and the inverse of the pen color (final pixel = (NOT pen) OR screen pixel).
-        //    R2_COPYPEN = 13,  // Pixel is the pen color.
-        //    R2_MERGEPENNOT = 14,  // Pixel is a combination of the pen color and the inverse of the screen color (final pixel = (NOT screen pixel) OR pen).
-        //    R2_MERGEPEN = 15,  // Pixel is a combination of the pen color and the screen color (final pixel = pen OR screen pixel).
-        //    R2_WHITE = 16,  // Pixel is always white.
-        //    R2_LAST = 16
-        //}
         public enum CursorStyle
         {
             NONE,
@@ -173,6 +152,8 @@ namespace YamuraView
             get { return equalScale; }
             set { equalScale = value; }
         }
+
+        List<YamuraView.UserControls.YAxis> yAxes = new List<UserControls.YAxis>();
         public ChartView()
         {
             InitializeComponent();
@@ -184,6 +165,9 @@ namespace YamuraView
             startMouseMove.Add(false);
             startMouseDrag.Add(false);
             xAxis1.axisScroll.Scroll += HScrollBar_Scroll;
+            yAxes.Add(new UserControls.YAxis());
+            yAxes.Add(new UserControls.YAxis());
+            yAxes.Add(new UserControls.YAxis());
         }
         #region control message handlers
         /// <summary>
@@ -371,41 +355,8 @@ namespace YamuraView
                         continue;
                     }
                     #endregion
-                    //        #region build unscaled path
-                    //        if ((curChanInfo.Value.ChannelPath == null) || (curChanInfo.Value.ChannelPath.PointCount == 0))
-                    //        {
-                    //            DataChannel curChannel = Logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
-                    //            initialValue = true;
-                    //            foreach (KeyValuePair<float, DataPoint> curData in curChannel.DataPoints)
-                    //            {
-                    //                // x axis is time - direct lookup
-                    //                if (XChannelName == "Time")
-                    //                {
-                    //                    points[1] = new PointF (curData.Key, curData.Value.PointValue);
-                    //                }
-                    //                // x axis is not time - find nearest time in axis channel, 
-                    //                else
-                    //                {
-                    //                    DataPoint tst = Logger.runData[curChanInfo.Value.RunIndex].channels[XChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
-                    //                    if (tst == null)
-                    //                    {
-                    //                        continue;
-                    //                    }
-                    //                    points[1] = new PointF(tst.PointValue, curData.Value.PointValue);
-                    //                }
-                    //                if (initialValue)
-                    //                {
-                    //                    initialValue = false;
-                    //                    points[0] = new PointF(points[1].X, points[1].Y);
-                    //                    continue;
-                    //                }
-                    //                curChanInfo.Value.ChannelPath.AddLine(points[0], points[1]);
-                    //                points[0] = new PointF(points[1].X, points[1].Y);
-                    //            }
-                    //        }
-                    //        #endregion
                     #region draw to transformed graphic context
-                    pathPen = new Pen(Color.Black);
+                    pathPen = new Pen(Color.White);
                     using (Graphics chartGraphics = chartPanel.CreateGraphics())
                     {
                         displayScale[0] = (float)chartBounds.Width / ChartOwner.ChartAxes[XChannelName].AxisDisplayRange[2];
@@ -830,26 +781,23 @@ namespace YamuraView
             xAxis1.Width = Width - axisThickness;
             xAxis1.Location = new Point(axisThickness, Height - axisThickness);
 
-            yAxis1.Height = Height - axisThickness;
-            yAxis1.Width = axisThickness;
-            yAxis1.Location = new Point(0, 0);
-
-            chartRect.X = axisThickness;
+            int yAxisHeight = (Height - axisThickness) / yAxes.Count();
+            for (int yAxisIdx = 0; yAxisIdx < yAxes.Count(); yAxisIdx++)
+            {
+                yAxes[yAxisIdx].Height = yAxisHeight;
+                yAxes[yAxisIdx].Width = axisThickness;
+                yAxes[yAxisIdx].Location = new Point(0, yAxisIdx * yAxisHeight);
+                yAxes[yAxisIdx].Visible = showVScroll;
+                yAxes[yAxisIdx].BringToFront();
+                yAxes[yAxisIdx].BackColor = Color.White;
+                this.Controls.Add(yAxes[yAxisIdx]);
+            }
+            chartRect.X = (ShowVScroll ? axisThickness : 0);
             chartRect.Y = 0;
-            chartRect.Width = Width - axisThickness;
-            chartRect.Height = Height - axisThickness;
+            chartRect.Width = Width - (ShowVScroll ? axisThickness : 0);
+            chartRect.Height = Height - (ShowHScroll ? axisThickness : 0);
 
-            if (!showHScroll)
-            {
-                xAxis1.Visible = false;
-                chartRect.Height = Height;
-            }
-            if (!showVScroll)
-            {
-                yAxis1.Visible = false;
-                chartRect.X = 0;
-                chartRect.Width = Width;
-            }
+            xAxis1.Visible = showHScroll;
 
             chartPanel.Location = chartRect.Location;
             chartPanel.Width = chartRect.Width;

@@ -119,7 +119,6 @@ namespace YamuraControls.GDI
         private static extern bool BitBlt(IntPtr targetHDC, int targetX, int targetY, int targetWidth, int targetHeight,
                                             IntPtr sourceHDC, int sourceX, int sourceY, int drawOp);
         #endregion
-
         #region Variables
         protected Color borderColor;
         protected Color fillColor;
@@ -129,7 +128,6 @@ namespace YamuraControls.GDI
         protected StockObjects stockObject;
         protected PenStyles penStyle;
         #endregion
-
         #region Methods
         /// <summary>
         /// Constructor for GDI32 Graphics Library
@@ -373,18 +371,6 @@ namespace YamuraControls.GDI
             gSource.ReleaseHdc(sourceHDC);
             return rVal;
         }
-        //public bool Bit_Blt(Graphics gTarget, int targetX, int targetY, int targetWidth, int targetHeight,
-        //                    Bitmap bmpSource, int sourceX, int sourceY, int drawOp)
-        //{
-
-
-        //    IntPtr targetHDC = gTarget.GetHdc();
-        //    IntPtr sourceHDC = bmpSource.GetHdc();
-        //    bool rVal = BitBlt(targetHDC, targetX, targetY, targetWidth, targetHeight, sourceHDC, sourceX, sourceY, drawOp);
-        //    gTarget.ReleaseHdc(targetHDC);
-        //    gSource.ReleaseHdc(sourceHDC);
-        //    return rVal;
-        //}
         /// <summary>
         /// Reloads the old pen and brush.
         /// Deletes the pen that was created by InitPenAndBrush(g).

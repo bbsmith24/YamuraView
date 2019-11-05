@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.chartPanel = new System.Windows.Forms.Panel();
-            this.yAxis1 = new YamuraView.UserControls.YAxis();
+            //this.yAxis1 = new YamuraView.UserControls.YAxis();
             this.xAxis1 = new YamuraView.UserControls.XAxis();
             this.SuspendLayout();
             // 
@@ -44,17 +44,17 @@
             this.chartPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chartPanel_MouseMove);
             this.chartPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.chartPanel_MouseUp);
             this.chartPanel.Resize += new System.EventHandler(this.chartPanel_Resize);
-            // 
-            // yAxis1
-            // 
-            this.yAxis1.LargeChange = 10;
-            this.yAxis1.Location = new System.Drawing.Point(29, 9);
-            this.yAxis1.Maximum = 100;
-            this.yAxis1.Minimum = 0;
-            this.yAxis1.Name = "yAxis1";
-            this.yAxis1.Size = new System.Drawing.Size(56, 150);
-            this.yAxis1.TabIndex = 4;
-            this.yAxis1.Value = 0;
+            //// 
+            //// yAxis1
+            //// 
+            //this.yAxis1.LargeChange = 10;
+            //this.yAxis1.Location = new System.Drawing.Point(29, 9);
+            //this.yAxis1.Maximum = 100;
+            //this.yAxis1.Minimum = 0;
+            //this.yAxis1.Name = "yAxis1";
+            //this.yAxis1.Size = new System.Drawing.Size(56, 150);
+            //this.yAxis1.TabIndex = 4;
+            //this.yAxis1.Value = 0;
             // 
             // xAxis1
             // 
@@ -77,7 +77,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(284, 261);
-            this.Controls.Add(this.yAxis1);
+            //this.Controls.Add(this.yAxis1);
             this.Controls.Add(this.xAxis1);
             this.Controls.Add(this.chartPanel);
             this.Name = "ChartView";
@@ -90,6 +90,6 @@
         #endregion
         public System.Windows.Forms.Panel chartPanel;
         public UserControls.XAxis xAxis1;
-        public UserControls.YAxis yAxis1;
+        //public UserControls.YAxis yAxis1;
     }
 }
