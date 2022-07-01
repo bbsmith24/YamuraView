@@ -7,8 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-//using GDI;
-//using Win32Interop.Methods;
+using GDI;
+using Win32Interop.Methods;
 using WeifenLuo.WinFormsUI.Docking;
 using System.Drawing.Drawing2D;
 
@@ -17,27 +17,7 @@ namespace YamuraView
     public partial class ChartView : WeifenLuo.WinFormsUI.Docking.DockContent
     {
         public event ChartMouseMove ChartMouseMoveEvent;
-
-        public enum DrawMode
-        {
-            R2_BLACK = 1,  // Pixel is always black.
-            R2_NOTMERGEPEN = 2,  // Pixel is the inverse of the R2_MERGEPEN color (final pixel = NOT(pen OR screen pixel)).
-            R2_MASKNOTPEN = 3,  // Pixel is a combination of the colors common to both the screen and the inverse of the pen (final pixel = (NOT pen) AND screen pixel).
-            R2_NOTCOPYPEN = 4,  // Pixel is the inverse of the pen color.
-            R2_MASKPENNOT = 5,  // Pixel is a combination of the colors common to both the pen and the inverse of the screen (final pixel = (NOT screen pixel) AND pen).
-            R2_NOT = 6,  // Pixel is the inverse of the screen color.
-            R2_XORPEN = 7,  // Pixel is a combination of the colors that are in the pen or in the screen, but not in both (final pixel = pen XOR screen pixel).
-            R2_NOTMASKPEN = 8,  // Pixel is the inverse of the R2_MASKPEN color (final pixel = NOT(pen AND screen pixel)).
-            R2_MASKPEN = 9,  // Pixel is a combination of the colors common to both the pen and the screen (final pixel = pen AND screen pixel).
-            R2_NOTXORPEN = 10,  // Pixel is the inverse of the R2_XORPEN color (final pixel = NOT(pen XOR screen pixel)).
-            R2_NOP = 11,  // Pixel remains unchanged.
-            R2_MERGENOTPEN = 12,  // Pixel is a combination of the screen color and the inverse of the pen color (final pixel = (NOT pen) OR screen pixel).
-            R2_COPYPEN = 13,  // Pixel is the pen color.
-            R2_MERGEPENNOT = 14,  // Pixel is a combination of the pen color and the inverse of the screen color (final pixel = (NOT screen pixel) OR pen).
-            R2_MERGEPEN = 15,  // Pixel is a combination of the pen color and the screen color (final pixel = pen OR screen pixel).
-            R2_WHITE = 16,  // Pixel is always white.
-            R2_LAST = 16
-        }
+        public event AxisMouseMove AxisMouseMoveEvent;
         public enum CursorStyle
         {
             NONE,
@@ -47,7 +27,6 @@ namespace YamuraView
             BOX,
             CIRCLE
         }
-
         public DataLogger Logger
         {
             get
@@ -55,21 +34,12 @@ namespace YamuraView
                 return YamuraView.YamuraViewMain.dataLogger;
             }
         }
-
         ChartControl chartOwner;
         public ChartControl ChartOwner
         {
             get { return chartOwner; }
             set { chartOwner = value; }
         }
-
-        //Dictionary<string, Axis> chartAxes;// = new Dictionary<string, Axis>();
-        //public Dictionary<string, Axis> ChartAxes
-        //{
-        //    get { return chartAxes; }
-        //    set { chartAxes = value; }
-        //}
-
         string chartName = "Chart";
         public string ChartName
         {
@@ -80,7 +50,6 @@ namespace YamuraView
                 Text = chartName;
             }
         }
-
         protected int dragZoomPenWidth = 1;
         protected int chartBorder = 10;
         protected Rectangle chartBounds = new Rectangle(0, 0, 0, 0);
@@ -88,6 +57,7 @@ namespace YamuraView
         protected List<bool> startMouseMove = new List<bool>();
         protected List<Point> chartLastCursorPos = new List<Point>();
         protected List<Point> chartStartCursorPos = new List<Point>();
+        protected int axisThickness = 56;
 
         string xChannelName;
         public string XChannelName
@@ -182,6 +152,8 @@ namespace YamuraView
             get { return equalScale; }
             set { equalScale = value; }
         }
+
+        List<YamuraView.UserControls.YAxis> yAxes = new List<UserControls.YAxis>();
         public ChartView()
         {
             InitializeComponent();
@@ -192,7 +164,10 @@ namespace YamuraView
             chartStartCursorPos.Add(new Point(0, 0));
             startMouseMove.Add(false);
             startMouseDrag.Add(false);
-            hScrollBar.Scroll += HScrollBar_Scroll;
+            xAxis1.axisScroll.Scroll += HScrollBar_Scroll;
+            yAxes.Add(new UserControls.YAxis());
+            yAxes.Add(new UserControls.YAxis());
+            yAxes.Add(new UserControls.YAxis());
         }
         #region control message handlers
         /// <summary>
@@ -264,7 +239,7 @@ namespace YamuraView
                         continue;
                     }
                     #endregion
-                    #region build unscaled path
+                    #region build unscaled path if needed (initial display, values changed after load (invert, filter etc)
                     if ((curChanInfo.Value.ChannelPath == null) || (curChanInfo.Value.ChannelPath.PointCount == 0))
                     {
                         DataChannel curChannel = Logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
@@ -303,7 +278,8 @@ namespace YamuraView
                     {
                         displayScale[0] = (float)chartBounds.Width / ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
                         displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
-                        if(EqualScale)
+                        #region X and Y scales equal, take smallest
+                        if (EqualScale)
                         {
                             if(displayScale[0] < displayScale[1])
                             {
@@ -314,9 +290,12 @@ namespace YamuraView
                                 displayScale[0] = displayScale[1];
                             }
                         }
+                        #endregion
                         displayScale[1] *= -1.0F;
-
                         // translate to lower left corner of display area
+                        Rectangle clipRect = chartBounds;
+                        clipRect.Inflate(2, 2);
+                        chartGraphics.SetClip(clipRect);
                         chartGraphics.TranslateTransform(chartBorder,  (float)chartBounds.Height + chartBorder);
                         // scale to display range in X and Y
                         chartGraphics.ScaleTransform(displayScale[0], displayScale[1]);
@@ -325,7 +304,7 @@ namespace YamuraView
                                                          ChartOwner.ChartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
                                                          -1* yAxis.Value.AxisDisplayRange[0] +
                                                          ChartOwner.ChartAxes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1]);  // offset Y
-                        // set pen width to 0 (1 pixel)
+                        // set pen width to 0 (1 pixel regardless of scaling)
                         pathPen.Width = 0;
                         // draw the path
                         chartGraphics.DrawPath(pathPen, curChanInfo.Value.ChannelPath);
@@ -376,41 +355,8 @@ namespace YamuraView
                         continue;
                     }
                     #endregion
-                    //        #region build unscaled path
-                    //        if ((curChanInfo.Value.ChannelPath == null) || (curChanInfo.Value.ChannelPath.PointCount == 0))
-                    //        {
-                    //            DataChannel curChannel = Logger.runData[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
-                    //            initialValue = true;
-                    //            foreach (KeyValuePair<float, DataPoint> curData in curChannel.DataPoints)
-                    //            {
-                    //                // x axis is time - direct lookup
-                    //                if (XChannelName == "Time")
-                    //                {
-                    //                    points[1] = new PointF (curData.Key, curData.Value.PointValue);
-                    //                }
-                    //                // x axis is not time - find nearest time in axis channel, 
-                    //                else
-                    //                {
-                    //                    DataPoint tst = Logger.runData[curChanInfo.Value.RunIndex].channels[XChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
-                    //                    if (tst == null)
-                    //                    {
-                    //                        continue;
-                    //                    }
-                    //                    points[1] = new PointF(tst.PointValue, curData.Value.PointValue);
-                    //                }
-                    //                if (initialValue)
-                    //                {
-                    //                    initialValue = false;
-                    //                    points[0] = new PointF(points[1].X, points[1].Y);
-                    //                    continue;
-                    //                }
-                    //                curChanInfo.Value.ChannelPath.AddLine(points[0], points[1]);
-                    //                points[0] = new PointF(points[1].X, points[1].Y);
-                    //            }
-                    //        }
-                    //        #endregion
                     #region draw to transformed graphic context
-                    pathPen = new Pen(Color.Black);
+                    pathPen = new Pen(Color.White);
                     using (Graphics chartGraphics = chartPanel.CreateGraphics())
                     {
                         displayScale[0] = (float)chartBounds.Width / ChartOwner.ChartAxes[XChannelName].AxisDisplayRange[2];
@@ -561,11 +507,12 @@ namespace YamuraView
                 axisPoint = ScaleDisplayToData(axisPoint,
                                    displayScale[0],
                                    displayScale[1],
-                                   0.0F,
+                                   ChartOwner.ChartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0] +
+                                   ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0],
                                    0.0F,
                                    chartBounds);
-                axisPoint.X -= (-1 * ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0] +
-                                       ChartOwner.ChartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0]);  // offset X
+                //axisPoint.X -= (-1 * ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0] +
+                //                       ChartOwner.ChartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0]);  // offset X
 
                 moveEventArgs.XAxisValues.Add(channel.Value.RunIndex.ToString() + "-" + channel.Value.ChannelName, axisPoint.X);
             }
@@ -584,8 +531,7 @@ namespace YamuraView
                     axisPoint = ScaleDisplayToData(axisPoint,
                                        displayScale[0],
                                        displayScale[1],
-                                       0.0F,
-                                       0.0F,
+                                       ChartOwner.ChartAxes[xChannelName].AssociatedChannels[channel.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0] + ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0], 0.0F,
                                        chartBounds);
 
                     axisPoint.Y -= (channel.Value.AxisRange[0] +
@@ -595,6 +541,11 @@ namespace YamuraView
                 }
             }
             ChartMouseMoveEvent(this, moveEventArgs);
+
+            YamuraView.UserControls.AxisControlMouseMoveEventArgs axisMoveEventArgs = new UserControls.AxisControlMouseMoveEventArgs();
+            axisMoveEventArgs.XAxisValues.Add(xChannelName, axisPoint.X);
+            axisMoveEventArgs.YAxisValues.Add("none", 0);
+            AxisMouseMoveEvent(this, axisMoveEventArgs);
         }
         /// <summary>
         /// 
@@ -629,10 +580,10 @@ namespace YamuraView
                 ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2] = ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[1] - ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0];
 
 
-                hScrollBar.Minimum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[0];
-                hScrollBar.Maximum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[1];
-                hScrollBar.Value = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0];
-                hScrollBar.LargeChange = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
+                xAxis1.Minimum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[0];
+                xAxis1.Maximum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[1];
+                xAxis1.Value = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0];
+                xAxis1.LargeChange = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
                 startMouseDrag[0] = false;
                 chartPanel.Invalidate();
             }
@@ -655,27 +606,27 @@ namespace YamuraView
         #endregion
 
         #region GDI support
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="color"></param>
-        /// <returns></returns>
-        public static uint RGB(Color color)
-        {
-            uint rgb = (uint)(color.R + (color.G << 8) + (color.B << 16));
-            return rgb;
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="color"></param>
-        /// <returns></returns>
-        public static uint NotRGB(Color color)
-        {
-            uint rgb = (uint)(color.R + (color.G << 8) + (color.B << 16));
-            rgb = ~rgb & 0xFFFFFF;
-            return rgb;
-        }
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="color"></param>
+        ///// <returns></returns>
+        //public static uint RGB(Color color)
+        //{
+        //    uint rgb = (uint)(color.R + (color.G << 8) + (color.B << 16));
+        //    return rgb;
+        //}
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="color"></param>
+        ///// <returns></returns>
+        //public static uint NotRGB(Color color)
+        //{
+        //    uint rgb = (uint)(color.R + (color.G << 8) + (color.B << 16));
+        //    rgb = ~rgb & 0xFFFFFF;
+        //    return rgb;
+        //}
         /// <summary>
         /// 
         /// </summary>
@@ -688,64 +639,64 @@ namespace YamuraView
             lpPoint = IntPtr.Zero;
             using (Graphics drawGraphics = chartPanel.CreateGraphics())
             {
-                //#region create GDI objects
-                //IntPtr hDC = drawGraphics.GetHdc();
-                //IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-                //                                dragZoomPenWidth,
-                //                                NotRGB(Color.Black));
-                //IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.BLACK_BRUSH);
-                //IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-                //IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-                //Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
-                //#endregion
+                #region create GDI objects
+                IntPtr hDC = drawGraphics.GetHdc();
+                IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
+                                                dragZoomPenWidth,
+                                                GDI32.NotRGB(Color.Black));
+                IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.BLACK_BRUSH);
+                IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
+                IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
+                Gdi32.SetROP2(hDC, (int)GDI.DrawMode.R2_XORPEN);
+                #endregion
                 #region crosshairs
                 if (cursorMode == CursorStyle.CROSSHAIRS)
                 {
                     // horizontal line
-                    //Gdi32.MoveToEx(hDC, 0, y, lpPoint);
-                    //Gdi32.LineTo(hDC, chartPanel.Width, y);
-                    //// vertical line
-                    //Gdi32.MoveToEx(hDC, x, chartPanel.Height, lpPoint);
-                    //Gdi32.LineTo(hDC, x, 0);
+                    Gdi32.MoveToEx(hDC, 0, y, lpPoint);
+                    Gdi32.LineTo(hDC, chartPanel.Width, y);
+                    // vertical line
+                    Gdi32.MoveToEx(hDC, x, chartPanel.Height, lpPoint);
+                    Gdi32.LineTo(hDC, x, 0);
                 }
                 #endregion
                 #region box
                 else if (cursorMode == CursorStyle.BOX)
                 {
                     locationBox = new Rectangle(x - (cursorBoxSize / 2), y - (cursorBoxSize / 2), cursorBoxSize, cursorBoxSize);
-                    //Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + cursorBoxSize, locationBox.Top + cursorBoxSize);
+                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + cursorBoxSize, locationBox.Top + cursorBoxSize);
                 }
                 #endregion
                 #region circle
                 else if (cursorMode == CursorStyle.CIRCLE)
                 {
                     locationBox = new Rectangle(x - (cursorBoxSize / 2), y - (cursorBoxSize / 2), cursorBoxSize, cursorBoxSize);
-                    //Gdi32.Ellipse(hDC, locationBox.Left, locationBox.Top, locationBox.Left + cursorBoxSize, locationBox.Top + cursorBoxSize);
+                    Gdi32.Ellipse(hDC, locationBox.Left, locationBox.Top, locationBox.Left + cursorBoxSize, locationBox.Top + cursorBoxSize);
                 }
                 #endregion
                 #region horizontal line
                 else if (cursorMode == CursorStyle.HORIZONTAL)
                 {
                     // horizontal line
-                    //Gdi32.MoveToEx(hDC, 0, y, lpPoint);
-                    //Gdi32.LineTo(hDC, chartPanel.Width, y);
+                    Gdi32.MoveToEx(hDC, 0, y, lpPoint);
+                    Gdi32.LineTo(hDC, chartPanel.Width, y);
                 }
                 #endregion
                 #region vertical line
                 else if (cursorMode == CursorStyle.VERTICAL)
                 {
                     // vertical line
-                    //Gdi32.MoveToEx(hDC, x, 0, lpPoint);
-                    //Gdi32.LineTo(hDC, x, chartPanel.Height);
+                    Gdi32.MoveToEx(hDC, x, 0, lpPoint);
+                    Gdi32.LineTo(hDC, x, chartPanel.Height);
                 }
                 #endregion
-                //#region clean up GDI, reset context
-                //Gdi32.SelectObject(hDC, oldPen);
-                //Gdi32.SelectObject(hDC, oldBrush);
-                //Gdi32.DeleteObject(newPen);
-                //Gdi32.DeleteObject(newBrush);
-                //drawGraphics.ReleaseHdc();
-                //#endregion
+                #region clean up GDI, reset context
+                Gdi32.SelectObject(hDC, oldPen);
+                Gdi32.SelectObject(hDC, oldBrush);
+                Gdi32.DeleteObject(newPen);
+                Gdi32.DeleteObject(newBrush);
+                drawGraphics.ReleaseHdc();
+                #endregion
             }
         }
         /// <summary>
@@ -759,24 +710,24 @@ namespace YamuraView
         {
             using (Graphics drawGraphics = chartPanel.CreateGraphics())
             {
-                //#region create GDI objects
-                //IntPtr hDC = drawGraphics.GetHdc();
-                //IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-                //                                dragZoomPenWidth,
-                //                                NotRGB(Color.Gray));
-                //IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.GRAY_BRUSH);
-                //IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-                //IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-                //Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
-                //#endregion
-                //Gdi32.Rectangle(hDC, fromX, fromY, toX, toY);
-                //#region clean up GDI restore context
-                //Gdi32.SelectObject(hDC, oldPen);
-                //Gdi32.SelectObject(hDC, oldBrush);
-                //Gdi32.DeleteObject(newPen);
-                //Gdi32.DeleteObject(newBrush);
-                //drawGraphics.ReleaseHdc();
-                //#endregion
+                #region create GDI objects
+                IntPtr hDC = drawGraphics.GetHdc();
+                IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
+                                                dragZoomPenWidth,
+                                                GDI32.NotRGB(Color.Gray));
+                IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.GRAY_BRUSH);
+                IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
+                IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
+                Gdi32.SetROP2(hDC, (int)GDI.DrawMode.R2_XORPEN);
+                #endregion
+                Gdi32.Rectangle(hDC, fromX, fromY, toX, toY);
+                #region clean up GDI restore context
+                Gdi32.SelectObject(hDC, oldPen);
+                Gdi32.SelectObject(hDC, oldBrush);
+                Gdi32.DeleteObject(newPen);
+                Gdi32.DeleteObject(newBrush);
+                drawGraphics.ReleaseHdc();
+                #endregion
             }
         }
         #endregion
@@ -812,7 +763,8 @@ namespace YamuraView
         internal PointF ScaleDisplayToData(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
         {
             PointF rPt = new PointF(sourcePt.X, sourcePt.Y);
-            rPt.X = (rPt.X / scaleX) - offsetX;
+            //rPt.X = (rPt.X / scaleX) - offsetX;
+            rPt.X = ((rPt.X - (float)bounds.X) / scaleX) + offsetX;
             rPt.Y = -1.0F * ((rPt.Y - (float)bounds.Height) / scaleY) - offsetY;
             return rPt;
         }
@@ -825,30 +777,27 @@ namespace YamuraView
         {
             Rectangle chartRect = new Rectangle();
             // default shown positions
-            hScrollBar.Height = 17;
-            hScrollBar.Width = Width - 17;
-            hScrollBar.Location = new Point(17, Height - 17);
+            xAxis1.Height = axisThickness;
+            xAxis1.Width = Width - axisThickness;
+            xAxis1.Location = new Point(axisThickness, Height - axisThickness);
 
-            vScrollBar.Height = Height - 17;
-            vScrollBar.Width = 17;
-            vScrollBar.Location = new Point(0, 0);
-
-            chartRect.X = 17;
+            int yAxisHeight = (Height - axisThickness) / yAxes.Count();
+            for (int yAxisIdx = 0; yAxisIdx < yAxes.Count(); yAxisIdx++)
+            {
+                yAxes[yAxisIdx].Height = yAxisHeight;
+                yAxes[yAxisIdx].Width = axisThickness;
+                yAxes[yAxisIdx].Location = new Point(0, yAxisIdx * yAxisHeight);
+                yAxes[yAxisIdx].Visible = showVScroll;
+                yAxes[yAxisIdx].BringToFront();
+                yAxes[yAxisIdx].BackColor = Color.White;
+                this.Controls.Add(yAxes[yAxisIdx]);
+            }
+            chartRect.X = (ShowVScroll ? axisThickness : 0);
             chartRect.Y = 0;
-            chartRect.Width = Width - 17;
-            chartRect.Height = Height - 17;
+            chartRect.Width = Width - (ShowVScroll ? axisThickness : 0);
+            chartRect.Height = Height - (ShowHScroll ? axisThickness : 0);
 
-            if (!showHScroll)
-            {
-                hScrollBar.Visible = false;
-                chartRect.Height = Height;
-            }
-            if (!showVScroll)
-            {
-                vScrollBar.Visible = false;
-                chartRect.X = 0;
-                chartRect.Width = Width;
-            }
+            xAxis1.Visible = showHScroll;
 
             chartPanel.Location = chartRect.Location;
             chartPanel.Width = chartRect.Width;
@@ -982,10 +931,10 @@ namespace YamuraView
         public void OnChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e)
         {
             xChannelName = e.XAxisName;
-            hScrollBar.Minimum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[0];
-            hScrollBar.Maximum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[1];
-            hScrollBar.Value = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0];
-            hScrollBar.LargeChange = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
+            xAxis1.Minimum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[0];
+            xAxis1.Maximum = (int)ChartOwner.ChartAxes[xChannelName].AxisValueRange[1];
+            xAxis1.Value = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[0];
+            xAxis1.LargeChange = (int)ChartOwner.ChartAxes[xChannelName].AxisDisplayRange[2];
             chartPanel.Invalidate();
         }
         public void OnClearGraphicsPath(object sender, EventArgs e)

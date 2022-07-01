@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>YamuraView</RootNamespace>
     <AssemblyName>YamuraView</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -143,9 +143,6 @@
     <Compile Include="ChartControl.Designer.cs">
       <DependentUpon>ChartControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="TriStateTreeView.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="UploadFiles.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -224,6 +221,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\japanese_flag.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UserControls\YamuraControls.csproj">
+      <Project>{582d0701-81bc-4401-9d6a-8562cd35189d}</Project>
+      <Name>YamuraControls</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

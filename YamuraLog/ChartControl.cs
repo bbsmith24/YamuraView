@@ -17,6 +17,7 @@ namespace YamuraView
     public delegate void ChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e);
     public delegate void AxisOffsetUpdate(object sender, AxisOffsetUpdateEventArgs e);
     public delegate void ClearGraphicsPath(object sender, EventArgs e);
+    public delegate void AxisMouseMove(object sender, YamuraView.UserControls.AxisControlMouseMoveEventArgs e);
 
     public partial class ChartControl :  WeifenLuo.WinFormsUI.Docking.DockContent
     {
@@ -32,17 +33,6 @@ namespace YamuraView
             get { return chartType; }
             set { chartType = value; }
         }
-        //DataLogger logger;
-        //public DataLogger Logger
-        //{
-        //    get { return logger; }
-        //    set
-        //    {
-        //        logger = value;
-        //        chartPropertiesForm.Logger = logger;
-        //        chartViewForm.Logger = logger;
-        //    }
-        //}
         public DataLogger Logger
         {
             get { return YamuraView.YamuraViewMain.dataLogger; }
@@ -118,9 +108,6 @@ namespace YamuraView
                 chartPropertiesForm.Text = value + " setup";
             }
         }
-
-        Rectangle chartBounds = new Rectangle(0, 0, 0, 0);
-
         // panel forms
         public ChartView chartViewForm = new ChartView();
         public ChartProperties chartPropertiesForm = new ChartProperties();
@@ -158,10 +145,10 @@ namespace YamuraView
             ChartAxes[chartViewForm.XChannelName].AxisDisplayRange[1] = ChartAxes[chartViewForm.XChannelName].AxisValueRange[1];
             ChartAxes[chartViewForm.XChannelName].AxisDisplayRange[2] = ChartAxes[chartViewForm.XChannelName].AxisValueRange[2];
 
-            chartViewForm.hScrollBar.Minimum = (int)chartAxes[chartViewForm.XChannelName].AxisValueRange[0];
-            chartViewForm.hScrollBar.Maximum = (int)chartAxes[chartViewForm.XChannelName].AxisValueRange[1];
-            chartViewForm.hScrollBar.Value = (int)chartAxes[chartViewForm.XChannelName].AxisDisplayRange[0];
-            chartViewForm.hScrollBar.LargeChange = (int)chartAxes[chartViewForm.XChannelName].AxisDisplayRange[2];
+            chartViewForm.xAxis1.Minimum = (int)chartAxes[chartViewForm.XChannelName].AxisValueRange[0];
+            chartViewForm.xAxis1.Maximum = (int)chartAxes[chartViewForm.XChannelName].AxisValueRange[1];
+            chartViewForm.xAxis1.Value = (int)chartAxes[chartViewForm.XChannelName].AxisDisplayRange[0];
+            chartViewForm.xAxis1.LargeChange = (int)chartAxes[chartViewForm.XChannelName].AxisDisplayRange[2];
 
             chartViewForm.chartPanel.Invalidate();
         }
@@ -180,7 +167,6 @@ namespace YamuraView
             get { return yAxisValues; }
             set { yAxisValues = value; }
         }
-
     }
     public class ChartControlXAxisChangeEventArgs : EventArgs
     {
