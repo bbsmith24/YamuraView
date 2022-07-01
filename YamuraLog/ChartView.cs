@@ -7,8 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GDI;
-using Win32Interop.Methods;
+//using GDI;
+//using Win32Interop.Methods;
 using WeifenLuo.WinFormsUI.Docking;
 using System.Drawing.Drawing2D;
 
@@ -688,64 +688,64 @@ namespace YamuraView
             lpPoint = IntPtr.Zero;
             using (Graphics drawGraphics = chartPanel.CreateGraphics())
             {
-                #region create GDI objects
-                IntPtr hDC = drawGraphics.GetHdc();
-                IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-                                                dragZoomPenWidth,
-                                                NotRGB(Color.Black));
-                IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.BLACK_BRUSH);
-                IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-                IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-                Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
-                #endregion
+                //#region create GDI objects
+                //IntPtr hDC = drawGraphics.GetHdc();
+                //IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
+                //                                dragZoomPenWidth,
+                //                                NotRGB(Color.Black));
+                //IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.BLACK_BRUSH);
+                //IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
+                //IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
+                //Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
+                //#endregion
                 #region crosshairs
                 if (cursorMode == CursorStyle.CROSSHAIRS)
                 {
                     // horizontal line
-                    Gdi32.MoveToEx(hDC, 0, y, lpPoint);
-                    Gdi32.LineTo(hDC, chartPanel.Width, y);
-                    // vertical line
-                    Gdi32.MoveToEx(hDC, x, chartPanel.Height, lpPoint);
-                    Gdi32.LineTo(hDC, x, 0);
+                    //Gdi32.MoveToEx(hDC, 0, y, lpPoint);
+                    //Gdi32.LineTo(hDC, chartPanel.Width, y);
+                    //// vertical line
+                    //Gdi32.MoveToEx(hDC, x, chartPanel.Height, lpPoint);
+                    //Gdi32.LineTo(hDC, x, 0);
                 }
                 #endregion
                 #region box
                 else if (cursorMode == CursorStyle.BOX)
                 {
                     locationBox = new Rectangle(x - (cursorBoxSize / 2), y - (cursorBoxSize / 2), cursorBoxSize, cursorBoxSize);
-                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + cursorBoxSize, locationBox.Top + cursorBoxSize);
+                    //Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + cursorBoxSize, locationBox.Top + cursorBoxSize);
                 }
                 #endregion
                 #region circle
                 else if (cursorMode == CursorStyle.CIRCLE)
                 {
                     locationBox = new Rectangle(x - (cursorBoxSize / 2), y - (cursorBoxSize / 2), cursorBoxSize, cursorBoxSize);
-                    Gdi32.Ellipse(hDC, locationBox.Left, locationBox.Top, locationBox.Left + cursorBoxSize, locationBox.Top + cursorBoxSize);
+                    //Gdi32.Ellipse(hDC, locationBox.Left, locationBox.Top, locationBox.Left + cursorBoxSize, locationBox.Top + cursorBoxSize);
                 }
                 #endregion
                 #region horizontal line
                 else if (cursorMode == CursorStyle.HORIZONTAL)
                 {
                     // horizontal line
-                    Gdi32.MoveToEx(hDC, 0, y, lpPoint);
-                    Gdi32.LineTo(hDC, chartPanel.Width, y);
+                    //Gdi32.MoveToEx(hDC, 0, y, lpPoint);
+                    //Gdi32.LineTo(hDC, chartPanel.Width, y);
                 }
                 #endregion
                 #region vertical line
                 else if (cursorMode == CursorStyle.VERTICAL)
                 {
                     // vertical line
-                    Gdi32.MoveToEx(hDC, x, 0, lpPoint);
-                    Gdi32.LineTo(hDC, x, chartPanel.Height);
+                    //Gdi32.MoveToEx(hDC, x, 0, lpPoint);
+                    //Gdi32.LineTo(hDC, x, chartPanel.Height);
                 }
                 #endregion
-                #region clean up GDI, reset context
-                Gdi32.SelectObject(hDC, oldPen);
-                Gdi32.SelectObject(hDC, oldBrush);
-                Gdi32.DeleteObject(newPen);
-                Gdi32.DeleteObject(newBrush);
-                drawGraphics.ReleaseHdc();
-                #endregion
+                //#region clean up GDI, reset context
+                //Gdi32.SelectObject(hDC, oldPen);
+                //Gdi32.SelectObject(hDC, oldBrush);
+                //Gdi32.DeleteObject(newPen);
+                //Gdi32.DeleteObject(newBrush);
+                //drawGraphics.ReleaseHdc();
+                //#endregion
             }
         }
         /// <summary>
@@ -759,24 +759,24 @@ namespace YamuraView
         {
             using (Graphics drawGraphics = chartPanel.CreateGraphics())
             {
-                #region create GDI objects
-                IntPtr hDC = drawGraphics.GetHdc();
-                IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
-                                                dragZoomPenWidth,
-                                                NotRGB(Color.Gray));
-                IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.GRAY_BRUSH);
-                IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
-                IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
-                Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
-                #endregion
-                Gdi32.Rectangle(hDC, fromX, fromY, toX, toY);
-                #region clean up GDI restore context
-                Gdi32.SelectObject(hDC, oldPen);
-                Gdi32.SelectObject(hDC, oldBrush);
-                Gdi32.DeleteObject(newPen);
-                Gdi32.DeleteObject(newBrush);
-                drawGraphics.ReleaseHdc();
-                #endregion
+                //#region create GDI objects
+                //IntPtr hDC = drawGraphics.GetHdc();
+                //IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
+                //                                dragZoomPenWidth,
+                //                                NotRGB(Color.Gray));
+                //IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.GRAY_BRUSH);
+                //IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
+                //IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
+                //Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
+                //#endregion
+                //Gdi32.Rectangle(hDC, fromX, fromY, toX, toY);
+                //#region clean up GDI restore context
+                //Gdi32.SelectObject(hDC, oldPen);
+                //Gdi32.SelectObject(hDC, oldBrush);
+                //Gdi32.DeleteObject(newPen);
+                //Gdi32.DeleteObject(newBrush);
+                //drawGraphics.ReleaseHdc();
+                //#endregion
             }
         }
         #endregion

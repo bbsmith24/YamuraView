@@ -104,5 +104,9 @@ namespace YamuraView
             runIndex = idx;
             channelName = name;
         }
+        public override string ToString()
+        {
+            return ChannelName + "_" + runIndex.ToString();
+        }
     }
 }

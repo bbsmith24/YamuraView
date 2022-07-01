@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.axisChannelTree = new YamuraView.TriStateTreeView();
             this.channelsContext = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.invertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblAxisMin = new System.Windows.Forms.ToolStripTextBox();
@@ -50,22 +49,11 @@
             this.label4 = new System.Windows.Forms.Label();
             this.txtAutoThreshold = new System.Windows.Forms.TextBox();
             this.btnDoAutoAlign = new System.Windows.Forms.Button();
+            this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
+            this.axisChannelTree = new YamuraView.TriStateTreeView();
             this.channelsContext.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axisOffsetsGrid)).BeginInit();
             this.SuspendLayout();
-            // 
-            // axisChannelTree
-            // 
-            this.axisChannelTree.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.axisChannelTree.ContextMenuStrip = this.channelsContext;
-            this.axisChannelTree.Location = new System.Drawing.Point(12, 175);
-            this.axisChannelTree.Name = "axisChannelTree";
-            this.axisChannelTree.Size = new System.Drawing.Size(348, 209);
-            this.axisChannelTree.TabIndex = 30;
-            this.axisChannelTree.TriStateStyleProperty = YamuraView.TriStateTreeView.TriStateStyles.Standard;
-            this.axisChannelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.axisChannelTree_AfterCheck);
             // 
             // channelsContext
             // 
@@ -90,23 +78,27 @@
             // 
             // lblAxisMin
             // 
+            this.lblAxisMin.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.lblAxisMin.Name = "lblAxisMin";
             this.lblAxisMin.Size = new System.Drawing.Size(100, 23);
             this.lblAxisMin.Text = "Axis Minimum";
             // 
             // txtAxisMinValue
             // 
+            this.txtAxisMinValue.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtAxisMinValue.Name = "txtAxisMinValue";
             this.txtAxisMinValue.Size = new System.Drawing.Size(100, 23);
             // 
             // lblAxisMax
             // 
+            this.lblAxisMax.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.lblAxisMax.Name = "lblAxisMax";
             this.lblAxisMax.Size = new System.Drawing.Size(100, 23);
             this.lblAxisMax.Text = "Axis Maximum";
             // 
             // txtAxisMaxValue
             // 
+            this.txtAxisMaxValue.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtAxisMaxValue.Name = "txtAxisMaxValue";
             this.txtAxisMaxValue.Size = new System.Drawing.Size(100, 23);
             // 
@@ -242,12 +234,39 @@
             this.btnDoAutoAlign.UseVisualStyleBackColor = true;
             this.btnDoAutoAlign.Click += new System.EventHandler(this.btnDoAutoAlign_Click);
             // 
+            // checkedListBox1
+            // 
+            this.checkedListBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.checkedListBox1.CheckOnClick = true;
+            this.checkedListBox1.FormattingEnabled = true;
+            this.checkedListBox1.Location = new System.Drawing.Point(194, 175);
+            this.checkedListBox1.Name = "checkedListBox1";
+            this.checkedListBox1.Size = new System.Drawing.Size(165, 199);
+            this.checkedListBox1.Sorted = true;
+            this.checkedListBox1.TabIndex = 40;
+            this.checkedListBox1.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox1_ItemCheck);
+            // 
+            // axisChannelTree
+            // 
+            this.axisChannelTree.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.axisChannelTree.ContextMenuStrip = this.channelsContext;
+            this.axisChannelTree.Location = new System.Drawing.Point(12, 175);
+            this.axisChannelTree.Name = "axisChannelTree";
+            this.axisChannelTree.Size = new System.Drawing.Size(176, 209);
+            this.axisChannelTree.TabIndex = 30;
+            this.axisChannelTree.TriStateStyleProperty = YamuraView.TriStateTreeView.TriStateStyles.Standard;
+            this.axisChannelTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.axisChannelTree_AfterCheck);
+            // 
             // ChartProperties
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(372, 396);
             this.CloseButton = false;
+            this.Controls.Add(this.checkedListBox1);
             this.Controls.Add(this.btnDoAutoAlign);
             this.Controls.Add(this.txtAutoThreshold);
             this.Controls.Add(this.label4);
@@ -291,5 +310,6 @@
         private System.Windows.Forms.TextBox txtAutoThreshold;
         private System.Windows.Forms.Button btnDoAutoAlign;
         private System.Windows.Forms.ToolStripMenuItem invertToolStripMenuItem;
+        public System.Windows.Forms.CheckedListBox checkedListBox1;
     }
 }

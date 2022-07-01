@@ -1,0 +1,13 @@
+# ignore anything in DEBUG or RELEASE folders
+Debug
+Release
+# Visual Studio files that don't need to be included
+*.vspx
+*.press
+.suo
+*.suo
+
+.vs/YamuraView/v16/Server/sqlite3/db.lock
+.vs/YamuraView/v16/Server/sqlite3/storage.ide
+.vs/YamuraView/v16/Server/sqlite3/storage.ide-shm
+.vs/YamuraView/v16/Server/sqlite3/storage.ide-wal

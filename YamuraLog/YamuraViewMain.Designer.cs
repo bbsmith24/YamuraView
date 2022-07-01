@@ -54,14 +54,14 @@
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
-            this.runDataContext = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.fileInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addStripchart = new System.Windows.Forms.ToolStripMenuItem();
             this.addTractionCircle = new System.Windows.Forms.ToolStripMenuItem();
             this.addTrackMap = new System.Windows.Forms.ToolStripMenuItem();
+            this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
+            this.runDataContext = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.fileInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.runDataContext.SuspendLayout();
@@ -94,6 +94,7 @@
             this.colRunNumber.HeaderText = "Run";
             this.colRunNumber.Name = "colRunNumber";
             this.colRunNumber.ReadOnly = true;
+            this.colRunNumber.Width = 52;
             // 
             // colDate
             // 
@@ -101,6 +102,7 @@
             this.colDate.HeaderText = "Date/Time";
             this.colDate.Name = "colDate";
             this.colDate.ReadOnly = true;
+            this.colDate.Width = 83;
             // 
             // colMinTime
             // 
@@ -108,6 +110,7 @@
             this.colMinTime.HeaderText = "Start";
             this.colMinTime.Name = "colMinTime";
             this.colMinTime.ReadOnly = true;
+            this.colMinTime.Width = 54;
             // 
             // colMaxTime
             // 
@@ -115,6 +118,7 @@
             this.colMaxTime.HeaderText = "End";
             this.colMaxTime.Name = "colMaxTime";
             this.colMaxTime.ReadOnly = true;
+            this.colMaxTime.Width = 51;
             // 
             // colSourceFile
             // 
@@ -192,58 +196,89 @@
             // addRunsMenuItem
             // 
             this.addRunsMenuItem.Name = "addRunsMenuItem";
-            this.addRunsMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.addRunsMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addRunsMenuItem.Text = "Add Runs";
             this.addRunsMenuItem.Click += new System.EventHandler(this.addRunsMenuItem_Click);
             // 
             // clearRunsMenuItem
             // 
             this.clearRunsMenuItem.Name = "clearRunsMenuItem";
-            this.clearRunsMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.clearRunsMenuItem.Size = new System.Drawing.Size(180, 22);
             this.clearRunsMenuItem.Text = "Clear Runs";
             this.clearRunsMenuItem.Click += new System.EventHandler(this.clearRunsMenuItem_Click);
             // 
             // loggerToolStripMenuItem
             // 
             this.loggerToolStripMenuItem.Name = "loggerToolStripMenuItem";
-            this.loggerToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.loggerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.loggerToolStripMenuItem.Text = "Logger";
             this.loggerToolStripMenuItem.Click += new System.EventHandler(this.loggerToolStripMenuItem_Click);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(161, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
             // 
             // openWorkspaceToolStripMenuItem
             // 
             this.openWorkspaceToolStripMenuItem.Name = "openWorkspaceToolStripMenuItem";
-            this.openWorkspaceToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.openWorkspaceToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openWorkspaceToolStripMenuItem.Text = "Open Workspace";
             // 
             // saveWorkspaceToolStripMenuItem
             // 
             this.saveWorkspaceToolStripMenuItem.Name = "saveWorkspaceToolStripMenuItem";
-            this.saveWorkspaceToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.saveWorkspaceToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveWorkspaceToolStripMenuItem.Text = "Save Workspace";
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(161, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
             // 
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.settingsToolStripMenuItem.Text = "Settings";
             // 
             // exitMenuItem
             // 
             this.exitMenuItem.Name = "exitMenuItem";
-            this.exitMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.exitMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitMenuItem.Text = "Exit";
             this.exitMenuItem.Click += new System.EventHandler(this.exitMenuItem_Click);
+            // 
+            // addChartToolStripMenuItem
+            // 
+            this.addChartToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addStripchart,
+            this.addTractionCircle,
+            this.addTrackMap});
+            this.addChartToolStripMenuItem.Name = "addChartToolStripMenuItem";
+            this.addChartToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addChartToolStripMenuItem.Text = "Add Chart";
+            // 
+            // addStripchart
+            // 
+            this.addStripchart.Name = "addStripchart";
+            this.addStripchart.Size = new System.Drawing.Size(149, 22);
+            this.addStripchart.Text = "Stripchart";
+            this.addStripchart.Click += new System.EventHandler(this.addStripchart_Click);
+            // 
+            // addTractionCircle
+            // 
+            this.addTractionCircle.Name = "addTractionCircle";
+            this.addTractionCircle.Size = new System.Drawing.Size(149, 22);
+            this.addTractionCircle.Text = "Traction Circle";
+            this.addTractionCircle.Click += new System.EventHandler(this.addTractionCircle_Click);
+            // 
+            // addTrackMap
+            // 
+            this.addTrackMap.Name = "addTrackMap";
+            this.addTrackMap.Size = new System.Drawing.Size(149, 22);
+            this.addTrackMap.Text = "Track Map";
+            this.addTrackMap.Click += new System.EventHandler(this.addTrackMap_Click);
             // 
             // dockPanel1
             // 
@@ -261,52 +296,21 @@
             this.fileInfoToolStripMenuItem,
             this.exportFileToolStripMenuItem});
             this.runDataContext.Name = "runDataContext";
-            this.runDataContext.Size = new System.Drawing.Size(129, 48);
+            this.runDataContext.Size = new System.Drawing.Size(130, 48);
             // 
             // fileInfoToolStripMenuItem
             // 
             this.fileInfoToolStripMenuItem.Name = "fileInfoToolStripMenuItem";
-            this.fileInfoToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.fileInfoToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.fileInfoToolStripMenuItem.Text = "File Info";
             this.fileInfoToolStripMenuItem.Click += new System.EventHandler(this.fileInfoToolStripMenuItem_Click);
             // 
             // exportFileToolStripMenuItem
             // 
             this.exportFileToolStripMenuItem.Name = "exportFileToolStripMenuItem";
-            this.exportFileToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.exportFileToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.exportFileToolStripMenuItem.Text = "Export File";
             this.exportFileToolStripMenuItem.Click += new System.EventHandler(this.exportFileToolStripMenuItem_Click);
-            // 
-            // addChartToolStripMenuItem
-            // 
-            this.addChartToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addStripchart,
-            this.addTractionCircle,
-            this.addTrackMap});
-            this.addChartToolStripMenuItem.Name = "addChartToolStripMenuItem";
-            this.addChartToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
-            this.addChartToolStripMenuItem.Text = "Add Chart";
-            // 
-            // addStripchart
-            // 
-            this.addStripchart.Name = "addStripchart";
-            this.addStripchart.Size = new System.Drawing.Size(152, 22);
-            this.addStripchart.Text = "Stripchart";
-            this.addStripchart.Click += new System.EventHandler(this.addStripchart_Click);
-            // 
-            // addTractionCircle
-            // 
-            this.addTractionCircle.Name = "addTractionCircle";
-            this.addTractionCircle.Size = new System.Drawing.Size(152, 22);
-            this.addTractionCircle.Text = "Traction Circle";
-            this.addTractionCircle.Click += new System.EventHandler(this.addTractionCircle_Click);
-            // 
-            // addTrackMap
-            // 
-            this.addTrackMap.Name = "addTrackMap";
-            this.addTrackMap.Size = new System.Drawing.Size(152, 22);
-            this.addTrackMap.Text = "Track Map";
-            this.addTrackMap.Click += new System.EventHandler(this.addTrackMap_Click);
             // 
             // YamuraViewMain
             // 
@@ -320,7 +324,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "YamuraViewMain";
-            this.Text = "Team Yamura Data Viewer";
+            this.Text = "YamuraLog Data Viewer";
             ((System.ComponentModel.ISupportInitialize)(this.runDataGrid)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();

@@ -49,7 +49,7 @@
             // 
             // chartPanel
             // 
-            this.chartPanel.BackColor = System.Drawing.Color.White;
+            this.chartPanel.BackColor = System.Drawing.Color.Black;
             this.chartPanel.Location = new System.Drawing.Point(82, 12);
             this.chartPanel.Name = "chartPanel";
             this.chartPanel.Size = new System.Drawing.Size(200, 100);

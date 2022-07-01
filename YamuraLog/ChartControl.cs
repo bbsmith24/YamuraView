@@ -1,15 +1,15 @@
-﻿using System;
+﻿using GDI;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GDI;
-using Win32Interop.Methods;
 using WeifenLuo.WinFormsUI.Docking;
+using Win32Interop.Methods;
 
 namespace YamuraView
 {
@@ -59,12 +59,22 @@ namespace YamuraView
                 {
                     return;
                 }
+                chartPropertiesForm.checkedListBox1.Items.Clear();
                 chartPropertiesForm.AxisChannelTree.Nodes.Clear();
                 chartPropertiesForm.CmbXAxis.Items.Clear();
                 chartPropertiesForm.CmbAlignAxis.Items.Clear();
                 chartPropertiesForm.TxtAutoThreshold.Text = "0.0";
                 foreach (KeyValuePair<String, Axis> curAxis in chartAxes)
                 {
+                    //int curRun = YamuraView.YamuraViewMain.dataLogger.runData.Count - 1;
+                    //chartPropertiesForm.checkedListBox1.Items.Add(curAxis.Key + "_" + YamuraView.YamuraViewMain.dataLogger.runData[curRun].fileName);
+                    foreach (KeyValuePair<String, ChannelInfo> associatedChannel in curAxis.Value.AssociatedChannels)
+                    {
+                        chartPropertiesForm.checkedListBox1.Items.Add(associatedChannel.Value);
+                    }
+
+
+
                     chartPropertiesForm.CmbXAxis.Items.Add(curAxis.Key);
                     chartPropertiesForm.CmbAlignAxis.Items.Add(curAxis.Key);
 

@@ -504,6 +504,13 @@ namespace YamuraView
             UpdateData();
         }
         /// <summary>
+        /// YamuraLog V5 with CAN ids as identifiers
+        /// </summary>
+        /// <param name="fileName"></param>
+        private void ReadYL5File(String fileName)
+        {
+        }
+        /// <summary>
         /// very specific NMEA parser for the output from Sparkfun QWIIC GPS breakout
         /// see the Titan datasheet for more info
         /// 
@@ -972,6 +979,11 @@ namespace YamuraView
                 else if (fileName.EndsWith("YLG", StringComparison.CurrentCultureIgnoreCase))
                 {
                     ReadYLGFile(fileName);
+                }
+                // v5 logger with CAN message id as identifiers
+                else if (fileName.EndsWith("YL5", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    ReadYL5File(fileName);
                 }
             }
             for (int chartIdx = 0; chartIdx < chartControls.Count; chartIdx++)

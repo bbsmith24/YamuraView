@@ -369,6 +369,28 @@ namespace YamuraView
         }
         #endregion
 
+        private void checkedListBox1_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+
+            string channelName = (checkedListBox1.Items[e.Index] as ChannelInfo).ChannelName;
+            int runIdx = (checkedListBox1.Items[e.Index] as ChannelInfo).RunIndex;
+            string runName = Logger.runData[runIdx].fileName;
+            //            string parentName = (checkedListBox1.Items[e.Index] as ChannelInfo).;
+            // axis
+            //if (e.Node.Parent == null)
+            //{
+            //    ChartOwner.ChartAxes[e.Node.Name].ShowAxis = e.Node.Checked;
+            //}
+            // channel
+            //else
+            //{
+            //    ChartOwner.ChartAxes[e.Node.Parent.Name].AssociatedChannels[e.Node.Text].ShowChannel = e.Node.Checked;
+            //    ChartOwner.ChartAxes[e.Node.Parent.Name].ShowAxis = e.Node.Checked == true ? true : ChartOwner.ChartAxes[e.Node.Parent.Name].ShowAxis;
+            //}
+            ChartOwner.ChartAxes[channelName].AssociatedChannels.ElementAt(runIdx).Value.ShowChannel = (e.NewValue == CheckState.Checked);
+            ChartOwner.ChartAxes[channelName].ShowAxis = e.NewValue == CheckState.Checked ? true : ChartOwner.ChartAxes[channelName].ShowAxis;
+
+        }
     }
     public class AxisOffsetUpdateEventArgs : EventArgs
     {
